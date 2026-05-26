@@ -1,0 +1,116 @@
+services:
+  # =============================================
+  # 🖥️ FRONTEND (React + Vite + Nginx)
+  # =============================================
+  frontend:
+    build: ./src/frontend
+    container_name: frontend
+    user: "1001:1001" 
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:3000
+    depends_on:
+      - backend
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
+  # =============================================
+  # 📦 BACKEND (Node + Express + Prisma)
+  # =============================================
+  backend:
+    build: ./src/backend
+    container_name: backend
+    user: "1001:1001" 
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/chessguard
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./src/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
+  # =============================================
+  # 🗃️ DATABASE (PostgreSQL)
+  # =============================================
+  db:
+    image: postgres:15
+    container_name: chessguard-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-chessguard}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
+  # =============================================
+  # 🔧 OUTILS (Optionnels)
+  # =============================================
+  portainer:
+    image: portainer/portainer-ce:2.39.1
+    container_name: portainer
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:9.15
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
+# =============================================
+# 💾 VOLUMES
+# =============================================
+volumes:
+  postgres_data:
+  portainer_data:
+
+# =============================================
+# 🌐 NETWORK
+# =============================================
+networks:
+  chessguard_network:
+    name: chessguard_network
+    driver: bridge

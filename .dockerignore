@@ -1,0 +1,25 @@
+# Backend & Frontend
+node_modules
+npm-debug.log
+dist
+.env
+.env.*
+.DS_Store
+*.log
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts
+*.tar.gz
+*.zip
