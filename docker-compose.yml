@@ -16,6 +16,20 @@ services:
       - chessguard_network
     restart: unless-stopped
 
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./src/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
   # =============================================
   # 📦 BACKEND (Node + Express + Prisma)
   # =============================================
@@ -30,20 +44,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - chessguard_network
-    restart: unless-stopped
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./src/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - frontend
-      - backend
     networks:
       - chessguard_network
     restart: unless-stopped
@@ -87,18 +87,24 @@ services:
     restart: unless-stopped
 
   pgadmin:
-    image: dpage/pgadmin4:9.15
-    container_name: pgadmin
+    image: dpage/pgadmin4
+    container_name: chessguard-pgadmin
+    restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_DEFAULT_EMAIL: admin@chessguard.com
+      PGADMIN_DEFAULT_PASSWORD: admin_password
+      # Optionnel : Associe le mot de passe à l'utilisateur de la DB pour l'auto-connexion
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+    volumes:
+      # Injecte la configuration des serveurs au lancement
+      - ./src/pgadmin/servers.json:/pgadmin4/servers.json:ro
     ports:
       - "5050:80"
-    depends_on:
-      - db
     networks:
       - chessguard_network
-    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
 
 # =============================================
 # 💾 VOLUMES
