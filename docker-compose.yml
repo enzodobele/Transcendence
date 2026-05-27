@@ -5,16 +5,23 @@ services:
   frontend:
     build: ./src/frontend
     container_name: frontend
-    user: "1001:1001" 
     expose:
       - "5173"
-    environment:
-      - VITE_API_URL=/api
-    depends_on:
-      - backend
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm run dev -- --host 0.0.0.0 --port 5173
     networks:
       - chessguard_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5173"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
+
 
   nginx:
     image: nginx:alpine
@@ -25,10 +32,18 @@ services:
     volumes:
       - ./src/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - frontend
-      - backend
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
     networks:
       - chessguard_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-check-certificate", "-qO-", "https://127.0.0.1:443"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
 
   # =============================================
@@ -47,6 +62,12 @@ services:
         condition: service_healthy
     networks:
       - chessguard_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
 
   # =============================================
@@ -88,7 +109,6 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: chessguard-pgadmin
-    restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@chessguard.com
       PGADMIN_DEFAULT_PASSWORD: admin_password
@@ -104,6 +124,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    
 
 # =============================================
 # 💾 VOLUMES

@@ -3,9 +3,19 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  root: '.',  // Racine du projet (où se trouve index.html)
+
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+
+    hmr: {
+      host: 'localhost',
+    },
+  },
+
   build: {
-    outDir: 'dist',  // Dossier de sortie
-    emptyOutDir: true,  // Nettoie le dossier dist avant le build
+    outDir: 'dist',
+    emptyOutDir: true,
   },
 });
