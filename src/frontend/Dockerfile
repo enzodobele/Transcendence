@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 # 1. Crée le dossier cible à la racine pendant le build (en tant que root)
 # et donne les droits totaux d'écriture
