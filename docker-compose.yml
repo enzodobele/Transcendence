@@ -22,6 +22,9 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  # =============================================
+  # 🌐 NGINX (Reverse Proxy)
+  # =============================================
   nginx:
     image: nginx:alpine
     build: ./src/nginx
@@ -29,7 +32,6 @@ services:
     ports:
       - "443:443"
     volumes:
-      # - ./src/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./src/nginx/html:/usr/share/nginx/html
     depends_on:
       frontend:
@@ -56,16 +58,19 @@ services:
       - "3000"
     secrets:
       - db_password
+      - db_user
+      - db_name
     environment:
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-    depends_on:
-      db:
-        condition: service_healthy
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     networks:
       - chessguard_network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:3000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -81,15 +86,17 @@ services:
     expose:
       - "5432"
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_DB_FILE: /run/secrets/db_name
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
     secrets:
       - db_password
+      - db_user
+      - db_name
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/db_user) -d $(cat /run/secrets/db_name)"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -108,6 +115,7 @@ services:
       - portainer_data:/data
     secrets:
       - portainer_password
+
     command: --admin-password-file=/run/secrets/portainer_password
     networks:
       - chessguard_network
@@ -117,13 +125,13 @@ services:
     image: dpage/pgadmin4
     container_name: pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_EMAIL_FILE: /run/secrets/pgadmin_email
       PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
       PGADMIN_CONFIG_SERVER_MODE: "True"
     secrets:
       - pgadmin_password
+      - pgadmin_email
     volumes:
-      # Injecte la configuration des serveurs au lancement
       - ./src/pgadmin/servers.json:/pgadmin4/servers.json:ro
     networks:
       - chessguard_network
@@ -137,7 +145,6 @@ services:
       retries: 3
       start_period: 20s
     restart: unless-stopped
-    
 
 # =============================================
 # 💾 VOLUMES
@@ -154,10 +161,19 @@ networks:
     name: chessguard_network
     driver: bridge
 
+# =============================================
+# 🔐 SECRETS
+# =============================================
 secrets:
-  portainer_password:
-    file: src/secrets/portainer_password.txt
-  pgadmin_password:
-    file: src/secrets/pgadmin_password.txt
+  db_user:
+    file: src/secrets/db_user.txt
+  db_name:
+    file: src/secrets/db_name.txt
   db_password:
     file: src/secrets/db_password.txt
+  portainer_password:
+    file: src/secrets/portainer_password.txt
+  pgadmin_email:
+    file: src/secrets/pgadmin_email.txt
+  pgadmin_password:
+    file: src/secrets/pgadmin_password.txt

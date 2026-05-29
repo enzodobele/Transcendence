@@ -3,7 +3,10 @@
 # =============================================
 
 NAME = chessguard
-COMPOSE = docker compose -f docker-compose.yml -p $(NAME)
+
+DOCKER_COMPOSE := $(shell command -v docker-compose 2>/dev/null || echo "docker compose")
+
+COMPOSE = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)
 
 .PHONY: up down build rebuild logs ps clean fclean \
         db-push db-studio db-migrate shell-back shell-front

@@ -30,9 +30,13 @@ mkdir -p "$SECRETS_DIR"
 # generate_password > "$SECRETS_DIR/pgadmin_password.txt"
 
 #### For development
-echo "p" > "$SECRETS_DIR/db_password.txt"
-echo "p" > "$SECRETS_DIR/portainer_password.txt"
-echo "p" > "$SECRETS_DIR/pgadmin_password.txt"
+printf "p" > "$SECRETS_DIR/db_password.txt"
+printf "p" > "$SECRETS_DIR/portainer_password.txt"
+printf "p" > "$SECRETS_DIR/pgadmin_password.txt"
+
+printf "chessguard" > "$SECRETS_DIR/db_name.txt"
+printf "postgres" > "$SECRETS_DIR/db_user.txt"
+printf "admin@example.com" > "$SECRETS_DIR/pgadmin_email.txt"
 
 # Restrictive permissions (read/write for owner only)
 chmod 600 "$SECRETS_DIR"/*.txt

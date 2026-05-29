@@ -22,7 +22,7 @@ RUN npm run db:generate
 # =========================
 # STAGE 2: Runtime
 # =========================
-FROM node:18-alpine
+FROM node:20-alpine
 
 RUN apk add --no-cache wget postgresql-client
 
@@ -44,6 +44,8 @@ RUN npm install -g prisma
 # Copie du script d'entrée
 COPY --chown=nodejs:nodejs entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
+
 
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 
