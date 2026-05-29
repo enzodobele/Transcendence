@@ -24,7 +24,7 @@ build:
 rebuild:
 	@$(COMPOSE) up -d --build
 
-restart: down rebuild
+re: down rebuild up
 
 logs:
 	@$(COMPOSE) logs -f

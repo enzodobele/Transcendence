@@ -1,7 +1,7 @@
 # =========================
 # STAGE 1: Build
 # =========================
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Crée un utilisateur avec ton UID/GID local
 RUN addgroup -g 1001 -S nodejs && \
@@ -24,7 +24,7 @@ RUN npm run db:generate
 # =========================
 FROM node:18-alpine
 
-RUN apk add --no-cache wget
+RUN apk add --no-cache wget postgresql-client
 
 # Crée le même utilisateur
 RUN addgroup -g 1001 -S nodejs && \
@@ -49,8 +49,6 @@ ENV NPM_CONFIG_CACHE=/tmp/.npm
 
 EXPOSE 3000
 
-# Passe à l'utilisateur non-root
-USER nodejs
-
+USER root
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["node", "src/app.js"]

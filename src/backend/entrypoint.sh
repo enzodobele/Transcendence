@@ -1,14 +1,14 @@
 #!/bin/sh
+set -e
 
-# Attend que la DB soit prête
-echo "Waiting for database to be ready..."
-while ! nc -z db 5432; do
-  sleep 1
-done
+export DB_PASSWORD=$(cat /run/secrets/db_password)
+export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}"
 
-# Applique les migrations Prisma (sans toucher à node_modules)
+echo "Waiting for database..."
+timeout 30s sh -c 'until pg_isready -h db -p 5432 -U "$DB_USER"; do sleep 1; done'
+
 echo "Applying Prisma migrations..."
-npx prisma db push --skip-generate  # <-- Évite de régénérer le client
+npx prisma migrate deploy || { echo "Migration failed"; exit 1; }
 
-# Lance l'application
-exec "$@"
+echo "Starting backend..."
+su nodejs -c "$@"
