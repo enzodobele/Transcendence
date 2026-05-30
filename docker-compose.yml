@@ -1,0 +1,181 @@
+services:
+  # =============================================
+  # 🖥️ FRONTEND (React + Vite + Nginx)
+  # =============================================
+  frontend:
+    build: ./src/frontend
+    container_name: frontend
+    expose:
+      - "5173"
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    networks:
+      - chessguard_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5173"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # =============================================
+  # 🌐 NGINX (Reverse Proxy)
+  # =============================================
+  nginx:
+    image: nginx:alpine
+    build: ./src/nginx
+    container_name: nginx
+    ports:
+      - "443:443"
+    volumes:
+      - ./src/nginx/html:/usr/share/nginx/html
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - chessguard_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-check-certificate", "-qO-", "https://127.0.0.1:443"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # =============================================
+  # 📦 BACKEND (Node + Express + Prisma)
+  # =============================================
+  backend:
+    build: ./src/backend
+    container_name: backend
+    expose:
+      - "3000"
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+    environment:
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+    user: "nodejs"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # =============================================
+  # 🗃️ DATABASE (PostgreSQL)
+  # =============================================
+  db:
+    image: postgres:16
+    container_name: chessguard-db
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_DB_FILE: /run/secrets/db_name
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
+  # =============================================
+  # 🔧 OUTILS (Optionnels)
+  # =============================================
+  portainer:
+    image: portainer/portainer-ce:2.39.1
+    container_name: portainer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    secrets:
+      - portainer_password
+
+    command: --admin-password-file=/run/secrets/portainer_password
+    networks:
+      - chessguard_network
+    restart: unless-stopped
+
+  pgadmin:
+    # image: dpage/pgadmin4:9.15.0
+    build: ./src/pgadmin
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+    secrets:
+      - pgadmin_password
+      - pgadmin_email
+    volumes:
+      - ./src/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - chessguard_network
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    # restart: unless-stopped
+
+# =============================================
+# 💾 VOLUMES
+# =============================================
+volumes:
+  postgres_data:
+  portainer_data:
+
+# =============================================
+# 🌐 NETWORK
+# =============================================
+networks:
+  chessguard_network:
+    name: chessguard_network
+    driver: bridge
+
+# =============================================
+# 🔐 SECRETS
+# =============================================
+secrets:
+  db_user:
+    file: src/secrets/db_user.txt
+  db_name:
+    file: src/secrets/db_name.txt
+  db_password:
+    file: src/secrets/db_password.txt
+  portainer_password:
+    file: src/secrets/portainer_password.txt
+  pgadmin_email:
+    file: src/secrets/pgadmin_email.txt
+  pgadmin_password:
+    file: src/secrets/pgadmin_password.txt
