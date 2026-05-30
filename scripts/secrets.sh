@@ -30,17 +30,36 @@ mkdir -p "$SECRETS_DIR"
 # generate_password > "$SECRETS_DIR/pgadmin_password.txt"
 
 #### For development
-printf "p" > "$SECRETS_DIR/db_password.txt"
-printf "p" > "$SECRETS_DIR/portainer_password.txt"
-printf "p" > "$SECRETS_DIR/pgadmin_password.txt"
-
-printf "chessguard" > "$SECRETS_DIR/db_name.txt"
+# Génère les secrets pour la base de données (sans saut de ligne)
 printf "postgres" > "$SECRETS_DIR/db_user.txt"
-printf "admin@example.com" > "$SECRETS_DIR/pgadmin_email.txt"
+printf "chessguard" > "$SECRETS_DIR/db_name.txt"
+printf "p" > "$SECRETS_DIR/db_password.txt"
 
-# Restrictive permissions (read/write for owner only)
-chmod 600 "$SECRETS_DIR"/*.txt
-# Directory access permission
-chmod 700 "$SECRETS_DIR"
+# Génère les secrets pour PGAdmin
+printf "admin@example.com" > "$SECRETS_DIR/pgadmin_email.txt"
+printf "admin" > "$SECRETS_DIR/pgadmin_password.txt"
+
+# Génère les secrets pour Portainer
+printf "admin123456789" > "$SECRETS_DIR/portainer_password.txt"
+
+# =============================================
+# 🔐 Applique les permissions correctes
+# =============================================
+# Change le groupe des fichiers pour le groupe 1001 (celui de nodejs dans Docker)
+sudo chgrp 1001 "$SECRETS_DIR"/*.txt 2>/dev/null || chgrp 1001 "$SECRETS_DIR"/*.txt
+
+# Permissions : lecture/écriture pour le propriétaire, lecture pour le groupe
+chmod 640 "$SECRETS_DIR"/*.txt
+
+# Permissions du dossier : accès complet pour le propriétaire, lecture/exécution pour le groupe
+chmod 750 "$SECRETS_DIR"
+
+# permissions pour pgadmin secrets
+sudo chgrp 0 "$SECRETS_DIR/pgadmin_email.txt"
+sudo chgrp 0 "$SECRETS_DIR/pgadmin_password.txt"
+
+chmod 640 "$SECRETS_DIR/pgadmin_email.txt"
+chmod 640 "$SECRETS_DIR/pgadmin_password.txt"
 
 echo -e "${GREEN}✅ Done. Secure secrets generated in: $SECRETS_DIR${NC}"
+echo -e "Permissions set to 640 for files and 750 for directory, group 1001."

@@ -64,13 +64,14 @@ services:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name
       DB_PASSWORD_FILE: /run/secrets/db_password
-    # depends_on:
-    #   db:
-    #     condition: service_healthy
+    user: "nodejs"
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - chessguard_network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:3000/health || exit 1"]
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -81,7 +82,7 @@ services:
   # 🗃️ DATABASE (PostgreSQL)
   # =============================================
   db:
-    image: postgres:15
+    image: postgres:16
     container_name: chessguard-db
     expose:
       - "5432"
@@ -96,7 +97,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/db_user) -d $(cat /run/secrets/db_name)"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -122,10 +123,11 @@ services:
     restart: unless-stopped
 
   pgadmin:
-    image: dpage/pgadmin4
+    # image: dpage/pgadmin4:9.15.0
+    build: ./src/pgadmin
     container_name: pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL_FILE: /run/secrets/pgadmin_email
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
       PGADMIN_CONFIG_SERVER_MODE: "True"
     secrets:
@@ -144,7 +146,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
-    restart: unless-stopped
+    # restart: unless-stopped
 
 # =============================================
 # 💾 VOLUMES
