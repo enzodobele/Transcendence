@@ -25,7 +25,7 @@ down:
 	@$(COMPOSE) down $(SERVICE)
 
 # si changements dans Docker ou Dockerfile, sinon pas besoin de rebuild
-rebuild:
+rebuild: down
 	@$(COMPOSE) up -d --build $(SERVICE)
 
 # si changement de config/.env. Pour les sources de backend et frontend, c'est géré par node.

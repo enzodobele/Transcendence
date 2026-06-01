@@ -58,4 +58,4 @@ USER nodejs
 EXPOSE 3000
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["node", "src/app.js"]
+CMD ["npm", "run", "dev"]

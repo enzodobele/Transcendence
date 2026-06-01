@@ -54,28 +54,39 @@ services:
   backend:
     build: ./src/backend
     container_name: backend
-    expose:
-      - "3000"
-    secrets:
-      - db_password
-      - db_user
-      - db_name
+
+    user: "nodejs"
+
+    volumes:
+      - ./src/backend:/app
+      - /app/node_modules
+
     environment:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name
       DB_PASSWORD_FILE: /run/secrets/db_password
-    user: "nodejs"
+
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+
     depends_on:
       db:
         condition: service_healthy
+
     networks:
       - chessguard_network
+
+    command: npm run dev
+
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+
     restart: unless-stopped
 
   # =============================================
@@ -147,6 +158,17 @@ services:
       retries: 3
       start_period: 20s
     # restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    environment:
+      MP_BASE_URL: /mailpit
+    ports:
+      - "8025:8025"
+    networks:
+      - chessguard_network
+    restart: unless-stopped
 
 # =============================================
 # 💾 VOLUMES
