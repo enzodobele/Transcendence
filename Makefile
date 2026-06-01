@@ -36,7 +36,7 @@ logs:
 	@$(COMPOSE) logs -f $(SERVICE)
 
 ps:
-	@$(COMPOSE) ps
+	@$(COMPOSE) ps --format 'table {{.Name}}\t{{.State}}\t{{.Status}}\t{{.Ports}}'
 
 exec:
 	@$(COMPOSE) exec $(SERVICE) sh
