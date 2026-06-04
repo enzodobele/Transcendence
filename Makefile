@@ -22,7 +22,7 @@ up:
 	@$(COMPOSE) up -d $(SERVICE)
 
 down:
-	@$(COMPOSE) down $(SERVICE)
+	@$(COMPOSE) down $(SERVICE) -v
 
 # si changements dans Docker ou Dockerfile, sinon pas besoin de rebuild
 rebuild: down

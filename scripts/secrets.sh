@@ -36,11 +36,13 @@ printf "chessguard" > "$SECRETS_DIR/db_name.txt"
 printf "p" > "$SECRETS_DIR/db_password.txt"
 
 # Génère les secrets pour PGAdmin
-printf "admin@example.com" > "$SECRETS_DIR/pgadmin_email.txt"
 printf "admin" > "$SECRETS_DIR/pgadmin_password.txt"
 
 # Génère les secrets pour Portainer
 printf "admin123456789" > "$SECRETS_DIR/portainer_password.txt"
+
+# Génère le JWT_SECRET pour l'authentification
+printf "my_super_secret_jwt_key" > "$SECRETS_DIR/jwt_secret.txt"
 
 # =============================================
 # 🔐 Applique les permissions correctes
@@ -55,11 +57,9 @@ chmod 640 "$SECRETS_DIR"/*.txt
 chmod 750 "$SECRETS_DIR"
 
 # permissions pour pgadmin secrets
-sudo chgrp 0 "$SECRETS_DIR/pgadmin_email.txt"
 sudo chgrp 0 "$SECRETS_DIR/pgadmin_password.txt"
-
-chmod 640 "$SECRETS_DIR/pgadmin_email.txt"
 chmod 640 "$SECRETS_DIR/pgadmin_password.txt"
+
 
 echo -e "${GREEN}✅ Done. Secure secrets generated in: $SECRETS_DIR${NC}"
 echo -e "Permissions set to 640 for files and 750 for directory, group 1001."
