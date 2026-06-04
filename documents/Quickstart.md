@@ -46,3 +46,7 @@ Les commandes make down et make clean intègrent le flag -v pour détruire syst�
 
 make exec : Permet d'ouvrir rapidement un shell dans le conteneur ciblé
 (ex: make exec SERVICE=backend).
+
+# Node
+si vous devez ajouter des dépendances dans le back ou le front.
+Si vous codez en faisant tourner le réseau docker, pensez à faire vos npm install depuis le bon répertoire et pas depuis la racine.
