@@ -7,18 +7,33 @@ const prisma = new PrismaClient();
 export const register = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
 
+  // Validation basique
+  if (!email || !username || !password) {
+    return res.status(400).json({ error: "Tous les champs sont obligatoires." });
+  }
+
+  // Validation de l'email
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: "Email invalide." });
+  }
+
+  // Validation du mot de passe (6 caractères minimum)
+  if (password.length < 6) {
+    return res.status(400).json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
+  }
+
   try {
-	const hashedPassword = await hashPassword(password); // Plus besoin de déstructurer `salt`
-	const user = await prisma.user.create({
-	data: {
-		email,
-		username,
-		hashedPassword, // Ici, `hashedPassword` est une string
-	},
-	});
+    const hashedPassword = await hashPassword(password);
+    const user = await prisma.user.create({
+      data: { email, username, hashedPassword },
+    });
     res.status(201).json({ userId: user.id, username: user.username });
   } catch (error) {
-    res.status(400).json({ error: "Erreur lors de l'inscription" });
+    // Gestion des erreurs Prisma (ex: email ou username déjà existant)
+    if (error instanceof Error && error.message.includes("Unique constraint failed")) {
+      return res.status(400).json({ error: "Email ou username déjà utilisé." });
+    }
+    res.status(500).json({ error: "Erreur lors de l'inscription." });
   }
 };
 

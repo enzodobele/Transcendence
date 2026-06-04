@@ -1,12 +1,13 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
-import authRoutes from './routes/authRoutes'; // 1. Extension .ts retirée
+import authRoutes from './routes/authRoutes';
 
 const app = express();
 const prisma = new PrismaClient();
 
 // Middlewares globaux
 app.use(express.json());
+
 
 /**
  * Health check
