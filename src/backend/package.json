@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/app.js",
   "scripts": {
-	"dev": "tsx watch src/app.ts",
+    "dev": "tsx watch src/app.ts",
     "start": "node src/app.js",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
@@ -11,15 +11,23 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
-    "express": "^4.19.2"
+    "bcrypt": "^6.0.0",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.1",
     "prisma": "^6.19.3",
     "tsx": "^4.22.4"
   },
   "allowScripts": {
-    "prisma@6.19.3": true
+    "prisma@6.19.3": true,
+    "bcrypt@6.0.0": true,
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "esbuild@0.28.0": true
   }
 }
