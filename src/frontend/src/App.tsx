@@ -186,5 +186,7 @@ export default function App() {
         <ResetButton onClick={resetGame} />
       </div>
     </div>
+</div>
   );
+
 }
