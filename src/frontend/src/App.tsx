@@ -21,6 +21,7 @@ export default function App() {
       {is3D ? (
         <>
           <Canvas camera={{ position: [5, 8, 5] }}>
+			
             {/* Lumières */}
             <ambientLight intensity={0.5} />
             <directionalLight position={[20, 100, 20]} intensity={1} shadow-mapSize={2048} />
@@ -183,7 +184,7 @@ export default function App() {
           onDragEnd={() => setIsDragging(false)}
         />
 
-        <ResetButton onClick={resetGame} />
+        {/* <ResetButton onClick={resetGame} /> */}
       </div>
     </div>
 </div>
