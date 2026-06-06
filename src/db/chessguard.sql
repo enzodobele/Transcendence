@@ -6,7 +6,7 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    elo_rating INT DEFAULT 1200, -- Rating ELO par défaut
+    elo_rating INT DEFAULT 1200,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME NULL,
     is_active BOOLEAN DEFAULT TRUE,
@@ -70,51 +70,6 @@ CREATE TABLE game_states (
 );
 
 -- =============================================
--- TABLE: tournaments (Tournois)
--- =============================================
-CREATE TABLE tournaments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT NULL,
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
-    organizer_id INT NOT NULL,
-    max_players INT DEFAULT 100,
-    status ENUM('inscription', 'en_cours', 'termine', 'annule') DEFAULT 'inscription',
-    prize_pool DECIMAL(10, 2) NULL, -- Montant du prix (si applicable)
-    time_control VARCHAR(20) NOT NULL, -- Ex: "15+10"
-    FOREIGN KEY (organizer_id) REFERENCES users(id)
-);
-
--- =============================================
--- TABLE: tournament_players (Joueurs inscrits à un tournoi)
--- =============================================
-CREATE TABLE tournament_players (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    tournament_id INT NOT NULL,
-    user_id INT NOT NULL,
-    score DECIMAL(5, 2) DEFAULT 0.00, -- Points accumulés
-    rank INT NULL, -- Classement final (NULL si tournoi en cours)
-    status ENUM('inscrit', 'qualifie', 'elimine', 'gagnant') DEFAULT 'inscrit',
-    FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    UNIQUE (tournament_id, user_id) -- Un joueur ne peut s'inscrire qu'une fois par tournoi
-);
-
--- =============================================
--- TABLE: tournament_games (Parties d'un tournoi)
--- =============================================
-CREATE TABLE tournament_games (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    tournament_id INT NOT NULL,
-    game_id INT NOT NULL,
-    round_number INT NOT NULL, -- Numéro du tour (1, 2, 3...)
-    FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE,
-    FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
-    UNIQUE (tournament_id, game_id) -- Une partie ne peut appartenir qu'à un seul tournoi
-);
-
--- =============================================
 -- TABLE: friends (Amis)
 -- =============================================
 CREATE TABLE friends (
@@ -139,20 +94,6 @@ CREATE TABLE chat_messages (
     is_read BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (sender_id) REFERENCES users(id),
     FOREIGN KEY (receiver_id) REFERENCES users(id)
-);
-
--- =============================================
--- TABLE: notifications (Notifications)
--- =============================================
-CREATE TABLE notifications (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL, -- Destinataire
-    type ENUM('invitation', 'fin_partie', 'message', 'tournament_start', 'challenge') NOT NULL,
-    content TEXT NOT NULL,
-    is_read BOOLEAN DEFAULT FALSE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    related_id INT NULL, -- ID de l'élément lié (ex: game_id, tournament_id)
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- =============================================
