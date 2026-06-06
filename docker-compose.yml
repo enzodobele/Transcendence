@@ -65,11 +65,12 @@ services:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name
       DB_PASSWORD_FILE: /run/secrets/db_password
-
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
     secrets:
       - db_password
       - db_user
       - db_name
+      - jwt_secret
 
     depends_on:
       db:
@@ -134,7 +135,6 @@ services:
     restart: unless-stopped
 
   pgadmin:
-    # image: dpage/pgadmin4:9.15.0
     build: ./src/pgadmin
     container_name: pgadmin
     environment:
@@ -143,7 +143,6 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: "True"
     secrets:
       - pgadmin_password
-      - pgadmin_email
     volumes:
       - ./src/pgadmin/servers.json:/pgadmin4/servers.json:ro
     networks:
@@ -197,7 +196,7 @@ secrets:
     file: src/secrets/db_password.txt
   portainer_password:
     file: src/secrets/portainer_password.txt
-  pgadmin_email:
-    file: src/secrets/pgadmin_email.txt
   pgadmin_password:
     file: src/secrets/pgadmin_password.txt
+  jwt_secret:
+    file: src/secrets/jwt_secret.txt

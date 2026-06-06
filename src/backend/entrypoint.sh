@@ -1,19 +1,36 @@
 #!/bin/sh
 set -e
 
-# Lit les secrets via les variables d'environnement (PostgreSQL 16+)
-# OU via les fichiers (pour PostgreSQL 15)
-export DB_USER=$(cat /run/secrets/db_user 2>/dev/null || echo "postgres")
-export DB_NAME=$(cat /run/secrets/db_name 2>/dev/null || echo "chessguard")
-export DB_PASSWORD=$(cat /run/secrets/db_password 2>/dev/null || echo "p")
+# Fonction utilitaire pour lire un secret de manière stricte
+read_secret_strict() {
+  local secret_name="$1"
+  local secret_path="/run/secrets/$secret_name"
+
+  # Vérifie si le fichier existe et n'est pas vide
+  if [ ! -s "$secret_path" ]; then
+    echo "[-] CRITICAL ERROR: Secret '$secret_name' is missing or empty at $secret_path" >&2
+    exit 1
+  fi
+
+  # Lit le contenu du secret
+  cat "$secret_path"
+}
+
+# Assignation stricte des variables (Crash immédiat si échec)
+export DB_USER=$(read_secret_strict "db_user")
+export DB_NAME=$(read_secret_strict "db_name")
+export DB_PASSWORD=$(read_secret_strict "db_password")
+export JWT_SECRET=$(read_secret_strict "jwt_secret")
+
+# Construction de l'URL de connexion à la base de données
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}"
 
-echo "DATABASE_URL: $DATABASE_URL"
-echo "Waiting for database..."
+echo "[+] DATABASE_URL générée avec succès."
+echo "[+] Waiting for database..."
 timeout 30s sh -c 'until pg_isready -h db -p 5432 -U "$DB_USER"; do sleep 1; done'
 
-echo "Applying Prisma schema..."
-npx prisma db push --skip-generate || { echo "Prisma push failed"; exit 1; }
+echo "[+] Applying Prisma schema..."
+npx prisma db push --skip-generate || { echo "[-] Prisma push failed"; exit 1; }
 
-echo "Starting backend..."
+echo "[+] Starting backend..."
 exec "$@"
