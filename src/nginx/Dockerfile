@@ -22,7 +22,11 @@ RUN mkdir -p /etc/nginx/ssl && \
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 RUN echo "✅ Config Nginx copiée."
 
-# 5. Affiche un résumé pour débogage
+# 5. Copie les fichiers HTML
+COPY html /usr/share/nginx/html
+RUN echo "✅ Fichiers HTML copiés."
+
+# 6. Affiche un résumé pour débogage
 RUN echo "📌 Contenu de /etc/nginx/conf.d/:" && \
     ls -la /etc/nginx/conf.d/ && \
     echo "📌 Contenu de /etc/nginx/ssl/:" && \

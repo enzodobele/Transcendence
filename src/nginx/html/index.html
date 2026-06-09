@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChessGuard Dev Dashboard</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #111827;
+      color: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 3rem;
+      font-size: 2.5rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: #1f2937;
+      border-radius: 16px;
+      padding: 2rem;
+      text-decoration: none;
+      color: white;
+      transition: transform 0.2s ease, background 0.2s ease;
+      border: 1px solid #374151;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      background: #374151;
+    }
+
+    .card h2 {
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+    }
+
+    .card p {
+      color: #d1d5db;
+      line-height: 1.5;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>♟️ ChessGuard Dashboard</h1>
+
+    <div class="grid">
+      <a class="card" href="https://localhost/" target="_blank">
+        <h2>Frontend</h2>
+        <p>React + Vite application</p>
+      </a>
+
+      <a class="card" href="https://localhost/api/health" target="_blank">
+        <h2>Backend API</h2>
+        <p>Express + Prisma backend</p>
+      </a>
+
+      <a class="card" href="https://localhost/pgadmin/" target="_blank">
+        <h2>pgAdmin</h2>
+        <p>PostgreSQL administration interface</p>
+      </a>
+
+      <a class="card" href="https://localhost/portainer/" target="_blank">
+        <h2>Portainer</h2>
+        <p>Docker containers management</p>
+      </a>
+	  
+	  <a class="card" href="http://localhost:8025/" target="_blank">
+        <h2>Mailpit</h2>
+        <p>Mail catching and inspection</p>
+      </a>
+    </div>
+
+    <div class="footer">
+      Docker • Nginx • React • Express • PostgreSQL
+    </div>
+  </div>
+</body>
+</html>

@@ -12,6 +12,7 @@ import { BoardCoordinates } from "./components/BoardCoordinates";
 import { Board } from "./components/Board";
 import connexionLogo from "./assets/Logo/login.svg";
 import "./App.css";
+import AuthSandbox from "./AuthSandbox"; // 1. Import de votre bac à sable
 
 export default function App() {
   const { game, board, selected, handleSquareClick, resetGame, lastMove, isDragging, setIsDragging, handleDragStart, handleDragOver, handleDrop, capturedPieces, pendingPromotion, handlePromotionChoice } = useChessGame();
@@ -22,6 +23,7 @@ export default function App() {
       {is3D ? (
         <>
           <Canvas camera={{ position: [5, 8, 5] }}>
+			
             {/* Lumières */}
             <ambientLight intensity={0.5} />
             <directionalLight position={[20, 100, 20]} intensity={1} shadow-mapSize={2048} />
@@ -138,6 +140,44 @@ export default function App() {
           </button>
         );
       })()}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row", // 2. Aligne l'Auth et le Jeu côte à côte (mettez "column" pour superposer)
+        alignItems: "flex-start",
+        justifyContent: "center",
+        gap: "40px",
+        minHeight: "100vh",
+        padding: "20px",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* 3. Bloc d'Authentification temporaire */}
+      <div style={{ marginTop: "60px" }}>
+        <AuthSandbox />
+      </div>
+
+      {/* 4. Bloc Jeu d'échecs d'origine */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <h1>♔ Chess ♚</h1>
+
+        <Board
+          board={board}
+          game={game}
+          selected={selected}
+          lastMove={lastMove}
+          isDragging={isDragging}
+          onSquareClick={handleSquareClick}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onDragStart={handleDragStart}
+          onDragEnd={() => setIsDragging(false)}
+        />
+
+        {/* <ResetButton onClick={resetGame} /> */}
+      </div>
     </div>
+</div>
   );
+
 }

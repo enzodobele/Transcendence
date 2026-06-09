@@ -8,6 +8,9 @@ DOCKER_COMPOSE := $(shell command -v docker-compose 2>/dev/null || echo "docker 
 
 COMPOSE = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)
 
+# Variables
+SERVICE ?=  # Si non spécifié, gère tous les services
+
 .PHONY: up down build rebuild logs ps clean fclean \
         db-push db-studio db-migrate shell-back shell-front
 
@@ -16,47 +19,27 @@ COMPOSE = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)
 # =============================================
 
 up:
-	@$(COMPOSE) up -d
+	@$(COMPOSE) up -d $(SERVICE)
 
 down:
-	@$(COMPOSE) down
+	@$(COMPOSE) down $(SERVICE) -v
 
-build:
-	@$(COMPOSE) build
+# si changements dans Docker ou Dockerfile, sinon pas besoin de rebuild
+rebuild: down
+	@$(COMPOSE) up -d --build $(SERVICE)
 
-rebuild:
-	@$(COMPOSE) up -d --build
+# si changement de config/.env. Pour les sources de backend et frontend, c'est géré par node.
+restart: down up
 
-restart: down rebuild
 
 logs:
-	@$(COMPOSE) logs -f
+	@$(COMPOSE) logs -f $(SERVICE)
 
 ps:
-	@$(COMPOSE) ps
+	@$(COMPOSE) ps --format 'table {{.Name}}\t{{.State}}\t{{.Status}}\t{{.Ports}}'
 
-# =============================================
-# 🗃️ DATABASE (Prisma)
-# =============================================
-
-db-push:
-	@$(COMPOSE) exec backend npx prisma db push
-
-db-studio:
-	@$(COMPOSE) exec backend npx prisma studio
-
-db-migrate:
-	@$(COMPOSE) exec backend npx prisma migrate dev
-
-# =============================================
-# 🐚 SHELLS
-# =============================================
-
-shell-back:
-	@$(COMPOSE) exec backend sh
-
-shell-front:
-	@$(COMPOSE) exec frontend sh
+exec:
+	@$(COMPOSE) exec $(SERVICE) sh
 
 # =============================================
 # 🧹 CLEAN
