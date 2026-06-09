@@ -6,7 +6,7 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    elo_rating INT DEFAULT 1200,
+    elo_rating INT DEFAULT 500,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME NULL,
     is_active BOOLEAN DEFAULT TRUE,
@@ -105,7 +105,7 @@ CREATE TABLE user_stats (
     wins INT DEFAULT 0,
     losses INT DEFAULT 0,
     draws INT DEFAULT 0,
-    elo_history JSON NULL, -- Historique des ratings ELO (ex: [{"date": "2026-05-01", "elo": 1200}, ...])
+    elo_history JSON NULL, -- Historique des ratings ELO (ex: [{"date": "2026-05-01", "elo": 500}, ...])
     favorite_opening VARCHAR(50) NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
