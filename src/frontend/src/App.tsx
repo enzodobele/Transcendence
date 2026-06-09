@@ -10,10 +10,12 @@ import { PromotionDialog } from "./components/PromotionDialog";
 import { PlatformBase } from "./components/PlatformBase";
 import { BoardCoordinates } from "./components/BoardCoordinates";
 import { Board } from "./components/Board";
+import connexionLogo from "./assets/Logo/login.svg";
+import "./App.css";
 
 export default function App() {
   const { game, board, selected, handleSquareClick, resetGame, lastMove, isDragging, setIsDragging, handleDragStart, handleDragOver, handleDrop, capturedPieces, pendingPromotion, handlePromotionChoice } = useChessGame();
-  const [is3D, setIs3D] = useState(true);
+  const [is3D, setIs3D] = useState(false);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
@@ -79,12 +81,12 @@ export default function App() {
           {pendingPromotion && (
             <PromotionDialog
               onChoose={handlePromotionChoice}
-              playerColor={game.turn() === 'w' ? 'b' : 'w'}
+              playerColor={game.turn() === 'w' ? 'w' : 'b'}
             />
           )}
         </>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", backgroundColor: "#2a2a2a" }}>
+        <div className="Board">
           <Board
         	board={board}
             game={game}
@@ -97,19 +99,18 @@ export default function App() {
             onDragStart={handleDragStart}
             onDragEnd={() => setIsDragging(false)}
           />
+		  <button className="connexion-button">
+			<img
+    		src={connexionLogo}
+    		alt="connexion"
+    		className="connexion-logo"
+  			/>
+			Connexion
+			</button>
           <button 
             onClick={resetGame}
-            style={{
-            	marginTop: "20px",
-            	padding: "10px 20px",
-            	fontSize: "16px",
-            	cursor: "pointer",
-            	backgroundColor: "#4CAF50",
-            	color: "white",
-            	border: "none",
-            	borderRadius: "4px"
-            }}
-          >
+            className="reset-board"
+			>
             Réinitialiser
           </button>
           {pendingPromotion && (
@@ -131,18 +132,7 @@ export default function App() {
         return (
           <button 
             onClick={() => setIs3D(!is3D)}
-            style={{
-            	position: "absolute",
-            	top: "20px",
-            	right: "20px",
-            	padding: "10px 20px",
-            	fontSize: "16px",
-            	cursor: "pointer",
-            	backgroundColor: "#2196F3",
-            	color: "white",
-            	border: "none",
-            	borderRadius: "4px"
-            }}
+            className="button-switch-2d-3d"
           >
             {buttonText}
           </button>
