@@ -232,7 +232,7 @@
 }
 
 .button-switch-2d-3d {
-	 position: absolute;
+	position: absolute;
     top: 20px;
     right: 20px;
     padding: 10px 20px;
@@ -242,4 +242,35 @@
     color: rgb(255, 255, 255);
     border: none;
     border-radius: 10px;
+}
+
+.login-overlay
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	background: rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(8px);
+
+	z-index: 1000;
+}
+
+.login-content
+{
+	width: 400px;
+	padding: 30px;
+
+	background: white;
+	border-radius: 12px;
+
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 }

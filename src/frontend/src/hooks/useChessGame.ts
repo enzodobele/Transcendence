@@ -33,7 +33,6 @@ const extractCapturedPieces = (game: Chess): CapturedPiece[] =>
 			captured.push({ type: move.captured, color: captureColor });
 		}
 	});
-
 	return captured;
 };
 
