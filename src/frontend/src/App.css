@@ -2,6 +2,19 @@
     font-family: 'Inter', sans-serif;
 }
 
+.app {
+	height: 100vh;
+	width: 100vw;
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            #d9b986 0%,
+            #e5bc79 35%,
+            rgba(255, 255, 255, 0) 70%
+        ),
+        #f5f5f5;
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -217,7 +230,6 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    background-color: #ffffff;
 }
 
 .reset-board {
@@ -264,6 +276,7 @@
 
 .login-content
 {
+	position: relative;
 	width: 400px;
 	padding: 30px;
 
@@ -273,4 +286,32 @@
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
+}
+
+.title-chess {
+	position: absolute;
+  	top: 30px;
+  	left: 50%;
+	transform: translateX(-50%);
+  	text-align: center;
+  	font-size: 48px;
+  	font-weight: bold;
+  	letter-spacing: 2px;
+	color: #b58863;
+}
+
+.title-guard {
+	
+}
+
+.subtitle-chess-guard {
+	position: absolute;
+  	top: 10%;
+  	left: 50%;
+	transform: translateX(-50%);
+  	text-align: center;
+  	font-size: 18px;
+  	font-weight: bold;
+  	letter-spacing: 2px;
+	color: black;
 }

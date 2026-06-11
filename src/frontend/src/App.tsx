@@ -36,7 +36,7 @@ export default function App() {
 	const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
+    <div className="app">
       {is3D ? (
         <>
           <Canvas camera={{ position: [5, 8, 5] }}>
@@ -84,7 +84,6 @@ export default function App() {
               maxDistance={30}
             />
           </Canvas>
-
           <button
             onClick={resetGame}
             style={{
@@ -134,6 +133,9 @@ export default function App() {
         </button>
 
 		<Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}/>
+
+		<h1 className="title-chess">CHESS <span className="title-guard">GUARD</span></h1>
+		<p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
 
         <button onClick={resetGame} className="reset-board">
         	Réinitialiser
