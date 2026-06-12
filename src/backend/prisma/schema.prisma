@@ -12,28 +12,29 @@ datasource db {
 // MODEL: User (Joueurs)
 // =============================================
 model User {
-  id             Int           @id @default(autoincrement())
-  username       String       @unique
-  email          String       @unique
+  id             Int      @id @default(autoincrement())
+  username       String  @unique
+  email          String  @unique
   hashedPassword String
-  eloRating      Int          @default(500)       // ✅ Ajouté (équivalent de elo_rating)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  lastLogin      DateTime?    // ✅ Ajouté
-  isActive       Boolean      @default(true)      // ✅ Ajouté
-  avatarUrl      String?      // ✅ Ajouté
-  bio            String?      // ✅ Ajouté
+  eloRating      Int     @default(500)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  lastLogin      DateTime?
+  isActive       Boolean @default(true)
+  avatarUrl      String?
+  bio            String?
 
   // Relations
-  gamesAsPlayer1 Game[]       @relation("Player1")  // Parties où l'utilisateur est joueur 1 (blanc)
-  gamesAsPlayer2 Game[]       @relation("Player2")  // Parties où l'utilisateur est joueur 2 (noir)
-  gamesWon        Game[]       @relation("Winner")   // Parties gagnées par l'utilisateur
-  moves           Move[]                       // Coups joués par l'utilisateur
-  friends1        Friend      @relation("Friend1") // Amis (côté user1_id)
-  friends2        Friend      @relation("Friend2") // Amis (côté user2_id)
-  sentMessages    ChatMessage @relation("Sender")  // Messages envoyés
-  receivedMessages ChatMessage @relation("Receiver") // Messages reçus
-  stats           UserStats?  // Statistiques (1:1)
+  gamesAsPlayer1 Game[]       @relation("Player1")
+  gamesAsPlayer2 Game[]       @relation("Player2")
+  gamesWon        Game[]       @relation("Winner")
+  moves           Move[]
+  // ✅ Relations inverses pour les amis (avec noms uniques)
+  friendsAsUser1 Friend[] @relation("User1Friends")
+  friendsAsUser2 Friend[] @relation("User2Friends")
+//   sentMessages    ChatMessage @relation("Sender")
+//   receivedMessages ChatMessage @relation("Receiver")
+  stats           UserStats?
 
   @@map("users")
 }
@@ -47,17 +48,17 @@ model Game {
   player2Id    Int        // Joueur noir
   startTime    DateTime   @default(now())
   endTime      DateTime?
-  status       String     @default("en_cours") // ENUM: "en_cours" | "terminee" | "abandonnee" | "nulle"
+  status       String     @default("en_cours") // "en_cours" | "terminee" | "abandonnee" | "nulle"
   winnerId     Int?
   timeControl  String     // Ex: "5+0"
   isRated      Boolean    @default(true)
+  fenString    String     // ✅ NOUVEAU : État actuel du plateau (FEN)
 
   // Relations
   player1 User   @relation("Player1", fields: [player1Id], references: [id])
   player2 User   @relation("Player2", fields: [player2Id], references: [id])
   winner  User?  @relation("Winner", fields: [winnerId], references: [id])
   moves   Move[]
-  states  GameState[]
 
   // Contrainte: player1 != player2 (à valider côté application)
   @@unique([player1Id, player2Id])
@@ -91,23 +92,7 @@ model Move {
   @@map("moves")
 }
 
-// =============================================
-// MODEL: GameState (États du plateau)
-// =============================================
-model GameState {
-  id         Int      @id @default(autoincrement())
-  gameId     Int
-  moveId     Int?
-  fenString  String   // Notation FEN
-  createdAt  DateTime @default(now())
 
-  // Relations
-  game Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  move Move?     @relation(fields: [moveId], references: [id])
-
-  @@index([gameId])
-  @@map("game_states")
-}
 
 // =============================================
 // MODEL: Friend (Amis)
@@ -117,32 +102,17 @@ model Friend {
   user2Id    Int
   createdAt  DateTime @default(now())
 
-  // Relations
-  user1 User @relation("Friend1", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2 User @relation("Friend2", fields: [user2Id], references: [id], onDelete: Cascade)
+  // Relations (avec les mêmes noms que dans User)
+  user1 User @relation("User1Friends", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 User @relation("User2Friends", fields: [user2Id], references: [id], onDelete: Cascade)
 
-  // Contrainte: user1_id < user2_id pour éviter les doublons
+  // Clé primaire composite
   @@id([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
   @@map("friends")
 }
 
-// =============================================
-// MODEL: ChatMessage (Messages)
-// =============================================
-model ChatMessage {
-  id          Int      @id @default(autoincrement())
-  senderId    Int
-  receiverId  Int
-  content     String
-  timestamp   DateTime @default(now())
-  isRead      Boolean  @default(false)
-
-  // Relations
-  sender   User @relation("Sender", fields: [senderId], references: [id])
-  receiver User @relation("Receiver", fields: [receiverId], references: [id])
-
-  @@map("chat_messages")
-}
 
 // =============================================
 // MODEL: UserStats (Statistiques)
@@ -161,3 +131,23 @@ model UserStats {
 
   @@map("user_stats")
 }
+
+
+// // =============================================
+// // MODEL: ChatMessage (Messages)
+// // =============================================
+// model ChatMessage {
+//   id          Int      @id @default(autoincrement())
+//   senderId    Int
+//   receiverId  Int
+//   content     String
+//   timestamp   DateTime @default(now())
+//   isRead      Boolean  @default(false)
+
+//   // Relations
+//   sender   User @relation("Sender", fields: [senderId], references: [id])
+//   receiver User @relation("Receiver", fields: [receiverId], references: [id])
+
+//   @@map("chat_messages")
+// }
+
