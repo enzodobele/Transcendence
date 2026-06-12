@@ -5,22 +5,22 @@ import { hashPassword, comparePassword, generateToken } from '../services/authSe
 const prisma = new PrismaClient();
 
 export const register = async (req: Request, res: Response) => {
-  const { email, username, password } = req.body;
+	const { email, username, password } = req.body;
 
-  // Validation basique
-  if (!email || !username || !password) {
-    return res.status(400).json({ error: "Tous les champs sont obligatoires." });
-  }
+	// Validation basique
+	if (!email || !username || !password) {
+		return res.status(400).json({ error: "Tous les champs sont obligatoires." });
+	}
 
-  // Validation de l'email
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ error: "Email invalide." });
-  }
+	// Validation de l'email
+	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+		return res.status(400).json({ error: "Email invalide." });
+	}
 
-  // Validation du mot de passe (6 caractères minimum)
-  if (password.length < 6) {
-    return res.status(400).json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
-  }
+	// Validation du mot de passe (6 caractères minimum)
+	if (password.length < 6) {
+		return res.status(400).json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
+	}
 
   try {
     const hashedPassword = await hashPassword(password);
@@ -49,17 +49,19 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(401).json({ error: "Utilisateur non trouvé" });
+      return res.status(401).json({ error: "Utilisateur non trouvé." });
     }
 
     const isPasswordValid = await comparePassword(password, user.hashedPassword);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Mot de passe incorrect" });
+      return res.status(401).json({ error: "Mot de passe incorrect." });
     }
+
+    // Génère un token JWT
+    const token = generateToken(user.id, user.username);
 
     const token = generateToken(user.id, user.email, user.username);
 
@@ -72,6 +74,6 @@ export const login = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    res.status(400).json({ error: "Erreur lors de la connexion" });
+    res.status(500).json({ error: "Erreur lors de la connexion." });
   }
 };
