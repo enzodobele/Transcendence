@@ -1,6 +1,4 @@
-// This is your Prisma schema file
-// Learn more: https://pris.ly/d/prisma-schema
-
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,12 +8,156 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modèle User pour l'authentification
+// =============================================
+// MODEL: User (Joueurs)
+// =============================================
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String   @unique
-  hashedPassword	String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             Int           @id @default(autoincrement())
+  username       String       @unique
+  email          String       @unique
+  hashedPassword String
+  eloRating      Int          @default(500)       // ✅ Ajouté (équivalent de elo_rating)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  lastLogin      DateTime?    // ✅ Ajouté
+  isActive       Boolean      @default(true)      // ✅ Ajouté
+  avatarUrl      String?      // ✅ Ajouté
+  bio            String?      // ✅ Ajouté
+
+  // Relations
+  gamesAsPlayer1 Game[]       @relation("Player1")  // Parties où l'utilisateur est joueur 1 (blanc)
+  gamesAsPlayer2 Game[]       @relation("Player2")  // Parties où l'utilisateur est joueur 2 (noir)
+  gamesWon        Game[]       @relation("Winner")   // Parties gagnées par l'utilisateur
+  moves           Move[]                       // Coups joués par l'utilisateur
+  friends1        Friend      @relation("Friend1") // Amis (côté user1_id)
+  friends2        Friend      @relation("Friend2") // Amis (côté user2_id)
+  sentMessages    ChatMessage @relation("Sender")  // Messages envoyés
+  receivedMessages ChatMessage @relation("Receiver") // Messages reçus
+  stats           UserStats?  // Statistiques (1:1)
+
+  @@map("users")
+}
+
+// =============================================
+// MODEL: Game (Parties)
+// =============================================
+model Game {
+  id           Int        @id @default(autoincrement())
+  player1Id    Int        // Joueur blanc
+  player2Id    Int        // Joueur noir
+  startTime    DateTime   @default(now())
+  endTime      DateTime?
+  status       String     @default("en_cours") // ENUM: "en_cours" | "terminee" | "abandonnee" | "nulle"
+  winnerId     Int?
+  timeControl  String     // Ex: "5+0"
+  isRated      Boolean    @default(true)
+
+  // Relations
+  player1 User   @relation("Player1", fields: [player1Id], references: [id])
+  player2 User   @relation("Player2", fields: [player2Id], references: [id])
+  winner  User?  @relation("Winner", fields: [winnerId], references: [id])
+  moves   Move[]
+  states  GameState[]
+
+  // Contrainte: player1 != player2 (à valider côté application)
+  @@unique([player1Id, player2Id])
+  @@map("games")
+}
+
+// =============================================
+// MODEL: Move (Coups)
+// =============================================
+model Move {
+  id             Int        @id @default(autoincrement())
+  gameId         Int
+  playerId       Int
+  moveNumber     Int
+  fromSquare     String    // Ex: "e2"
+  toSquare       String    // Ex: "e4"
+  piece          String    // Ex: "P" (pion), "K" (roi), "Q" (dame)
+  isCheck         Boolean   @default(false)
+  isCheckmate     Boolean   @default(false)
+  isCastle        Boolean   @default(false)
+  isEnPassant     Boolean   @default(false)
+  promotionPiece  String?   // Ex: "Q" (dame)
+  timestamp       DateTime @default(now())
+
+  // Relations
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  player User   @relation(fields: [playerId], references: [id])
+
+  // Index pour reconstruire la partie rapidement
+  @@index([gameId, moveNumber])
+  @@map("moves")
+}
+
+// =============================================
+// MODEL: GameState (États du plateau)
+// =============================================
+model GameState {
+  id         Int      @id @default(autoincrement())
+  gameId     Int
+  moveId     Int?
+  fenString  String   // Notation FEN
+  createdAt  DateTime @default(now())
+
+  // Relations
+  game Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  move Move?     @relation(fields: [moveId], references: [id])
+
+  @@index([gameId])
+  @@map("game_states")
+}
+
+// =============================================
+// MODEL: Friend (Amis)
+// =============================================
+model Friend {
+  user1Id    Int
+  user2Id    Int
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user1 User @relation("Friend1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 User @relation("Friend2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  // Contrainte: user1_id < user2_id pour éviter les doublons
+  @@id([user1Id, user2Id])
+  @@map("friends")
+}
+
+// =============================================
+// MODEL: ChatMessage (Messages)
+// =============================================
+model ChatMessage {
+  id          Int      @id @default(autoincrement())
+  senderId    Int
+  receiverId  Int
+  content     String
+  timestamp   DateTime @default(now())
+  isRead      Boolean  @default(false)
+
+  // Relations
+  sender   User @relation("Sender", fields: [senderId], references: [id])
+  receiver User @relation("Receiver", fields: [receiverId], references: [id])
+
+  @@map("chat_messages")
+}
+
+// =============================================
+// MODEL: UserStats (Statistiques)
+// =============================================
+model UserStats {
+  userId        Int     @id @unique
+  totalGames    Int     @default(0)
+  wins          Int     @default(0)
+  losses        Int     @default(0)
+  draws         Int     @default(0)
+  eloHistory    Json?   // Historique des ratings ELO
+  favoriteOpening String?
+
+  // Relation 1:1 avec User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_stats")
 }
