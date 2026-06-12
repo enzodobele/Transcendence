@@ -50,8 +50,6 @@ app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-
-
 /**
  * Démarrage serveur
  */

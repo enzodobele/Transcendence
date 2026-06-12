@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { hashPassword, comparePassword, generateToken } from '../services/authService';
+import { hashPassword, comparePassword } from '../services/authService';
+import { generateToken } from '../services/jwtService';
 
 const prisma = new PrismaClient();
 
@@ -22,29 +23,24 @@ export const register = async (req: Request, res: Response) => {
 		return res.status(400).json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
 	}
 
-  try {
-    const hashedPassword = await hashPassword(password);
-    const user = await prisma.user.create({
-      data: { email, username, hashedPassword },
-    });
-    
-    const token = generateToken(user.id, user.email, user.username);
-    
-    res.status(201).json({ 
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username
-      }
-    });
-  } catch (error) {
-    // Gestion des erreurs Prisma (ex: email ou username déjà existant)
-    if (error instanceof Error && error.message.includes("Unique constraint failed")) {
-      return res.status(400).json({ error: "Email ou username déjà utilisé." });
-    }
-    res.status(500).json({ error: "Erreur lors de l'inscription." });
-  }
+	try {
+	const hashedPassword = await hashPassword(password);
+	const user = await prisma.user.create({
+		data: { email, username, hashedPassword: hashedPassword },
+	});
+
+	// ✅ Génère le token
+	const token = generateToken(user.id, user.username);
+
+	// ✅ Renvoie le token dans la réponse
+	res.status(201).json({
+		userId: user.id,
+		username: user.username,
+		token,
+	});
+	} catch (error) {
+	res.status(400).json({ error: "Erreur lors de l'inscription." });
+	}
 };
 
 export const login = async (req: Request, res: Response) => {
@@ -63,13 +59,10 @@ export const login = async (req: Request, res: Response) => {
     // Génère un token JWT
     const token = generateToken(user.id, user.email, user.username);
 
-    res.status(200).json({ 
+    res.status(200).json({
+      userId: user.id,
+      username: user.username,
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username
-      }
     });
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la connexion." });
