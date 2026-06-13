@@ -1,0 +1,12 @@
+1. src/backend/src/app.ts
+// import http from 'http'; // Fourni par Node
+// import { WebSocketServer } from 'ws';
+
+//Ajout de la ligne 51 a 72 creant un server WebSocket et gerant la connection, les messages et la donnection
+//ligne 79 changement app.listen -> server.listen
+
+Btw, je suis sur l'equivalent de la branche main (rien commit et rien change pour le moment) et quand je make nginx est en unhealthy
+le probleme est qu'au lieu d'utiliser la config qu'on lui a faite (port 443 au lieu de 80 etc) on reutilise l'image toute faite de nginx:alpine
+
+pour regler le probleme pour le moment je change dans le docker-compose et j'enleve le image: nginx:alpine qui va reprendre celle officielle automatiquement
+Je le push pas mais c'est a revoir ensemble

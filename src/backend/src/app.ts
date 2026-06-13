@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/authRoutes';
+import http from 'http';
+import { WebSocketServer } from 'ws';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -46,12 +48,35 @@ app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
 /**
  * Démarrage serveur
  */
+// Envelopper l'app dans un vrai serveur HTTP
+const server = http.createServer(app);
+
+// Greffer serveur WebSocket sur ce serverur a l'adresse /ws
+const wss = new WebSocketServer({ server, path: '/ws' });
+
+// Gerer connexion client
+wss.on('connection', (socket) => 
+{
+  console.log('Un client est connecte au WebSocket') //client connecte
+  socket.on('message', (data) => //Process reception message
+  {
+    const message = data.toString();
+    console.log('Recu :', message);
+    socket.send(`Echo du serveur : ${message}`);
+  });
+
+  socket.on('close', () => //Process deconnection client
+  {
+    console.log('Un client s\'est deconnecte');
+  });
+});
+
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 async function start() {
   try {
     await prisma.$connect();
-    app.listen(PORT, '0.0.0.0', () => {
+    server.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (err) {
