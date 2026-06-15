@@ -1,48 +1,137 @@
 import { useState } from "react";
+import { login, register } from "../services/auth";
 
-interface LoginProps
-{
+interface LoginProps {
 	isOpen: boolean;
 	onClose: () => void;
 }
 
-export function Login({isOpen, onClose}: LoginProps)
-{
+export function Login({ isOpen, onClose }: LoginProps) {
 	const [isRegister, setIsRegister] = useState(false);
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [username, setUsername] = useState("");
+	const [error, setError] = useState("");
 
-	if (!isOpen)
-		return null;
+	function resetFields()
+	{
+		setEmail("");
+		setPassword("");
+		setUsername("");
+		setError("");
+	}
+
+	async function handleSubmit() {
+		try {
+			setError("");
+
+			if (isRegister) {
+				const data = await register(email, username, password);
+				console.log(data);
+			} else {
+				const data = await login(email, password);
+				console.log(data);
+			}
+		} catch (err: any) {
+			setError(err.message || "Utilisateur introuvable");
+		}
+	}
+
+	if (!isOpen) return null;
 
 	return (
 		<div className="login-overlay">
 			<div className="login-content">
-				<button onClick={onClose} style={{position: "absolute", background: "transparent", border: "none", fontSize: "18px", cursor: "pointer", right:"15px", top:"20px"}}>
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" >
-    			<line x1="6" y1="6" x2="18" y2="18" />
-   				<line x1="18" y1="6" x2="6" y2="18" />
-				</svg>
+				<button
+					onClick={onClose}
+					className="login-close-button"
+				>
+					<svg
+						onClick={() => {setIsRegister(false); resetFields();}}
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+					>
+						<line x1="6" y1="6" x2="18" y2="18" />
+						<line x1="18" y1="6" x2="6" y2="18" />
+					</svg>
 				</button>
-				<h2 style={{textAlign: "left"}}>{isRegister ? "Créer un compte" : "Bon retour"}</h2>
-				<p style={{textAlign: "left", fontSize: "13px", marginTop:"-10px", marginBottom:"10px"}}>{isRegister ? "Créez un compte pour jouer en ligne" : "Connectez-vous pour jouer en ligne"}</p>
+
+				<h2 className="login-title">
+					{isRegister ? "Créer un compte" : "Bon retour"}
+				</h2>
+
+				<p className="login-subtitle">
+					{isRegister
+						? "Créez un compte pour jouer en ligne"
+						: "Connectez-vous pour jouer en ligne"}
+				</p>
+
+				{error && (
+					<p className="login-error">
+						{error}
+					</p>
+				)}
 
 				{isRegister && (
 					<>
-					<strong style={{textAlign: "left", fontSize: "13px", color: "black", marginBottom: "-13px", marginTop: "-13px"}}>Pseudo</strong>
-					<input type="text" placeholder="JonDoe" style={{borderRadius: "10px", paddingTop: "8px", paddingBottom: "8px", paddingLeft: "10px", marginBottom:"20px", border: "1px solid white", boxShadow: "2px 2px 5px 3px rgba(0, 0, 0, 0.15)", outline: "none"}}/>
+						<strong className="login-label">
+							Pseudo
+						</strong>
+
+						<input
+							type="text"
+							value={username}
+							onChange={(e) => setUsername(e.target.value)}
+							placeholder="JonDoe"
+							className="login-input login-input-username"
+						/>
 					</>
 				)}
 
-				<strong style={{textAlign: "left", fontSize: "13px", color: "black", marginBottom: "-13px", marginTop: "-13px"}}>Email</strong>
-				<input type="text" placeholder="vous@exemple.com" style={{borderRadius: "10px", paddingTop: "8px", paddingBottom: "8px", paddingLeft: "10px", border: "1px solid white", boxShadow: "2px 2px 5px 3px rgba(0, 0, 0, 0.15)", outline: "none"}}/>
+				<strong className="login-label">
+					Email
+				</strong>
 
-				<strong style={{textAlign: "left", fontSize: "13px", color: "black", marginBottom: "-13px", marginTop: "10px"}}>Mot de passe</strong>
-				<input type="password" placeholder="••••••••" style={{borderRadius: "10px", paddingTop: "8px", paddingBottom: "8px", paddingLeft: "10px", border: "1px solid white", boxShadow: "2px 2px 5px 3px rgba(0, 0, 0, 0.15)", outline: "none"}}/>
+				<input
+					type="text"
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
+					placeholder="vous@exemple.com"
+					className="login-input"
+				/>
 
-				<button onClick={onClose} style={{marginTop:"20px", paddingTop: "10px", paddingBottom: "10px", borderRadius: "10px",backgroundColor: "#f0d9b5", outline: "none", border: "1px solid #f0d9b5", boxShadow: "2px 2px 5px 3px rgba(0, 0, 0, 0.15)", cursor: "pointer"}}>
-					Se connecter
+				<strong className="login-label login-password-label">
+					Mot de passe
+				</strong>
+
+				<input
+					type="password"
+					value={password}
+					onChange={(e) => setPassword(e.target.value)}
+					placeholder="••••••••"
+					className="login-input"
+				/>
+
+				<button
+					onClick={handleSubmit}
+					className="login-submit-button"
+				>
+					{isRegister ? "Créer un compte" : "Se connecter"}
 				</button>
-				<button onClick={() => setIsRegister(!isRegister)} style={{border:"none", backgroundColor:"White", marginTop:"10px", cursor: "pointer"}}>
-					{isRegister ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? S'inscrire"}
+
+				<button
+					onClick={() => {setIsRegister(!isRegister); resetFields(); }}
+					className="login-switch-button"
+				>
+					{isRegister
+						? "Déjà un compte ? Se connecter"
+						: "Pas encore de compte ? S'inscrire"}
 				</button>
 			</div>
 		</div>
