@@ -35,6 +35,7 @@ model User {
 //   sentMessages    ChatMessage @relation("Sender")
 //   receivedMessages ChatMessage @relation("Receiver")
   stats           UserStats?
+  waitlistEntry        waitlistEntry?
 
   @@map("users")
 }
@@ -50,9 +51,8 @@ model Game {
   endTime      DateTime?
   status       String     @default("en_cours") // "en_cours" | "terminee" | "abandonnee" | "nulle"
   winnerId     Int?
-  timeControl  String     // Ex: "5+0"
   isRated      Boolean    @default(true)
-  fenString    String     // ✅ NOUVEAU : État actuel du plateau (FEN)
+  fenString    String     // État actuel du plateau (FEN)
 
   // Relations
   player1 User   @relation("Player1", fields: [player1Id], references: [id])
@@ -111,6 +111,20 @@ model Friend {
   @@index([user1Id])
   @@index([user2Id])
   @@map("friends")
+}
+
+
+// =============================================
+// MODEL: waitlistEntry (File d'attente)
+// =============================================
+model waitlistEntry {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("waitlistEntrys")
 }
 
 

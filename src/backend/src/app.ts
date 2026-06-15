@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/authRoutes';
+import lobbyRoutes from './routes/lobbyRoutes';
 import { authenticate } from './middlewares/authMiddleware';
 
 const app = express();
@@ -35,6 +36,7 @@ app.get('/test-db', async (req: Request, res: Response) => {
  * Routes d'authentification
  */
 app.use('/auth', authRoutes);
+app.use('/lobby', lobbyRoutes);
 
 app.use('/testAuth', authenticate, (req: Request, res: Response) => {
   res.json({ message: `Hello ${req.user?.username}, you are authenticated!` });
