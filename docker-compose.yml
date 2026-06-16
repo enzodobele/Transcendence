@@ -26,7 +26,6 @@ services:
   # 🌐 NGINX (Reverse Proxy)
   # =============================================
   nginx:
-    image: nginx:alpine
     build: ./src/nginx
     container_name: nginx
     ports:

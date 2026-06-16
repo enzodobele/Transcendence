@@ -11,13 +11,30 @@ import { PlatformBase } from "./components/PlatformBase";
 import { BoardCoordinates } from "./components/BoardCoordinates";
 import { Board } from "./components/Board";
 import AuthSandbox from "./AuthSandbox"; // 1. Import de votre bac à sable
+import { useGameSocket } from "./hooks/useGameSocket";
 
 export default function App() {
-  const { game, board, selected, handleSquareClick, resetGame, lastMove, isDragging, setIsDragging, handleDragStart, handleDragOver, handleDrop, capturedPieces, pendingPromotion, handlePromotionChoice } = useChessGame();
+  const { status, color, sendMove, opponentMove, result } = useGameSocket();
+  const myColor = color === "white" ? "w" : color === "black" ? "b" : null;
+  const { game, board, selected, handleSquareClick, resetGame, lastMove, isDragging, setIsDragging, handleDragStart, handleDragOver, handleDrop, capturedPieces, pendingPromotion, handlePromotionChoice } = useChessGame(sendMove, opponentMove, myColor);
   const [is3D, setIs3D] = useState(true);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
+      {status === "over" && (
+        <div style={{ position: "absolute", inset: 0, background: "#000c", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
+          <h1>Partie terminée</h1>
+          <p style={{ fontSize: 20 }}>
+            {result?.reason === "checkmate"   && `Échec et mat — ${result.winner === "w" ? "Blancs" : "Noirs"} gagnent 👑`}
+            {result?.reason === "stalemate"   && "Pat — match nul"}
+            {result?.reason === "draw"        && "Match nul"}
+            {result?.reason === "opponentLeft"&& "Ton adversaire a quitté la partie 🏳️"}
+          </p>
+        </div>
+      )}
+      <div style={{ position: "absolute", top: 70, left: 20, zIndex: 10, background: "#000a", color: "#fff", padding: "8px 12px", borderRadius: 6 }}>
+        Statut : {status} {color ? `- tu es ${color}` : ""}
+      </div>
       {is3D ? (
         <>
           <Canvas camera={{ position: [5, 8, 5] }}>

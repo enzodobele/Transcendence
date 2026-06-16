@@ -10,3 +10,5 @@ le probleme est qu'au lieu d'utiliser la config qu'on lui a faite (port 443 au l
 
 pour regler le probleme pour le moment je change dans le docker-compose et j'enleve le image: nginx:alpine qui va reprendre celle officielle automatiquement
 Je le push pas mais c'est a revoir ensemble
+
+// A mettre a jour

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Chess } from "chess.js";
 
 // Import des sons
@@ -49,7 +49,7 @@ interface PendingPromotion
 	to: string;
 }
 
-export const useChessGame = () =>
+export const useChessGame = (sendMove? : (from: string, to: string) => void, opponentMove? : { from: string, to: string } | null, myColor?: "w" | "b" | null) =>
 {
 	const [game] = useState(() => new Chess());
 	const [board, setBoard] = useState(game.board());
@@ -58,6 +58,30 @@ export const useChessGame = () =>
 	const [isDragging, setIsDragging] = useState(false);
 	const [capturedPieces, setCapturedPieces] = useState<CapturedPiece[]>([]);
 	const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
+
+	useEffect(() => 
+	{
+		if (!opponentMove)
+			return;
+
+		let move;
+		try
+		{
+			move = game.move({ from: opponentMove.from as any, to: opponentMove.to as any, promotion: 'q' as any});
+		}
+		catch
+		{
+			move = null;
+		}
+
+		if (move)
+		{
+			setBoard(game.board());
+			setLastMove({ from: opponentMove.from, to: opponentMove.to });
+			setCapturedPieces(extractCapturedPieces(game));
+			playMoveSound(move);
+		}
+	}, [opponentMove]); 
 
 	const playMoveSound = (move: any) =>
 	{
@@ -90,6 +114,8 @@ export const useChessGame = () =>
 
 	const handleSquareClick = (square: string) =>
 	{
+		if (myColor && game.turn() !== myColor)
+			return;
 		// Si une promotion est en attente, traiter le clic comme un choix de pièce
 		if (pendingPromotion)
 		{
@@ -139,6 +165,7 @@ export const useChessGame = () =>
 						setLastMove({ from: selected, to: square });
 						setCapturedPieces(extractCapturedPieces(game));
 						playMoveSound(move);
+						sendMove?.(selected, square);
 					}
 				}
 			}
@@ -149,6 +176,9 @@ export const useChessGame = () =>
 
 	const handleDragStart = (square: string, e: React.DragEvent) =>
 	{
+		if (myColor && game.turn() !== myColor)
+			return;
+
 		const piece = game.get(square as any);
 		const currentTurn = game.turn();
 
@@ -187,6 +217,9 @@ export const useChessGame = () =>
 
 	const handleDrop = (square: string, e: React.DragEvent) =>
 	{
+		if (myColor && game.turn() !== myColor)
+			return;
+
 		e.preventDefault();
 		setIsDragging(false);
 
@@ -226,6 +259,7 @@ export const useChessGame = () =>
 					setSelected(null);
 					setLastMove({ from: fromSquare, to: square });
 					setCapturedPieces(extractCapturedPieces(game));
+					sendMove?.(selected, square);
 				}
 			}
 		}
@@ -263,6 +297,7 @@ export const useChessGame = () =>
 			setBoard(game.board());
 			setLastMove({ from: pendingPromotion.from, to: pendingPromotion.to });
 			setCapturedPieces(extractCapturedPieces(game));
+			sendMove?.(pendingPromotion.from, pendingPromotion.to);
 		}
 
 		setPendingPromotion(null);
