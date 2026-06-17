@@ -38,6 +38,8 @@ services:
         condition: service_healthy
       backend:
         condition: service_healthy
+      db:
+        condition: service_healthy
     networks:
       - chessguard_network
     healthcheck:
@@ -109,8 +111,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U $$(cat $$POSTGRES_USER_FILE) -d $$(cat $$POSTGRES_DB_FILE)"]
+      interval: 15s
       timeout: 5s
       retries: 5
     networks:
