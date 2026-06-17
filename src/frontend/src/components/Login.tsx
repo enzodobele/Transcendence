@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { login, register } from "../services/auth";
+import { useAuth } from "../contexts/AuthContext";
 
 interface LoginProps {
 	isOpen: boolean;
@@ -12,6 +13,7 @@ export function Login({ isOpen, onClose }: LoginProps) {
 	const [password, setPassword] = useState("");
 	const [username, setUsername] = useState("");
 	const [error, setError] = useState("");
+	const { login: loginUser } = useAuth();
 
 	function resetFields()
 	{
@@ -28,9 +30,21 @@ export function Login({ isOpen, onClose }: LoginProps) {
 			if (isRegister) {
 				const data = await register(email, username, password);
 				console.log(data);
+				// Après inscription, connecter automatiquement
+				if (data.user && data.token) {
+					loginUser(data.user, data.token);
+					resetFields();
+					onClose();
+				}
 			} else {
 				const data = await login(email, password);
 				console.log(data);
+				// Après connexion, sauvegarder le token et utilisateur
+				if (data.user && data.token) {
+					loginUser(data.user, data.token);
+					resetFields();
+					onClose();
+				}
 			}
 		} catch (err: any) {
 			setError(err.message || "Utilisateur introuvable");

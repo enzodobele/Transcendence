@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { hashPassword, comparePassword } from '../services/authService';
+import { hashPassword, comparePassword, generateToken } from '../services/authService';
 
 const prisma = new PrismaClient();
 
@@ -27,7 +27,17 @@ export const register = async (req: Request, res: Response) => {
     const user = await prisma.user.create({
       data: { email, username, hashedPassword },
     });
-    res.status(201).json({ userId: user.id, username: user.username });
+    
+    const token = generateToken(user.id, user.email, user.username);
+    
+    res.status(201).json({ 
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username
+      }
+    });
   } catch (error) {
     // Gestion des erreurs Prisma (ex: email ou username déjà existant)
     if (error instanceof Error && error.message.includes("Unique constraint failed")) {
@@ -51,7 +61,16 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Mot de passe incorrect" });
     }
 
-    res.status(200).json({ userId: user.id, username: user.username });
+    const token = generateToken(user.id, user.email, user.username);
+
+    res.status(200).json({ 
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username
+      }
+    });
   } catch (error) {
     res.status(400).json({ error: "Erreur lors de la connexion" });
   }

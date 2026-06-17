@@ -1,18 +1,8 @@
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
 import { useState } from "react";
 import { useChessGame } from "./hooks/useChessGame";
-import { BoardRenderer } from "./components/BoardRenderer";
-import { ChessBoardPieces } from "./components/ChessBoardPieces";
-import { CapturedPieces } from "./components/CapturedPieces";
-import { PromotionDialog } from "./components/PromotionDialog";
-import { PlatformBase } from "./components/PlatformBase";
-import { BoardCoordinates } from "./components/BoardCoordinates";
-import { Board } from "./components/Board";
-import connexionLogo from "./assets/Logo/login.svg";
+import { ChessGame3D } from "./components/ChessGame3D";
+import { ChessGame2D } from "./components/ChessGame2D";
 import "./App.css";
-import {Login} from "./components/Login";
 
 export default function App() {
   const {
@@ -30,126 +20,51 @@ export default function App() {
     capturedPieces,
     pendingPromotion,
     handlePromotionChoice,
-  	} = useChessGame();
+  } = useChessGame();
 
-	const [is3D, setIs3D] = useState(false);
-	const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [is3D, setIs3D] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
     <div className="app">
       {is3D ? (
-        <>
-          <Canvas camera={{ position: [5, 8, 5] }}>
-            <ambientLight intensity={0.5} />
-            <directionalLight
-              position={[20, 100, 20]}
-              intensity={1}
-              shadow-mapSize={2048}
-            />
-            <pointLight position={[-10, 100, -10]} intensity={0.8} />
-
-            <fog attach="fog" args={["#696969", 10, 200]} />
-
-            <mesh>
-              <boxGeometry args={[500, 300, 500]} />
-              <meshStandardMaterial
-                color="#6b7280"
-                side={THREE.BackSide}
-              />
-            </mesh>
-
-            <BoardRenderer
-              selected={selected}
-              onSquareClick={handleSquareClick}
-              game={game}
-              board={board}
-            />
-
-            <ChessBoardPieces
-              board={board}
-              selected={selected}
-              onSquareClick={handleSquareClick}
-            />
-
-            <CapturedPieces capturedPieces={capturedPieces} />
-            <BoardCoordinates />
-            <PlatformBase />
-
-            <OrbitControls
-              autoRotate
-              autoRotateSpeed={0}
-              minPolarAngle={Math.PI * 0}
-              maxPolarAngle={Math.PI * 0.5}
-              minDistance={2}
-              maxDistance={30}
-            />
-          </Canvas>
-          <button
-            onClick={resetGame}
-            style={{
-              position: "absolute",
-              top: "20px",
-              left: "20px",
-              padding: "10px 20px",
-              fontSize: "16px",
-              cursor: "pointer",
-              backgroundColor: "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-            }}
-          >
-            Réinitialiser
-          </button>
-
-          {pendingPromotion && (
-            <PromotionDialog
-              onChoose={handlePromotionChoice}
-              playerColor={game.turn() === "w" ? "w" : "b"}
-            />
-          )}
-        </>
-      ) : (
-        <div className="Board">
-        	<Board
-        	board={board}
-            game={game}
-            selected={selected}
-            lastMove={lastMove}
-            isDragging={isDragging}
-            onSquareClick={handleSquareClick}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-            onDragStart={handleDragStart}
-            onDragEnd={() => setIsDragging(false)}
+        <ChessGame3D
+          game={game}
+          board={board}
+          selected={selected}
+          capturedPieces={capturedPieces}
+          pendingPromotion={pendingPromotion}
+          onSquareClick={handleSquareClick}
+          onResetGame={resetGame}
+          onPromotionChoice={handlePromotionChoice}
         />
-        <button className="connexion-button" onClick={() => setIsLoginOpen(true)}>
-            <img
-            	src={connexionLogo}
-            	alt="connexion"
-            	className="connexion-logo"
-            />
-            Connexion
-        </button>
-
-		<Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}/>
-
-		<h1 className="title-chess">CHESS <span className="title-guard">GUARD</span></h1>
-		<p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
-
-        <button onClick={resetGame} className="reset-board">
-        	Réinitialiser
-        </button>
-
-          {pendingPromotion && (
-            <PromotionDialog
-              onChoose={handlePromotionChoice}
-              playerColor={game.turn() === "w" ? "b" : "w"}
-            />
-          )}
-        </div>
+      ) : (
+        <ChessGame2D
+          game={game}
+          board={board}
+          selected={selected}
+          lastMove={lastMove}
+          isDragging={isDragging}
+          pendingPromotion={pendingPromotion}
+          isLoginOpen={isLoginOpen}
+          onSquareClick={handleSquareClick}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onDragEnd={() => setIsDragging(false)}
+          onResetGame={resetGame}
+          onPromotionChoice={handlePromotionChoice}
+          onLoginOpen={setIsLoginOpen}
+        />
       )}
-      {/* bouton switch 2D / 3D */}
+      <div>
+       <h1 className="title-chess">
+        CHESS <span className="title-guard">GUARD</span>
+      </h1>
+
+      <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
+      </div>
+
       <button
         onClick={() => setIs3D(!is3D)}
         className="button-switch-2d-3d"

@@ -16,8 +16,10 @@ export async function register(
 		}),
 	});
 
-	if (!response.ok)
-		throw new Error("Erreur lors de l'inscription");
+	if (!response.ok) {
+		const error = await response.json();
+		throw new Error(error.error || "Erreur lors de l'inscription");
+	}
 
 	return response.json();
 }
@@ -38,8 +40,10 @@ export async function login(
 		}),
 	});
 
-	if (!response.ok)
-		throw new Error("Erreur lors de la connexion");
+	if (!response.ok) {
+		const error = await response.json();
+		throw new Error(error.error || "Erreur lors de la connexion");
+	}
 
 	return response.json();
 }

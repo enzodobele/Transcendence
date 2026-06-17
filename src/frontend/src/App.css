@@ -3,6 +3,7 @@
 }
 
 .app {
+  position: relative;
 	height: 100vh;
 	width: 100vw;
     background:
@@ -13,6 +14,10 @@
             rgba(255, 255, 255, 0) 70%
         ),
         #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .counter {
@@ -211,10 +216,10 @@
     color: white;
     border: none;
     border-radius: 20px;
-	display: flex;
+	  display: flex;
     align-items: center;
     gap: 8px;
-	font-family: inter, sans-serif;
+	  font-family: inter, sans-serif;
 }
 
 .connexion-logo {
@@ -225,11 +230,11 @@
 }
 
 .Board {
-	display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 70%;
+  
 }
 
 .reset-board {
@@ -290,9 +295,9 @@
 
 .title-chess {
 	position: absolute;
-  	top: 30px;
+  	top: 2%;
   	left: 50%;
-	transform: translateX(-50%);
+	  transform: translateX(-50%);
   	text-align: center;
   	font-size: 48px;
   	font-weight: bold;
@@ -379,4 +384,97 @@
 	border: none;
 	background-color: white;
 	cursor: pointer;
+}
+
+.login-error {
+	color: red;
+	font-size: 12px;
+	margin-top: 10px;
+}
+
+/* Profile Button Styles */
+.profile-container {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+}
+
+.profile-button {
+	width: 45px;
+	height: 45px;
+	border-radius: 50%;
+	background-color: #000000;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	transition: background-color 0.3s;
+}
+
+.profile-button:hover {
+	background-color: #333333;
+}
+
+.profile-icon {
+	width: 24px;
+	height: 24px;
+	filter: invert(1);
+}
+
+.profile-menu {
+	position: absolute;
+	top: 55px;
+	left: 0;
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	padding: 15px;
+	min-width: 200px;
+	z-index: 1001;
+}
+
+.profile-info {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e5e5e5;
+	margin-bottom: 10px;
+}
+
+.profile-username {
+	font-weight: bold;
+	margin: 0;
+	font-size: 14px;
+	color: #000;
+}
+
+.profile-email {
+	font-size: 12px;
+	color: #666;
+	margin: 5px 0 0 0;
+}
+
+.profile-logout-button {
+	width: 100%;
+	background-color: #f0d9b5;
+	border: 1px solid #e5bc79;
+	border-radius: 6px;
+	padding: 8px 12px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	font-size: 13px;
+	transition: background-color 0.3s;
+}
+
+.profile-logout-button:hover {
+	background-color: #e5bc79;
+}
+
+.logout-icon {
+	width: 16px;
+	height: 16px;
+}
 }
