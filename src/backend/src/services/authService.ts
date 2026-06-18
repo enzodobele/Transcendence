@@ -14,7 +14,7 @@ export const comparePassword = async (password: string, hashedPassword: string):
   return await bcrypt.compare(password, hashedPassword);
 };
 
-export const generateToken = (userId: string, email: string, username: string): string => {
+export const generateToken = (userId: Number, email: string, username: string): string => {
   const token = jwt.sign(
     { userId, email, username },
     JWT_SECRET,

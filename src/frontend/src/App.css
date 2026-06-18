@@ -478,4 +478,15 @@
 	height: 16px;
 }
 
-/* commentaire à supprimer */
+.button-find-game {
+    position: absolute;
+    top: 20px;
+    right: 150px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #000000;
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 10px;
+}
