@@ -19,14 +19,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
-    restart: unless-stopped
+      start_period: 30s
+    restart: always
 
   # =============================================
   # 🌐 NGINX (Reverse Proxy)
   # =============================================
   nginx:
-    image: nginx:alpine
+    image: transcendence-nginx
     build: ./src/nginx
     container_name: nginx
     ports:
