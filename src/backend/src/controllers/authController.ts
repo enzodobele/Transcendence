@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { hashPassword, comparePassword } from '../services/authService';
-import { generateToken } from '../services/jwtService';
+import { hashPassword, comparePassword, generateToken } from '../services/authService';
 
 const prisma = new PrismaClient();
 
@@ -29,10 +28,8 @@ export const register = async (req: Request, res: Response) => {
 		data: { email, username, hashedPassword: hashedPassword },
 	});
 
-	// ✅ Génère le token
-	const token = generateToken(user.id, user.username);
+	const token = generateToken(user.id, user.email, user.username);
 
-	// ✅ Renvoie le token dans la réponse
 	res.status(201).json({
 		userId: user.id,
 		username: user.username,
@@ -56,7 +53,6 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Mot de passe incorrect." });
     }
 
-    // Génère un token JWT
     const token = generateToken(user.id, user.email, user.username);
 
     res.status(200).json({
