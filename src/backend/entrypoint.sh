@@ -1,36 +1,80 @@
 #!/bin/sh
 set -e
 
-# Fonction utilitaire pour lire un secret de manière stricte
+# =============================================
+# Fonction utilitaire pour lire un secret
+# =============================================
 read_secret_strict() {
   local secret_name="$1"
   local secret_path="/run/secrets/$secret_name"
 
-  # Vérifie si le fichier existe et n'est pas vide
   if [ ! -s "$secret_path" ]; then
     echo "[-] CRITICAL ERROR: Secret '$secret_name' is missing or empty at $secret_path" >&2
     exit 1
   fi
 
-  # Lit le contenu du secret
-  cat "$secret_path"
+  cat "$secret_path" | tr -d '\n'  # ✅ Supprime les sauts de ligne
 }
 
-# Assignation stricte des variables (Crash immédiat si échec)
+# =============================================
+# Lecture des secrets
+# =============================================
+echo "[+] Loading secrets..."
 export DB_USER=$(read_secret_strict "db_user")
 export DB_NAME=$(read_secret_strict "db_name")
 export DB_PASSWORD=$(read_secret_strict "db_password")
 export JWT_SECRET=$(read_secret_strict "jwt_secret")
 
-# Construction de l'URL de connexion à la base de données
-export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}"
+# =============================================
+# Construction de DATABASE_URL
+# =============================================
+export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
+echo "[+] DATABASE_URL: $DATABASE_URL"
 
-echo "[+] DATABASE_URL générée avec succès."
-echo "[+] Waiting for database..."
-timeout 30s sh -c 'until pg_isready -h db -p 5432 -U "$DB_USER"; do sleep 1; done'
+# =============================================
+# Attente de la base de données (avec timeout)
+# =============================================
+echo "[+] Waiting for database to be ready..."
+MAX_RETRIES=30
+RETRY_INTERVAL=1
 
+for i in $(seq 1 $MAX_RETRIES); do
+  if pg_isready -h db -p 5432 -U "$DB_USER" -d "$DB_NAME" >/dev/null 2>&1; then
+    echo "[+] Database is ready after $i attempts."
+    break
+  fi
+
+  if [ $i -eq $MAX_RETRIES ]; then
+    echo "[-] ERROR: Database did not start in time." >&2
+    exit 1
+  fi
+
+  echo "[+] Retrying in $RETRY_INTERVAL second(s)..."
+  sleep $RETRY_INTERVAL
+done
+
+# =============================================
+# Application du schéma Prisma
+# =============================================
 echo "[+] Applying Prisma schema..."
-npx prisma db push --skip-generate || { echo "[-] Prisma push failed"; exit 1; }
+if ! npx prisma db push --skip-generate; then
+  echo "[-] ERROR: Failed to apply Prisma schema." >&2
+  exit 1
+fi
 
+echo "[+] Prisma schema applied successfully."
+
+# =============================================
+# Génération du client Prisma (optionnel)
+# =============================================
+echo "[+] Generating Prisma client..."
+if ! npx prisma generate; then
+  echo "[-] WARNING: Failed to generate Prisma client." >&2
+  # ✅ Ne pas échouer ici (le backend peut démarrer sans le client généré)
+fi
+
+# =============================================
+# Démarrage du backend
+# =============================================
 echo "[+] Starting backend..."
 exec "$@"
