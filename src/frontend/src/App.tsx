@@ -65,6 +65,7 @@ export default function App() {
       <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
       </div>
 
+      <button className="button-find-game">Chercher une partie</button>
       <button
         onClick={() => setIs3D(!is3D)}
         className="button-switch-2d-3d"
