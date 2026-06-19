@@ -33,7 +33,7 @@ export default function App() {
           board={board}
           selected={selected}
           capturedPieces={capturedPieces}
-          pendingPromotion={pendingPromotion}
+          pendingPromotion={!!pendingPromotion}
           onSquareClick={handleSquareClick}
           onResetGame={resetGame}
           onPromotionChoice={handlePromotionChoice}
@@ -45,7 +45,7 @@ export default function App() {
           selected={selected}
           lastMove={lastMove}
           isDragging={isDragging}
-          pendingPromotion={pendingPromotion}
+          pendingPromotion={!!pendingPromotion}
           isLoginOpen={isLoginOpen}
           onSquareClick={handleSquareClick}
           onDragStart={handleDragStart}

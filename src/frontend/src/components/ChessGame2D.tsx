@@ -14,9 +14,9 @@ interface ChessGame2DProps {
   pendingPromotion: boolean;
   isLoginOpen: boolean;
   onSquareClick: (square: string) => void;
-  onDragStart: (e: React.DragEvent, piece: string) => void;
+  onDragStart: (e: string, piece: React.DragEvent) => void;
   onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent, square: string) => void;
+  onDrop: (e: string, square: React.DragEvent<Element>) => void;
   onDragEnd: () => void;
   onResetGame: () => void;
   onPromotionChoice: (piece: string) => void;

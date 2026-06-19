@@ -15,24 +15,22 @@ const playSound = (soundFile: string) =>
 	audio.play().catch(() => {});
 };
 
-const extractCapturedPieces = (game: Chess): CapturedPiece[] =>
-{
+const extractCapturedPieces = (game: Chess): CapturedPiece[] => {
 	const captured: CapturedPiece[] = [];
 	const moves = game.history({ verbose: true });
 
-	moves.forEach((move: any) =>
-	{
-		if (move.captured)
-		{
-			// Déterminer la couleur de la pièce capturée (opposée au joueur qui a joué)
-			let captureColor;
-			if (move.color === 'w')
-				captureColor = 'b';
-			else
-				captureColor = 'w';
-			captured.push({ type: move.captured, color: captureColor });
+	moves.forEach((move) => {
+		if (move.captured) {
+			const captureColor: "w" | "b" =
+				move.color === "w" ? "b" : "w";
+
+			captured.push({
+				type: move.captured,
+				color: captureColor,
+			});
 		}
 	});
+
 	return captured;
 };
 
