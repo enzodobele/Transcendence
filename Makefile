@@ -19,7 +19,7 @@ SERVICE ?=  # Si non spécifié, gère tous les services
 # =============================================
 
 up:
-	@$(COMPOSE) up -d $(SERVICE)
+	@$(COMPOSE) up -d --build $(SERVICE) 
 
 down:
 	@$(COMPOSE) down $(SERVICE) -v
