@@ -204,12 +204,6 @@
   outline-offset: 3px;
 }
 
-.connexion-button,
-.reset-board {
-  width: min(100%, 20rem);
-  font-size: 0.98rem;
-}
-
 .connexion-logo {
   width: 1.05rem;
   height: 1.05rem;
@@ -218,17 +212,29 @@
 }
 
 .reset-board {
+  width: min(100%, 20rem);
+  font-size: 0.98rem;
   background: linear-gradient(135deg, #2e6b46 0%, #1f4c34 100%);
 }
 
 .connexion-button {
-  background: linear-gradient(135deg, #1b1d1f 0%, #31363b 100%);
+  position: absolute;
+  top: clamp(1rem, 2vw, 1.5rem);
+  left: clamp(1rem, 2vw, 1.5rem);
+  z-index: 6;
+  width: max-content;
+  font-size: 0.95rem;
+}
+
+.game-actions {
+  display: contents;
 }
 
 .button-find-game,
 .button-switch-2d-3d {
   position: absolute;
   top: clamp(1rem, 2vw, 1.5rem);
+  right: clamp(1rem, 2vw, 1.5rem);
   z-index: 6;
   min-width: 10rem;
   width: max-content;
@@ -236,27 +242,60 @@
 }
 
 .button-switch-2d-3d {
-  left: auto !important;
-  right: clamp(1rem, 2vw, 1.5rem);
-
+  top: clamp(1rem, 2vw, 1.5rem);
+  font-size: 1rem;
+  padding: 0.65rem 0.9rem;
+  min-height: unset;
+  min-width: unset;
 }
 
 .button-find-game {
-  position: absolute !important;
-  left: auto !important;
-  right: 2vh !important;
-  width: min(100%, 20rem);
-  font-size: 0.98rem;
-  margin-top: 4rem;
+  top: calc(clamp(1rem, 2vw, 1.5rem) + 4rem);
+  font-size: 1rem;
+  padding: 0.65rem 0.9rem;
+  min-height: unset;
+  min-width: unset;
 }
 
+.connexion-button:hover,
 .button-find-game:hover,
 .button-switch-2d-3d:hover {
   background: rgba(27, 29, 31, 0.94);
 }
 
+@media (max-width: 700px) {
+  .game-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .button-find-game,
+  .button-switch-2d-3d {
+    position: static;
+    min-width: 0;
+    width: auto;
+    flex: 1;
+    font-size: 0.88rem;
+    padding: 0.75rem 0.8rem;
+  }
+
+  .connexion-label {
+    display: none;
+  }
+
+  .connexion-button {
+    width: 2.9rem;
+    height: 2.9rem;
+    padding: 0;
+    min-height: unset;
+  }
+}
+
 .login-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
@@ -346,6 +385,8 @@
   background: linear-gradient(135deg, #d8a86c 0%, #b87e45 100%);
   color: #23160e;
   font-weight: 700;
+  border-radius: 999px;
+  padding: 0.85rem 1.1rem;
 }
 
 .login-switch-button {
@@ -369,6 +410,10 @@
 }
 
 .profile-button {
+  position: absolute;
+  top: clamp(1rem, 2vw, 1.5rem);
+  left: clamp(1rem, 2vw, 1.5rem);
+  z-index: 6;
   width: 2.9rem;
   height: 2.9rem;
   border-radius: 999px;
@@ -418,13 +463,15 @@
 }
 
 .profile-logout-button {
-  position: absolute;
   width: 100%;
   padding: 0.72rem 0.9rem;
   border-radius: 0.85rem;
   background: linear-gradient(135deg, #f3d1a7 0%, #dfab70 100%);
   color: #23160e;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .logout-icon {
@@ -436,15 +483,7 @@ canvas {
   display: block;
 }
 
-.button-find-game {
-  background: linear-gradient(135deg, #2e6b46 0%, #1f4c34 100%);
-}
 
-@media (max-width: 900px) {
-  .button-find-game {
-    right: clamp(9.5rem, 24vw, 11rem);
-  }
-}
 
 @media (max-width: 720px) {
   .title-chess {
@@ -472,28 +511,8 @@ canvas {
     height: 70px !important;
   }
 
-  .button-find-game {
-    
-  }
-
   .button-switch-2d-3d {
-    top: 1rem !important;
-    right: 1rem !important;
-    left: auto !important;
-    min-width: auto !important;
-    width: fit-content !important;
-    max-width: 100px !important;
-    padding: 0.6rem 0.8rem !important;
-    font-size: 0.8rem !important;
-    white-space: nowrap !important;
-    z-index: 10 !important;
-  }
-
-
-  .profile-container,
-  .app > button {
-    top: 1rem;
-    left: 1rem;
+    min-width: auto;
   }
 
   .login-content {
@@ -512,10 +531,19 @@ canvas {
     height: 58px !important;
   }
 
-  .connexion-button,
   .reset-board {
     width: 100%;
     font-size: 0.92rem;
+  }
+
+  .title-chess {
+    font-size: clamp(1.3rem, 7vw, 1.9rem);
+    letter-spacing: 0.1em;
+  }
+
+  .subtitle-chess-guard {
+    font-size: clamp(0.6rem, 2.5vw, 0.75rem);
+    letter-spacing: 0.14em;
   }
 
   .login-overlay {

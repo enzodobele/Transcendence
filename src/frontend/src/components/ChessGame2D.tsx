@@ -1,9 +1,5 @@
 import { Board } from "./Board";
 import { PromotionDialog } from "./PromotionDialog";
-import connexionLogo from "../assets/Logo/login.svg";
-import { Login } from "./Login";
-import { ProfileButton } from "./ProfileButton";
-import { useAuth } from "../contexts/AuthContext";
 
 interface ChessGame2DProps {
   game: any;
@@ -12,7 +8,6 @@ interface ChessGame2DProps {
   lastMove: any;
   isDragging: boolean;
   pendingPromotion: boolean;
-  isLoginOpen: boolean;
   onSquareClick: (square: string) => void;
   onDragStart: (e: string, piece: React.DragEvent) => void;
   onDragOver: (e: React.DragEvent) => void;
@@ -20,7 +15,6 @@ interface ChessGame2DProps {
   onDragEnd: () => void;
   onResetGame: () => void;
   onPromotionChoice: (piece: string) => void;
-  onLoginOpen: (open: boolean) => void;
 }
 
 export function ChessGame2D({
@@ -30,7 +24,6 @@ export function ChessGame2D({
   lastMove,
   isDragging,
   pendingPromotion,
-  isLoginOpen,
   onSquareClick,
   onDragStart,
   onDragOver,
@@ -38,10 +31,7 @@ export function ChessGame2D({
   onDragEnd,
   onResetGame,
   onPromotionChoice,
-  onLoginOpen,
 }: ChessGame2DProps) {
-  const { isAuthenticated } = useAuth();
-
   return (
     <div className="Board">
       <Board
@@ -56,24 +46,6 @@ export function ChessGame2D({
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       />
-
-      {isAuthenticated ? (
-        <ProfileButton />
-      ) : (
-        <button
-          className="connexion-button"
-          onClick={() => onLoginOpen(true)}
-        >
-          <img
-            src={connexionLogo}
-            alt="connexion"
-            className="connexion-logo"
-          />
-          Connexion
-        </button>
-      )}
-
-      <Login isOpen={isLoginOpen} onClose={() => onLoginOpen(false)} />
 
       <button onClick={onResetGame} className="reset-board">
         Réinitialiser
