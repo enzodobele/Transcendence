@@ -26,7 +26,7 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
-    <div className="app">
+    <div className={`app ${is3D ? "app-3d" : ""}`}>
       {is3D ? (
         <ChessGame3D
           game={game}
@@ -57,15 +57,16 @@ export default function App() {
           onLoginOpen={setIsLoginOpen}
         />
       )}
-      <div>
+      <div className="header-section">
        <h1 className="title-chess">
         CHESS <span className="title-guard">GUARD</span>
       </h1>
 
       <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
-      </div>
 
       <button className="button-find-game">Chercher une partie</button>
+      </div>
+
       <button
         onClick={() => setIs3D(!is3D)}
         className="button-switch-2d-3d"
