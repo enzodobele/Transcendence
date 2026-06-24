@@ -1,3 +1,4 @@
+import { MoveHistory } from "./components/MoveHistory";
 import { useState } from "react";
 import { useChessGame } from "./hooks/useChessGame";
 import { ChessGame3D } from "./components/ChessGame3D";
@@ -6,7 +7,8 @@ import { ProfileButton } from "./components/ProfileButton";
 import { Login } from "./components/Login";
 import { useAuth } from "./contexts/AuthContext";
 import connexionLogo from "./assets/Logo/login.svg";
-import "./App.css";
+import "./styles/App.css";
+import "./styles/Buttons.css";
 
 export default function App() {
   const {
@@ -29,38 +31,11 @@ export default function App() {
   const { isAuthenticated } = useAuth();
   const [is3D, setIs3D] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const currentHistory = game.history();
 
   return (
     <div className={`app ${is3D ? "app-3d" : ""}`}>
-      {is3D ? (
-        <ChessGame3D
-          game={game}
-          board={board}
-          selected={selected}
-          capturedPieces={capturedPieces}
-          pendingPromotion={!!pendingPromotion}
-          onSquareClick={handleSquareClick}
-          onResetGame={resetGame}
-          onPromotionChoice={handlePromotionChoice}
-        />
-      ) : (
-        <ChessGame2D
-          game={game}
-          board={board}
-          selected={selected}
-          lastMove={lastMove}
-          isDragging={isDragging}
-          pendingPromotion={!!pendingPromotion}
-          onSquareClick={handleSquareClick}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          onDragEnd={() => setIsDragging(false)}
-          onResetGame={resetGame}
-          onPromotionChoice={handlePromotionChoice}
-        />
-      )}
-
+      
       {isAuthenticated ? (
         <ProfileButton />
       ) : (
@@ -76,6 +51,44 @@ export default function App() {
           <span className="connexion-label">Connexion</span>
         </button>
       )}
+
+      {/* --- NOUVEAU CONTENEUR PRINCIPAL CÔTE À CÔTE --- */}
+      <div className="game-container">
+        <div className="chessboard-wrapper">
+          {is3D ? (
+            <ChessGame3D
+              game={game}
+              board={board}
+              selected={selected}
+              capturedPieces={capturedPieces}
+              pendingPromotion={!!pendingPromotion}
+              onSquareClick={handleSquareClick}
+              onResetGame={resetGame}
+              onPromotionChoice={handlePromotionChoice}
+            />
+          ) : (
+            <ChessGame2D
+              game={game}
+              board={board}
+              selected={selected}
+              lastMove={lastMove}
+              isDragging={isDragging}
+              pendingPromotion={!!pendingPromotion}
+              onSquareClick={handleSquareClick}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onDragEnd={() => setIsDragging(false)}
+              onResetGame={resetGame}
+              onPromotionChoice={handlePromotionChoice}
+            />
+          )}
+        </div>
+
+        {/* L'historique vient se placer juste à côté de l'échiquier */}
+        <MoveHistory history={currentHistory} />
+      </div>
+      {/* ------------------------------------------------ */}
 
       <Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
 

@@ -57,20 +57,11 @@ done
 # Application du schéma Prisma
 # =============================================
 echo "[+] Applying Prisma schema..."
-if ! npx prisma db push --skip-generate; then
+if ! npx prisma db push; then
   echo "[-] ERROR: Failed to apply Prisma schema." >&2
   exit 1
 fi
-
 echo "[+] Prisma schema applied successfully."
-
-# =============================================
-# Génération du client Prisma (optionnel)
-# =============================================
-echo "[+] Generating Prisma client..."
-if ! npx prisma generate; then
-  echo "[-] WARNING: Failed to generate Prisma client." >&2
-fi
 
 # =============================================
 # Lancement de la seed (optionnel)

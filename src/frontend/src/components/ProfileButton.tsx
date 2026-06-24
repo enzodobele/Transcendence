@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "../styles/ProfileButton.css";
 import { useAuth } from "../contexts/AuthContext";
 import profileIcon from "../assets/Logo/chessguard_profile_icon.svg";
 import logoutIcon from "../assets/Logo/logout.svg";

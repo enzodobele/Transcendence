@@ -14,13 +14,15 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.3",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@types/cors": "^2.8.19",
     "bcrypt": "^6.0.0",
     "chess.js": "^1.4.0",
     "cors": "^2.8.6",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.22.0",
     "ws": "^8.21.0"
   },
   "devDependencies": {
@@ -28,15 +30,16 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.1",
+    "@types/pg": "^8.20.0",
     "@types/ws": "^8.5.12",
-    "prisma": "^6.19.3",
+    "prisma": "^7.8.0",
     "tsx": "^4.22.4"
   },
   "allowScripts": {
-    "prisma@6.19.3": true,
-    "bcrypt@6.0.0": true,
-    "@prisma/client@6.19.3": true,
-    "@prisma/engines@6.19.3": true,
-    "esbuild@0.28.1": true
-  }
+	"prisma@7.8.0": true,
+	"@prisma/client@7.8.0": true,
+	"@prisma/engines@7.8.0": true,
+	"bcrypt@6.0.0": true,
+	"esbuild@0.28.1": true
+	}
 }
