@@ -6,22 +6,29 @@
     "dev": "tsx watch src/app.ts",
     "start": "node src/app.js",
     "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "@types/cors": "^2.8.19",
     "bcrypt": "^6.0.0",
+    "chess.js": "^1.4.0",
     "cors": "^2.8.6",
     "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.1",
+    "@types/ws": "^8.5.12",
     "prisma": "^6.19.3",
     "tsx": "^4.22.4"
   },

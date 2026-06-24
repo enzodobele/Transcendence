@@ -12,7 +12,7 @@ COMPOSE = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)
 SERVICE ?=  # Si non spécifié, gère tous les services
 
 .PHONY: up down build rebuild logs ps clean fclean \
-        db-push db-studio db-migrate shell-back shell-front
+	db-push db-studio db-seed db-migrate shell-back shell-front
 
 # =============================================
 # 🚀 APPLICATION
@@ -40,6 +40,9 @@ ps:
 
 exec:
 	@$(COMPOSE) exec $(SERVICE) sh
+
+db-seed:
+	@$(COMPOSE) exec backend npm run db:seed
 
 # =============================================
 # 🧹 CLEAN

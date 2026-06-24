@@ -70,7 +70,14 @@ echo "[+] Prisma schema applied successfully."
 echo "[+] Generating Prisma client..."
 if ! npx prisma generate; then
   echo "[-] WARNING: Failed to generate Prisma client." >&2
-  # ✅ Ne pas échouer ici (le backend peut démarrer sans le client généré)
+fi
+
+# =============================================
+# Lancement de la seed (optionnel)
+# =============================================
+echo "[+] Checking or applying database seed..."
+if ! npx prisma db seed; then
+  echo "[-] WARNING: Failed to seed the database. Moving on..." >&2
 fi
 
 # =============================================
