@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../prisma';
 import { hashPassword, comparePassword, generateToken } from '../services/authService';
 
-const prisma = new PrismaClient();
 
 export const register = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;

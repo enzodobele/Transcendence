@@ -1,97 +1,92 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../prisma';
+import { addToWaitlist, removeFromWaitlist, findOpponent } from '../services/waitlistService';
 
-const prisma = new PrismaClient();
-const INITIAL_FEN = 'rn1qkbnr/ppp1pppp/8/3p4/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-const toUserId = (value: unknown) => {
-	if (typeof value === 'number' && Number.isInteger(value)) {
-		return value;
-	}
-
-	if (typeof value === 'string' && value.trim() !== '') {
-		const parsedValue = Number.parseInt(value, 10);
-		return Number.isInteger(parsedValue) ? parsedValue : null;
-	}
-
-	return null;
-};
-
-// retourne la liste des personnes connectées. On ajustera la requête en fonction de ce qu'on veut afifcher
+// Retourne la liste des utilisateurs connectés (ou actifs)
 export const getConnectedUsers = async (_req: Request, res: Response) => {
-  const users = await prisma.user.findMany({
-    where: {
-      isActive: true
-    },
-    select: {
-      id: true,
-      username: true,
-      eloRating: true,
-      avatarUrl: true
-    }
-  });
-
-  res.json(users);
+  try {
+    const users = await prisma.user.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        username: true,
+        eloRating: true,
+        avatarUrl: true,
+      },
+    });
+    res.json(users);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des utilisateurs connectés:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 };
 
-// ajoute un utilisateur à la liste d'attente
+// Ajoute un utilisateur à la file d'attente
 export const joinWaitlist = async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
+  const userId = req.user?.id; // ✅ Utilise req.user.id (et non req.user.userId)
 
   if (!userId) {
-    return res.sendStatus(401);
+    return res.status(401).json({ error: 'Non autorisé' });
   }
 
-  const existing = await prisma.waitlistEntry.findUnique({
-    where: { userId }
-  });
-
-  if (existing) {
-    return res.json({
-      waiting: true
-    });
-  }
-
-  await prisma.waitlistEntry.create({
-    data: {
-      userId
+  try {
+    // Vérifie si l'utilisateur est déjà dans la file
+    const existing = await prisma.waitlistEntry.findUnique({ where: { userId } });
+    if (existing) {
+      return res.json({ waiting: true, message: 'Déjà en attente' });
     }
-  });
 
-  // regarde si on peut faire un match
-  await tryMatch();
+    // Ajoute l'utilisateur à la file
+    await addToWaitlist(userId, "5+0"); // ✅ Utilise waitlistService
 
-  res.json({
-    waiting: true
-  });
+    // Cherche un adversaire
+    const opponent = await findOpponent(userId, "5+0");
+    if (opponent) {
+      // Crée une partie en base de données
+      const game = await prisma.game.create({
+        data: {
+          player1Id: userId,
+          player2Id: opponent.userId,
+          fenString: INITIAL_FEN,
+          timeControl: "5+0",
+          status: "en_cours",
+        },
+      });
+
+      // Retire les deux joueurs de la file
+      await removeFromWaitlist(userId);
+      await removeFromWaitlist(opponent.userId);
+
+      return res.status(201).json({
+        message: 'Partie créée',
+        gameId: game.id,
+        opponent: opponent.user,
+        fenString: INITIAL_FEN,
+      });
+    } else {
+      return res.json({ waiting: true, message: 'En attente d\'un adversaire...' });
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout à la file d\'attente:', error);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
 };
 
-// lance la partie automatiquement si deux joueurs sont dans la liste d'attente
-const tryMatch = async () => {
-  const players = await prisma.waitlistEntry.findMany({
-    take: 2,
-    orderBy: {
-      createdAt: 'asc'
-    }
-  });
+// Retire un utilisateur de la file d'attente
+export const removeFromWaitlistController = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
 
-  if (players.length < 2) {
-    return;
+  if (!userId) {
+    return res.status(401).json({ error: 'Non autorisé' });
   }
 
-  await prisma.game.create({
-    data: {
-      player1Id: players[0].userId,
-      player2Id: players[1].userId,
-      fenString: INITIAL_FEN
-    }
-  });
-
-  await prisma.waitlistEntry.deleteMany({
-    where: {
-      userId: {
-        in: players.map(p => p.userId)
-      }
-    }
-  });
+  try {
+    await removeFromWaitlist(userId);
+    return res.json({ message: 'Vous avez quitté la file d\'attente.' });
+  } catch (error) {
+    console.error('Erreur lors de la suppression de la file d\'attente:', error);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
 };
