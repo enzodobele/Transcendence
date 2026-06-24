@@ -86,10 +86,14 @@ export default function App() {
         </button>
       </div>
 
-      <h1 className="title-chess">
-        CHESS <span className="title-guard">GUARD</span>
-      </h1>
-      <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
+      {!is3D && (
+        <>
+          <h1 className="title-chess">
+            CHESS <span className="title-guard">GUARD</span>
+          </h1>
+          <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
+        </>
+      )}
     </div>
   );
 }

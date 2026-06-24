@@ -73,24 +73,6 @@ export function ChessGame3D({
           maxDistance={30}
         />
       </Canvas>
-      <button
-        onClick={onResetGame}
-        style={{
-          position: "absolute",
-          top: "20px",
-          left: "20px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          cursor: "pointer",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-        }}
-      >
-        Réinitialiser
-      </button>
-
       {pendingPromotion && (
         <PromotionDialog
           onChoose={onPromotionChoice}

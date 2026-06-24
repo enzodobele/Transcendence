@@ -2,13 +2,13 @@
   position: relative;
   isolation: isolate;
   width: 100%;
-  min-height: 100svh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  padding: clamp(1rem, 2.5vw, 1.75rem);
+  gap: clamp(0.3rem, 0.6vw, 0.5rem);
+  padding: clamp(0.4rem, 0.8vw, 0.6rem);
   overflow: hidden;
 }
 
@@ -70,8 +70,8 @@
 }
 
 .title-chess {
-  top: clamp(1rem, 3vw, 2rem);
-  font-size: clamp(2.25rem, 5vw, 4rem);
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
   letter-spacing: 0.16em;
   line-height: 1;
   color: #8d5f3f;
@@ -83,8 +83,8 @@
 }
 
 .subtitle-chess-guard {
-  top: clamp(4.5rem, 8vw, 6rem);
-  font-size: clamp(0.8rem, 1.8vw, 1rem);
+  top: clamp(1.8rem, 2.5vw, 2.4rem);
+  font-size: clamp(0.55rem, 0.8vw, 0.68rem);
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: rgba(34, 38, 34, 0.7);
@@ -97,13 +97,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding-top: clamp(7rem, 12vw, 8.5rem);
-  padding-bottom: clamp(4rem, 8vw, 5.5rem);
+  gap: 0.4rem;
+  padding-top: clamp(5rem, 6.5vw, 5.5rem);
+  padding-bottom: 0.4rem;
 }
 
 .Board > div:first-child {
-  width: min(92vw, 48rem) !important;
+  width: min(92vw, 56rem, calc(100svh - 10rem)) !important;
   aspect-ratio: 1 / 1;
   grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
   grid-template-rows: repeat(8, minmax(0, 1fr));
@@ -205,25 +205,29 @@
 }
 
 .connexion-logo {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1rem;
+  height: 1rem;
   filter: invert(1);
   opacity: 0.9;
 }
 
 .reset-board {
-  width: min(100%, 20rem);
-  font-size: 0.98rem;
+  width: min(100%, 14rem);
+  font-size: 0.82rem;
+  min-height: 2rem;
+  padding: 0.4rem 0.8rem;
   background: linear-gradient(135deg, #2e6b46 0%, #1f4c34 100%);
 }
 
 .connexion-button {
   position: absolute;
-  top: clamp(1rem, 2vw, 1.5rem);
-  left: clamp(1rem, 2vw, 1.5rem);
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  left: clamp(0.4rem, 0.8vw, 0.6rem);
   z-index: 6;
   width: max-content;
-  font-size: 0.95rem;
+  font-size: 0.80rem;
+  min-height: 2rem;
+  padding: 0.4rem 0.75rem;
 }
 
 .game-actions {
@@ -233,27 +237,27 @@
 .button-find-game,
 .button-switch-2d-3d {
   position: absolute;
-  top: clamp(1rem, 2vw, 1.5rem);
-  right: clamp(1rem, 2vw, 1.5rem);
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  right: clamp(0.4rem, 0.8vw, 0.6rem);
   z-index: 6;
-  min-width: 10rem;
+  min-width: 0;
   width: max-content;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
 }
 
 .button-switch-2d-3d {
-  top: clamp(1rem, 2vw, 1.5rem);
-  font-size: 1rem;
-  padding: 0.65rem 0.9rem;
-  min-height: unset;
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  font-size: 0.82rem;
+  padding: 0.4rem 0.75rem;
+  min-height: 2rem;
   min-width: unset;
 }
 
 .button-find-game {
-  top: calc(clamp(1rem, 2vw, 1.5rem) + 4rem);
-  font-size: 1rem;
-  padding: 0.65rem 0.9rem;
-  min-height: unset;
+  top: calc(clamp(0.4rem, 0.8vw, 0.6rem) + 2.6rem);
+  font-size: 0.82rem;
+  padding: 0.4rem 0.75rem;
+  min-height: 2rem;
   min-width: unset;
 }
 
@@ -404,18 +408,19 @@
 
 .profile-container {
   position: fixed;
-  top: clamp(1rem, 2vw, 1.5rem);
-  left: clamp(1rem, 2vw, 1.5rem);
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  left: clamp(0.4rem, 0.8vw, 0.6rem);
   z-index: 6;
 }
 
-.profile-button {
+button.profile-button {
   position: absolute;
-  top: clamp(1rem, 2vw, 1.5rem);
-  left: clamp(1rem, 2vw, 1.5rem);
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  left: clamp(0.4rem, 0.8vw, 0.6rem);
   z-index: 6;
-  width: 2.9rem;
-  height: 2.9rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  min-height: unset;
   border-radius: 999px;
   background: linear-gradient(135deg, #1b1d1f 0%, #31363b 100%);
   display: inline-flex;
@@ -487,22 +492,23 @@ canvas {
 
 @media (max-width: 720px) {
   .title-chess {
-    font-size: clamp(1.9rem, 8vw, 2.8rem);
+    font-size: clamp(1rem, 4vw, 1.4rem);
     letter-spacing: 0.12em;
   }
 
   .subtitle-chess-guard {
-    top: clamp(4rem, 14vw, 5.3rem);
+    top: clamp(1.6rem, 6vw, 2.2rem);
+    font-size: clamp(0.5rem, 1.8vw, 0.65rem);
     letter-spacing: 0.18em;
   }
 
   .Board {
     width: 100%;
-    padding-top: clamp(6.5rem, 22vw, 8rem);
+    padding-top: clamp(5rem, 8vw, 5.5rem);
   }
 
   .Board > div:first-child {
-    width: min(94vw, 36rem) !important;
+    width: min(94vw, 36rem, calc(100svh - 10rem)) !important;
     border-radius: 1rem;
   }
 
@@ -523,7 +529,7 @@ canvas {
 
 @media (max-width: 480px) {
   .Board > div:first-child {
-    width: min(95vw, 30rem) !important;
+    width: min(95vw, 30rem, calc(100svh - 10rem)) !important;
   }
 
   .Board > div:first-child > div img {
@@ -533,16 +539,16 @@ canvas {
 
   .reset-board {
     width: 100%;
-    font-size: 0.92rem;
+    font-size: 0.78rem;
   }
 
   .title-chess {
-    font-size: clamp(1.3rem, 7vw, 1.9rem);
+    font-size: clamp(0.9rem, 4.5vw, 1.2rem);
     letter-spacing: 0.1em;
   }
 
   .subtitle-chess-guard {
-    font-size: clamp(0.6rem, 2.5vw, 0.75rem);
+    font-size: clamp(0.5rem, 2vw, 0.62rem);
     letter-spacing: 0.14em;
   }
 
