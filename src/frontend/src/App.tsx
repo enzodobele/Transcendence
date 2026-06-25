@@ -1,4 +1,3 @@
-// frontend/src/App.tsx
 import { useState } from "react";
 import { useChessGame } from "./hooks/useChessGame";
 import { useAuth } from "./contexts/AuthContext";
@@ -6,10 +5,12 @@ import { useAuth } from "./contexts/AuthContext";
 // Composants
 import { ChessGame3D } from "./components/ChessGame3D";
 import { ChessGame2D } from "./components/ChessGame2D";
+import { FloatingPiece } from "./components/FloatingPiece";
+import { AnimatedPiece } from "./components/AnimatedPiece";
 import { MoveHistory } from "./components/MoveHistory";
 import { ProfileButton } from "./components/ProfileButton";
 import { Login } from "./components/Login";
-import { FindGameButton } from "./components/FindGameButton"; // 💡 On importe notre bouton tout neuf
+import { FindGameButton } from "./components/FindGameButton";
 
 // Assets & Styles
 import connexionLogo from "./assets/Logo/login.svg";
@@ -22,18 +23,18 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLocalGame, setIsLocalGame] = useState(false);
 
+  // 💡 Fusion des deux hooks useChessGame (Récupération des animations + fonctions de drag)
   const {
     game,
     board,
     selected,
-    handleSquareClick,
-    resetGame,
     lastMove,
-    isDragging,
-    setIsDragging,
-    handleDragStart,
-    handleDragOver,
-    handleDrop,
+    dragPiece,
+    animatingPiece,
+    clearAnimation,
+    handleSquareClick,
+    handlePiecePointerDown,
+    resetGame,
     capturedPieces,
     pendingPromotion,
     handlePromotionChoice,
@@ -50,16 +51,12 @@ export default function App() {
     );
   }
 
-  // On est en match si c'est du local OU si le serveur nous a trouvé un "currentGameId"
+  // États du match
   const isInActiveGame = isLocalGame || !!user?.currentGame?.id;
-  // On détermine la couleur du joueur actuel en ligne (player1 = Blancs, player2 = Noirs)
-const isOnlineWhite = user?.username === user?.currentGame?.player1?.username;
+  const isOnlineWhite = user?.username === user?.currentGame?.player1?.username;
+  const playerColor: 'white' | 'black' = isLocalGame || isOnlineWhite ? 'white' : 'black';
 
-// En local, le joueur par défaut est souvent blanc (ou gère les deux), en ligne on applique le rôle
-const playerColor: 'white' | 'black' = isLocalGame || isOnlineWhite ? 'white' : 'black';
-
-// Optionnel : Pour déboguer rapidement dans ta console de navigateur
-console.log(`[ChessGuard] Tu es connecté en tant que : ${user?.username} | Couleur assignée : ${playerColor}`);
+  console.log(`[ChessGuard] Connecté en tant que : ${user?.username} | Couleur : ${playerColor}`);
 
   return (
     <div className={`app ${is3D ? "app-3d" : ""}`}>
@@ -89,7 +86,7 @@ console.log(`[ChessGuard] Tu es connecté en tant que : ${user?.username} | Coul
                 onSquareClick={handleSquareClick}
                 onResetGame={resetGame}
                 onPromotionChoice={handlePromotionChoice}
-				playerColor={playerColor}
+                playerColor={playerColor}
               />
             ) : (
               <ChessGame2D
@@ -97,24 +94,24 @@ console.log(`[ChessGuard] Tu es connecté en tant que : ${user?.username} | Coul
                 board={board}
                 selected={selected}
                 lastMove={lastMove}
-                isDragging={isDragging}
+                dragSquare={dragPiece?.square ?? null}
+                animatingToSquare={animatingPiece?.toSquare ?? null}
                 pendingPromotion={!!pendingPromotion}
                 onSquareClick={handleSquareClick}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onDragEnd={() => setIsDragging(false)}
+                onPiecePointerDown={handlePiecePointerDown}
                 onResetGame={resetGame}
                 onPromotionChoice={handlePromotionChoice}
-				playerColor={playerColor}
+                playerColor={playerColor}
               />
             )}
           </div>
+          
+          {/* Historique des coups avec les pseudos réels */}
           <MoveHistory 
-		history={currentHistory} 
-		player1Name={isLocalGame ? "Blancs (Local)" : (user?.currentGame?.player1?.username || "Chargement...")}
-		player2Name={isLocalGame ? "Noirs (Local)" : (user?.currentGame?.player2?.username || "Chargement...")}
-		/>
+            history={currentHistory} 
+            player1Name={isLocalGame ? "Blancs (Local)" : (user?.currentGame?.player1?.username || "Chargement...")}
+            player2Name={isLocalGame ? "Noirs (Local)" : (user?.currentGame?.player2?.username || "Chargement...")}
+          />
         </div>
       ) : (
         /* VUE LOBBY / ACCUEIL (Hors match) */
@@ -125,7 +122,6 @@ console.log(`[ChessGuard] Tu es connecté en tant que : ${user?.username} | Coul
           <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
 
           <div className="lobby-actions">
-            {/* 💡 Remplacement du vieux bouton par le nouveau flux de matchmaking */}
             {isAuthenticated ? (
               <FindGameButton />
             ) : (
@@ -137,6 +133,13 @@ console.log(`[ChessGuard] Tu es connecté en tant que : ${user?.username} | Coul
             </button>
           </div>
         </div>
+      )}
+
+      {/* Éléments overlay pour les animations fluides de ton pote */}
+      <FloatingPiece dragPiece={dragPiece} game={game} />
+
+      {animatingPiece && (
+        <AnimatedPiece data={animatingPiece} onDone={clearAnimation} />
       )}
 
       {/* ACTIONS COMPLÉMENTAIRES (Uniquement en match) */}

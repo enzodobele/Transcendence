@@ -33,7 +33,7 @@ export function ChessGame3D({
 }: ChessGame3DProps) {
   return (
     <>
-      <Canvas camera={{ position: [5, 8, 5] }}>
+      <Canvas camera={{ position: [0, 10, 13], fov: 50 }}>
         <ambientLight intensity={0.5} />
         <directionalLight
           position={[20, 100, 20]}

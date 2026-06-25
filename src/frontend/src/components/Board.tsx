@@ -7,13 +7,11 @@ interface BoardProps {
     game: any;
     selected: string | null;
     lastMove: { from: string; to: string } | null;
-    isDragging: boolean;
+    dragSquare: string | null;
+    animatingToSquare: string | null;
     onSquareClick: (square: string) => void;
-    onDragOver: (e: React.DragEvent) => void;
-    onDrop: (square: string, e: React.DragEvent) => void;
-    onDragStart: (square: string, e: React.DragEvent) => void;
-    onDragEnd: () => void;
-    playerColor: 'white' | 'black'; // 💡 Étape 1 : On ajoute la couleur aux props
+    onPiecePointerDown: (square: string, e: React.PointerEvent) => void;
+    playerColor: 'white' | 'black'; // 👑 Préservé : Couleur du joueur
 }
 
 export const Board: React.FC<BoardProps> = ({
@@ -21,15 +19,13 @@ export const Board: React.FC<BoardProps> = ({
     game,
     selected,
     lastMove,
-    isDragging,
+    dragSquare,
+    animatingToSquare,
     onSquareClick,
-    onDragOver,
-    onDrop,
-    onDragStart,
-    onDragEnd,
-    playerColor, // 💡 Étape 2 : On la récupère ici
+    onPiecePointerDown,
+    playerColor,
 }) => {
-    // 💡 Étape 3 : Si le joueur est noir, on prépare les index inversés
+    // 👑 Préservé : Inversion des index si le joueur est noir
     const isBlack = playerColor === 'black';
 
     return (
@@ -55,15 +51,19 @@ export const Board: React.FC<BoardProps> = ({
                     const rank = RANKS[actualRowIndex];
                     const square = file + rank;
                     
-                    // La couleur de la case dépend des index réels de l'échiquier
+                    // La couleur de la case dépend des coordonnées mathématiques de l'échiquier
                     const isLight = (actualColIndex + actualRowIndex) % 2 === 0;
-                    const isSelected = selected === square;
+                    
+                    // ⚡ Fusion des logiques de sélection (avec la nouvelle variable dragSquare de ton mate)
+                    const isSelected = dragSquare ? dragSquare === square : selected === square;
+                    const isBeingDragged = dragSquare === square;
 
                     let possibleMoves: string[] = [];
-
-                    if (selected) {
+                    const sourceSquare = dragSquare ?? selected;
+                    
+                    if (sourceSquare) {
                         possibleMoves = game
-                            .moves({ square: selected, verbose: true })
+                            .moves({ square: sourceSquare, verbose: true })
                             .map((m: any) => m.to);
                     }
 
@@ -74,18 +74,16 @@ export const Board: React.FC<BoardProps> = ({
                         <Square2D
                             key={square}
                             square={square}
-                            piece={actualPiece} // 💡 On passe la pièce correspondante à la vue inversée
+                            piece={actualPiece} // 👑 Préservé : On envoie la pièce inversée
                             isLight={isLight}
                             isSelected={isSelected}
                             isPossibleMove={isPossibleMove}
                             isCapture={isCapture}
+                            isBeingDragged={isBeingDragged} // ⚡ Nouveau : État de drag de ton mate
+                            isAnimatingTarget={animatingToSquare === square} // ⚡ Nouveau : État d'animation de ton mate
                             lastMove={lastMove}
-                            isDragging={isDragging}
                             onClick={onSquareClick}
-                            onDragOver={onDragOver}
-                            onDrop={onDrop}
-                            onDragStart={onDragStart}
-                            onDragEnd={onDragEnd}
+                            onPiecePointerDown={onPiecePointerDown} // ⚡ Nouveau : Pointer Events
                         />
                     );
                 });
