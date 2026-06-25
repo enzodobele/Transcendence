@@ -10,6 +10,7 @@ interface Square2DProps
 	isPossibleMove: boolean;
 	isCapture: boolean;
 	isBeingDragged: boolean;
+	isAnimatingTarget: boolean;
 	lastMove: { from: string; to: string } | null;
 	onClick: (square: string) => void;
 	onPiecePointerDown: (square: string, e: React.PointerEvent) => void;
@@ -23,6 +24,7 @@ export const Square2D: React.FC<Square2DProps> = ({
 	isPossibleMove,
 	isCapture,
 	isBeingDragged,
+	isAnimatingTarget,
 	lastMove,
 	onClick,
 	onPiecePointerDown,
@@ -72,7 +74,7 @@ export const Square2D: React.FC<Square2DProps> = ({
 						width: "80px",
 						height: "80px",
 						cursor: "grab",
-						opacity: isBeingDragged ? 0 : 1,
+						opacity: isBeingDragged || isAnimatingTarget ? 0 : 1,
 						userSelect: "none",
 					}}
 					draggable={false}

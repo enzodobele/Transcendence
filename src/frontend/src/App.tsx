@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useChessGame } from "./hooks/useChessGame";
 import { ChessGame3D } from "./components/ChessGame3D";
 import { ChessGame2D } from "./components/ChessGame2D";
+import { FloatingPiece } from "./components/FloatingPiece";
+import { AnimatedPiece } from "./components/AnimatedPiece";
 import { ProfileButton } from "./components/ProfileButton";
 import { Login } from "./components/Login";
 import { useAuth } from "./contexts/AuthContext";
-import { PIECE_SVG } from "./constants/pieces";
 import connexionLogo from "./assets/Logo/login.svg";
 import "./App.css";
 
@@ -16,6 +17,8 @@ export default function App() {
     selected,
     lastMove,
     dragPiece,
+    animatingPiece,
+    clearAnimation,
     handleSquareClick,
     handlePiecePointerDown,
     resetGame,
@@ -28,27 +31,6 @@ export default function App() {
   const [is3D, setIs3D] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  const floatingPiece = (() => {
-    if (!dragPiece) return null;
-    const piece = game.get(dragPiece.square as any);
-    if (!piece) return null;
-    const key = `${piece.color}${piece.type.toUpperCase()}`;
-    return (
-      <img
-        src={PIECE_SVG[key as keyof typeof PIECE_SVG]}
-        style={{
-          position: "fixed",
-          left: dragPiece.x - 40,
-          top: dragPiece.y - 40,
-          width: 80,
-          height: 80,
-          pointerEvents: "none",
-          zIndex: 9999,
-          userSelect: "none",
-        }}
-      />
-    );
-  })();
 
   return (
     <div className={`app ${is3D ? "app-3d" : ""}`}>
@@ -70,6 +52,7 @@ export default function App() {
           selected={selected}
           lastMove={lastMove}
           dragSquare={dragPiece?.square ?? null}
+          animatingToSquare={animatingPiece?.toSquare ?? null}
           pendingPromotion={!!pendingPromotion}
           onSquareClick={handleSquareClick}
           onPiecePointerDown={handlePiecePointerDown}
@@ -78,7 +61,11 @@ export default function App() {
         />
       )}
 
-      {floatingPiece}
+      <FloatingPiece dragPiece={dragPiece} game={game} />
+
+      {animatingPiece && (
+        <AnimatedPiece data={animatingPiece} onDone={clearAnimation} />
+      )}
 
       {isAuthenticated ? (
         <ProfileButton />

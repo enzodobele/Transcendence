@@ -9,6 +9,7 @@ interface BoardProps
 	selected: string | null;
 	lastMove: { from: string; to: string } | null;
 	dragSquare: string | null;
+	animatingToSquare: string | null;
 	onSquareClick: (square: string) => void;
 	onPiecePointerDown: (square: string, e: React.PointerEvent) => void;
 }
@@ -19,6 +20,7 @@ export const Board: React.FC<BoardProps> = ({
 	selected,
 	lastMove,
 	dragSquare,
+	animatingToSquare,
 	onSquareClick,
 	onPiecePointerDown,
 }) =>
@@ -64,6 +66,7 @@ export const Board: React.FC<BoardProps> = ({
 							isPossibleMove={isPossibleMove}
 							isCapture={isCapture}
 							isBeingDragged={isBeingDragged}
+							isAnimatingTarget={animatingToSquare === square}
 							lastMove={lastMove}
 							onClick={onSquareClick}
 							onPiecePointerDown={onPiecePointerDown}

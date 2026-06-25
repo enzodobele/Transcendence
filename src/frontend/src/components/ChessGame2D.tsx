@@ -9,6 +9,7 @@ interface ChessGame2DProps
 	selected: any;
 	lastMove: any;
 	dragSquare: string | null;
+	animatingToSquare: string | null;
 	pendingPromotion: boolean;
 	onSquareClick: (square: string) => void;
 	onPiecePointerDown: (square: string, e: React.PointerEvent) => void;
@@ -22,6 +23,7 @@ export function ChessGame2D({
 	selected,
 	lastMove,
 	dragSquare,
+	animatingToSquare,
 	pendingPromotion,
 	onSquareClick,
 	onPiecePointerDown,
@@ -37,6 +39,7 @@ export function ChessGame2D({
 				selected={selected}
 				lastMove={lastMove}
 				dragSquare={dragSquare}
+				animatingToSquare={animatingToSquare}
 				onSquareClick={onSquareClick}
 				onPiecePointerDown={onPiecePointerDown}
 			/>

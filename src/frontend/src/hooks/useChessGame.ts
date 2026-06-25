@@ -50,6 +50,16 @@ export interface DragPiece
 	y: number;
 }
 
+export interface AnimatingPiece
+{
+	pieceKey: string;
+	toSquare: string;
+	fromX: number;
+	fromY: number;
+	toX: number;
+	toY: number;
+}
+
 export const useChessGame = () =>
 {
 	const [game] = useState(() => new Chess());
@@ -59,9 +69,10 @@ export const useChessGame = () =>
 	const [capturedPieces, setCapturedPieces] = useState<CapturedPiece[]>([]);
 	const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
 	const [dragPiece, setDragPiece] = useState<DragPiece | null>(null);
+	const [animatingPiece, setAnimatingPiece] = useState<AnimatingPiece | null>(null);
 
 	const dragRef = useRef<{ square: string; startX: number; startY: number; started: boolean } | null>(null);
-	const justDropped = useRef(false);
+	const dragEndedAt = useRef<string | null>(null);
 
 	const playMoveSound = (move: any) =>
 	{
@@ -82,8 +93,9 @@ export const useChessGame = () =>
 			setTimeout(() => playSound(gameEndSound), 300);
 	};
 
-	const makeMove = (from: string, to: string, promotion?: string) =>
+	const makeMove = (from: string, to: string, promotion?: string, animate = true) =>
 	{
+		const piece = game.get(from as any);
 		const move = game.move({
 			from: from as any,
 			to: to as any,
@@ -96,15 +108,35 @@ export const useChessGame = () =>
 			setLastMove({ from, to });
 			setCapturedPieces(extractCapturedPieces(game));
 			playMoveSound(move);
+
+			if (animate && piece)
+			{
+				const fromEl = document.querySelector(`[data-square="${from}"]`);
+				const toEl = document.querySelector(`[data-square="${to}"]`);
+				const fromRect = fromEl?.getBoundingClientRect();
+				const toRect = toEl?.getBoundingClientRect();
+
+				if (fromRect && toRect)
+				{
+					setAnimatingPiece({
+						pieceKey: `${piece.color}${piece.type.toUpperCase()}`,
+						toSquare: to,
+						fromX: fromRect.left + fromRect.width / 2,
+						fromY: fromRect.top + fromRect.height / 2,
+						toX: toRect.left + toRect.width / 2,
+						toY: toRect.top + toRect.height / 2,
+					});
+				}
+			}
 		}
 		return move;
 	};
 
 	const handleSquareClick = (square: string) =>
 	{
-		if (justDropped.current)
+		if (dragEndedAt.current === square)
 		{
-			justDropped.current = false;
+			dragEndedAt.current = null;
 			return;
 		}
 
@@ -181,8 +213,6 @@ export const useChessGame = () =>
 
 			if (!wasMoved) return; // clic simple → laisser onClick gérer la sélection
 
-			justDropped.current = true;
-
 			const elem = document.elementFromPoint(e.clientX, e.clientY);
 			const squareEl = elem?.closest("[data-square]") as HTMLElement | null;
 			const targetSquare = squareEl?.dataset.square;
@@ -192,16 +222,24 @@ export const useChessGame = () =>
 				const allMoves = game.moves({ square: ref.square as any, verbose: true });
 				const moveData = allMoves.find((m: any) => m.to === targetSquare);
 
-				if (moveData && moveData.flags.includes("p"))
+				if (!moveData)
+				{
+					dragEndedAt.current = targetSquare;
+					setSelected(ref.square);
+				}
+				else if (moveData.flags.includes("p"))
 				{
 					setPendingPromotion({ from: ref.square, to: targetSquare });
 					setSelected(null);
 				}
 				else
-					makeMove(ref.square, targetSquare);
+					makeMove(ref.square, targetSquare, undefined, false);
 			}
 			else
-				setSelected(null);
+			{
+				if (targetSquare) dragEndedAt.current = targetSquare;
+				setSelected(ref.square);
+			}
 		};
 
 		document.addEventListener("pointermove", onMove);
@@ -251,6 +289,8 @@ export const useChessGame = () =>
 		lastMove,
 		makeMove,
 		dragPiece,
+		animatingPiece,
+		clearAnimation: () => setAnimatingPiece(null),
 		handleSquareClick,
 		handlePiecePointerDown,
 		resetGame,
