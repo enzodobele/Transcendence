@@ -52,6 +52,14 @@ export default function App() {
 
   // On est en match si c'est du local OU si le serveur nous a trouvé un "currentGameId"
   const isInActiveGame = isLocalGame || !!user?.currentGame?.id;
+  // On détermine la couleur du joueur actuel en ligne (player1 = Blancs, player2 = Noirs)
+const isOnlineWhite = user?.username === user?.currentGame?.player1?.username;
+
+// En local, le joueur par défaut est souvent blanc (ou gère les deux), en ligne on applique le rôle
+const playerColor: 'white' | 'black' = isLocalGame || isOnlineWhite ? 'white' : 'black';
+
+// Optionnel : Pour déboguer rapidement dans ta console de navigateur
+console.log(`[ChessGuard] Tu es connecté en tant que : ${user?.username} | Couleur assignée : ${playerColor}`);
 
   return (
     <div className={`app ${is3D ? "app-3d" : ""}`}>
@@ -81,6 +89,7 @@ export default function App() {
                 onSquareClick={handleSquareClick}
                 onResetGame={resetGame}
                 onPromotionChoice={handlePromotionChoice}
+				playerColor={playerColor}
               />
             ) : (
               <ChessGame2D
@@ -97,10 +106,15 @@ export default function App() {
                 onDragEnd={() => setIsDragging(false)}
                 onResetGame={resetGame}
                 onPromotionChoice={handlePromotionChoice}
+				playerColor={playerColor}
               />
             )}
           </div>
-          <MoveHistory history={currentHistory} />
+          <MoveHistory 
+		history={currentHistory} 
+		player1Name={isLocalGame ? "Blancs (Local)" : (user?.currentGame?.player1?.username || "Chargement...")}
+		player2Name={isLocalGame ? "Noirs (Local)" : (user?.currentGame?.player2?.username || "Chargement...")}
+		/>
         </div>
       ) : (
         /* VUE LOBBY / ACCUEIL (Hors match) */

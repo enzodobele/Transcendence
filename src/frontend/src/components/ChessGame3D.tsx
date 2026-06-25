@@ -1,3 +1,4 @@
+// src/frontend/src/components/ChessGame3D.tsx
 import { Canvas } from "@react-three/fiber";
 import "../styles/ChessGame3D.css";
 import { OrbitControls } from "@react-three/drei";

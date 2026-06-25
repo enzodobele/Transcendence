@@ -16,6 +16,7 @@ interface ChessGame2DProps {
   onDragEnd: () => void;
   onResetGame: () => void;
   onPromotionChoice: (piece: string) => void;
+  playerColor: 'white' | 'black';
 }
 
 export function ChessGame2D({
@@ -32,6 +33,7 @@ export function ChessGame2D({
   onDragEnd,
   onResetGame,
   onPromotionChoice,
+  playerColor,
 }: ChessGame2DProps) {
   return (
     <div className="Board">
@@ -46,6 +48,7 @@ export function ChessGame2D({
         onDrop={onDrop}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
+		playerColor={playerColor}
       />
 
       <button onClick={onResetGame} className="reset-board">

@@ -12,11 +12,9 @@ export const getMe = async (req: Request, res: Response) => {
     return res.status(401).json({ error: 'Non autorisé' });
   }
 
-  try { // 💡 Ajout du bloc 'try' manquant ici
+  try {
     const user = await prisma.user.findUnique({
-      where: {
-        id: userId // 💡 Utilise directement le userId extrait du token JWT
-      },
+      where: { id: userId },
       select: {
         id: true,
         username: true,
@@ -24,7 +22,14 @@ export const getMe = async (req: Request, res: Response) => {
           select: {
             id: true,
             status: true,
-            timeControl: true
+            timeControl: true,
+            // 💡 ON AJOUTE LES JOUEURS ICI
+            player1: {
+              select: { username: true }
+            },
+            player2: {
+              select: { username: true }
+            }
           }
         }
       },
@@ -114,11 +119,21 @@ export const joinWaitlist = async (req: Request, res: Response) => {
       await removeFromWaitlist(userId);
       await removeFromWaitlist(opponent.userId);
 
-      return res.status(201).json({
+	  // On récupère les usernames pour correspondre à la structure attendue par App.tsx
+      const p1 = await prisma.user.findUnique({ where: { id: userId }, select: { username: true } });
+      const p2 = await prisma.user.findUnique({ where: { id: opponent.userId }, select: { username: true } });
+
+		return res.status(201).json({
         message: 'Partie créée',
         gameId: game.id,
-        opponent: opponent.user,
         fenString: INITIAL_FEN,
+        currentGame: {
+          id: game.id,
+          status: game.status,
+          timeControl: game.timeControl,
+          player1: { username: p1?.username || "" },
+          player2: { username: p2?.username || "" }
+        }
       });
     } else {
       return res.json({ waiting: true, message: 'En attente d\'un adversaire...' });

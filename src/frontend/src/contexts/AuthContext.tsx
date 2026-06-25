@@ -6,7 +6,13 @@ import { fetchMe } from "../services/auth"; // 💡 On importe notre nouvelle fo
 interface User {
   id: number;
   username: string;
-  currentGame?: { id: number; status: string } | null; // 💡 id devient un "number"
+  currentGame?: {
+    id: number;
+    status: string;
+    timeControl: string;
+    player1: { username: string };
+    player2: { username: string };
+  } | null;
 }
 
 interface AuthContextType {
