@@ -1,6 +1,7 @@
+// frontend/src/main.tsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
+import "./styles/index.css";
 import "@fontsource/inter";
 import App from "./App";
 import { AuthProvider } from "./contexts/AuthContext";

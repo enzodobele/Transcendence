@@ -44,6 +44,15 @@ exec:
 db-seed:
 	@$(COMPOSE) exec backend npm run db:seed
 
+db-migrate:
+	@DB_USER=$$(cat src/secrets/db_user.txt) \
+	DB_PASSWORD=$$(cat src/secrets/db_password.txt) \
+	DB_NAME=$$(cat src/secrets/db_name.txt) \
+	docker exec -it \
+	-e DATABASE_URL="postgresql://$$DB_USER:$$DB_PASSWORD@db:5432/$$DB_NAME?schema=public" \
+	-e SHADOW_DATABASE_URL="postgresql://$$DB_USER:$$DB_PASSWORD@db:5432/shadow_db?schema=public" \
+	backend npx prisma migrate dev
+
 # =============================================
 # 🧹 CLEAN
 # =============================================

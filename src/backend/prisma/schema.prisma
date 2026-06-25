@@ -22,6 +22,8 @@ model User {
   isActive       Boolean @default(true)
   avatarUrl      String?
   bio            String?
+  currentGameId  Int?
+  currentGame    Game?    @relation("CurrentGame", fields: [currentGameId], references: [id], onDelete: SetNull)
 
   // Relations
   gamesAsPlayer1 Game[]          @relation("Player1")
@@ -56,9 +58,8 @@ model Game {
   player2 User   @relation("Player2", fields: [player2Id], references: [id])
   winner  User?  @relation("Winner", fields: [winnerId], references: [id])
   moves   Move[]
+  activeUser   User[]      @relation("CurrentGame")
 
-  // Contrainte: player1 != player2
-  @@unique([player1Id, player2Id])
   @@map("games")
 }
 

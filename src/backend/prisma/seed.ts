@@ -1,33 +1,37 @@
 import fs from 'fs';
-import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@prisma/client';
 
 const readSecret = (value?: string): string | undefined => {
-  if (!value) {
-    return undefined;
-  }
-
-  if (fs.existsSync(value)) {
-    return fs.readFileSync(value, 'utf8').trim();
-  }
-
+  if (!value) return undefined;
+  if (fs.existsSync(value)) return fs.readFileSync(value, 'utf8').trim();
   return value.trim();
 };
 
+// =============================================
+// 1. RÉCUPÉRATION DES SECRETS DOCKER
+// =============================================
 const dbUser = readSecret(process.env.DB_USER) ?? readSecret(process.env.DB_USER_FILE);
 const dbName = readSecret(process.env.DB_NAME) ?? readSecret(process.env.DB_NAME_FILE);
 const dbPassword = readSecret(process.env.DB_PASSWORD) ?? readSecret(process.env.DB_PASSWORD_FILE);
 
-if (!process.env.DATABASE_URL) {
-  if (!dbUser || !dbName || !dbPassword) {
-    throw new Error('Impossible de construire DATABASE_URL: secrets DB_USER, DB_NAME ou DB_PASSWORD manquants.');
-  }
-
-  process.env.DATABASE_URL = `postgresql://${dbUser}:${dbPassword}@db:5432/${dbName}?schema=public`;
+if (!dbUser || !dbName || !dbPassword) {
+  throw new Error('Impossible de construire la connexion : secrets DB_USER, DB_NAME ou DB_PASSWORD manquants.');
 }
 
-const prisma = new PrismaClient();
+// =============================================
+// 2. INITIALISATION PRISMA 7 (DRIVERS NATIVE)
+// =============================================
+const computedUrl = `postgresql://${dbUser}:${dbPassword}@db:5432/${dbName}?schema=public`;
+const pool = new Pool({ connectionString: computedUrl });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
+// =============================================
+// 3. JEU DE DONNÉES
+// =============================================
 const users = [
   {
     email: 'alice@example.com',
@@ -63,7 +67,13 @@ const users = [
   },
 ];
 
+// =============================================
+// 4. LOGIQUE PRINCIPALE DU SEED
+// =============================================
 async function main() {
+  console.log("🌱 Début du seeding...");
+
+  // Nettoyage de la base de données (Ordre des clés étrangères respecté)
   await prisma.$transaction([
     prisma.move.deleteMany(),
     prisma.game.deleteMany(),
@@ -75,6 +85,7 @@ async function main() {
 
   const createdUsers = [] as Array<{ id: number; username: string }>;
 
+  // Création des utilisateurs et de leurs statistiques
   for (const user of users) {
     const hashedPassword = await bcrypt.hash(user.password, 10);
 
@@ -104,6 +115,7 @@ async function main() {
     });
   }
 
+  // Relations amis, file d'attente et parties de démonstration
   const alice = createdUsers.find((user) => user.username === 'alice');
   const bob = createdUsers.find((user) => user.username === 'bob');
   const carla = createdUsers.find((user) => user.username === 'carla');
@@ -173,14 +185,18 @@ async function main() {
     });
   }
 
-  console.log(`Seed completed with ${users.length} users.`);
+  console.log(`✅ Seed completed successfully with ${users.length} users.`);
 }
 
+// =============================================
+// 5. EXÉCUTION ET NETTOYAGE DES POOLS
+// =============================================
 main()
   .catch((error) => {
-    console.error('Seed failed:', error);
+    console.error('❌ Seed failed:', error);
     process.exitCode = 1;
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end(); 
   });
