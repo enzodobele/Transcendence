@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useChessGame } from "./hooks/useChessGame";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -18,12 +18,31 @@ import "./styles/App.css";
 import "./styles/Buttons.css";
 
 export default function App() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  // 1️⃣ TOUS LES HOOKS RESTATENT SAGEMENT AU SOMMET
+  const { isAuthenticated, isLoading, user, token } = useAuth();
   const [is3D, setIs3D] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLocalGame, setIsLocalGame] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
 
-  // 💡 Fusion des deux hooks useChessGame (Récupération des animations + fonctions de drag)
+  // 2️⃣ CALCULS DES ÉTATS ET DE LA COULEUR
+  const isInActiveGame = isLocalGame || !!user?.currentGame?.id;
+  const isOnlineWhite = user?.username === user?.currentGame?.player1?.username;
+  const playerColor: 'white' | 'black' = isLocalGame || isOnlineWhite ? 'white' : 'black';
+
+  // 3️⃣ INTERCEPTIONS DES MOUVEMENTS LOCAUX ENVOYÉS VERS LE SERVEUR via Nginx
+  const handleSendMoveToServer = (moveData: { from: string; to: string; promotion?: string }) => {
+    if (isLocalGame) return;
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: "move",
+          data: moveData,
+        })
+      );
+    }
+  };
+
   const {
     game,
     board,
@@ -38,11 +57,57 @@ export default function App() {
     capturedPieces,
     pendingPromotion,
     handlePromotionChoice,
-  } = useChessGame();
+    makeMove,
+    syncWithServerFen,
+  } = useChessGame(playerColor, handleSendMoveToServer);
 
-  const currentHistory = game.history();
+  // 4️⃣ EFFET WEBSOCKET NETTOYÉ POUR PASSER PAR LE REVERSE PROXY NGINX
+  useEffect(() => {
+    if (isLocalGame || !user?.currentGame?.id || !token) return;
 
-  // 1️⃣ SÉCURITÉ : Pendant que /me charge au démarrage, on affiche un écran d'attente
+    const gameId = user.currentGame.id;
+    
+    // 🚀 Configuration de l'URL alignée avec ton Nginx (Port 443 SSL -> wss)
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    // 💡 Note l'absence du port 3000, Nginx se charge du routage d'infrastructure !
+    const wsUrl = `${protocol}//${window.location.hostname}/ws?token=${encodeURIComponent(token)}&gameId=${gameId}`;
+    
+    console.log(`[ChessGuard WS] Tentative de liaison proxy : ${wsUrl}`);
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onopen = () => console.log(`[ChessGuard WS] Session établie sur le salon #${gameId}`);
+    
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        switch (message.type) {
+          case "sync":
+            syncWithServerFen(message.fen);
+            break;
+          case "opponent_move":
+            const { from, to, promotion } = message.move;
+            makeMove(from, to, promotion, true); 
+            break;
+          case "error":
+            console.error("[ChessGuard WS] Erreur Backend :", message.message);
+            break;
+        }
+      } catch (err) {
+        console.error("[ChessGuard WS] Erreur lors du parsing JSON :", err);
+      }
+    };
+
+    ws.onerror = (error) => console.error("[ChessGuard WS] Erreur réseau proxy :", error);
+    ws.onclose = (e) => console.log(`[ChessGuard WS] Connexion close (${e.code}) : ${e.reason}`);
+
+    return () => {
+      if (ws) ws.close();
+      wsRef.current = null;
+    };
+  }, [user?.currentGame?.id, isLocalGame, token]);
+
+  // 5️⃣ VÉRIFICATION DU CHARGEMENT INITIAL (Intervient réglementairement après les hooks)
   if (isLoading) {
     return (
       <div className="app-loading">
@@ -51,16 +116,10 @@ export default function App() {
     );
   }
 
-  // États du match
-  const isInActiveGame = isLocalGame || !!user?.currentGame?.id;
-  const isOnlineWhite = user?.username === user?.currentGame?.player1?.username;
-  const playerColor: 'white' | 'black' = isLocalGame || isOnlineWhite ? 'white' : 'black';
-
-  console.log(`[ChessGuard] Connecté en tant que : ${user?.username} | Couleur : ${playerColor}`);
+  const currentHistory = game.history();
 
   return (
     <div className={`app ${is3D ? "app-3d" : ""}`}>
-      
       {/* HEADER : Connexion / Profil */}
       {isAuthenticated ? (
         <ProfileButton />
@@ -73,7 +132,6 @@ export default function App() {
 
       {/* RENDER PRINCIPAL */}
       {isInActiveGame ? (
-        /* VUE ÉCHIQUIER (En match) */
         <div className="game-container">
           <div className="chessboard-wrapper">
             {is3D ? (
@@ -86,7 +144,6 @@ export default function App() {
                 onSquareClick={handleSquareClick}
                 onResetGame={resetGame}
                 onPromotionChoice={handlePromotionChoice}
-                playerColor={playerColor}
               />
             ) : (
               <ChessGame2D
@@ -106,15 +163,13 @@ export default function App() {
             )}
           </div>
           
-          {/* Historique des coups avec les pseudos réels */}
           <MoveHistory 
             history={currentHistory} 
-            player1Name={isLocalGame ? "Blancs (Local)" : (user?.currentGame?.player1?.username || "Chargement...")}
-            player2Name={isLocalGame ? "Noirs (Local)" : (user?.currentGame?.player2?.username || "Chargement...")}
+            player1Name={isLocalGame ? "Blancs (Local)" : (user?.currentGame?.player1?.username || "Joueur 1")}
+            player2Name={isLocalGame ? "Noirs (Local)" : (user?.currentGame?.player2?.username || "Joueur 2")}
           />
         </div>
       ) : (
-        /* VUE LOBBY / ACCUEIL (Hors match) */
         <div className="lobby-container">
           <h1 className="title-chess">
             CHESS <span className="title-guard">GUARD</span>
@@ -135,14 +190,12 @@ export default function App() {
         </div>
       )}
 
-      {/* Éléments overlay pour les animations fluides de ton pote */}
       <FloatingPiece dragPiece={dragPiece} game={game} />
 
       {animatingPiece && (
         <AnimatedPiece data={animatingPiece} onDone={clearAnimation} />
       )}
 
-      {/* ACTIONS COMPLÉMENTAIRES (Uniquement en match) */}
       {isInActiveGame && (
         <div className="game-actions">
           {isLocalGame && (
