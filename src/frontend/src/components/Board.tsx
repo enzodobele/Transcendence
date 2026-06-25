@@ -8,12 +8,9 @@ interface BoardProps
 	game: any;
 	selected: string | null;
 	lastMove: { from: string; to: string } | null;
-	isDragging: boolean;
+	dragSquare: string | null;
 	onSquareClick: (square: string) => void;
-	onDragOver: (e: React.DragEvent) => void;
-	onDrop: (square: string, e: React.DragEvent) => void;
-	onDragStart: (square: string, e: React.DragEvent) => void;
-	onDragEnd: () => void;
+	onPiecePointerDown: (square: string, e: React.PointerEvent) => void;
 }
 
 export const Board: React.FC<BoardProps> = ({
@@ -21,12 +18,9 @@ export const Board: React.FC<BoardProps> = ({
 	game,
 	selected,
 	lastMove,
-	isDragging,
+	dragSquare,
 	onSquareClick,
-	onDragOver,
-	onDrop,
-	onDragStart,
-	onDragEnd,
+	onPiecePointerDown,
 }) =>
 {
 	return (
@@ -45,14 +39,15 @@ export const Board: React.FC<BoardProps> = ({
 					const rank = RANKS[rowIndex];
 					const square = file + rank;
 					const isLight = (colIndex + rowIndex) % 2 === 0;
-					const isSelected = selected === square;
+					const isSelected = dragSquare ? dragSquare === square : selected === square;
+					const isBeingDragged = dragSquare === square;
 
 					let possibleMoves: string[] = [];
-
-					if (selected)
+					const sourceSquare = dragSquare ?? selected;
+					if (sourceSquare)
 					{
 						possibleMoves = game
-							.moves({ square: selected, verbose: true })
+							.moves({ square: sourceSquare, verbose: true })
 							.map((m: any) => m.to);
 					}
 
@@ -68,13 +63,10 @@ export const Board: React.FC<BoardProps> = ({
 							isSelected={isSelected}
 							isPossibleMove={isPossibleMove}
 							isCapture={isCapture}
+							isBeingDragged={isBeingDragged}
 							lastMove={lastMove}
-							isDragging={isDragging}
 							onClick={onSquareClick}
-							onDragOver={onDragOver}
-							onDrop={onDrop}
-							onDragStart={onDragStart}
-							onDragEnd={onDragEnd}
+							onPiecePointerDown={onPiecePointerDown}
 						/>
 					);
 				})

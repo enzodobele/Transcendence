@@ -1,62 +1,56 @@
+import React from "react";
 import { Board } from "./Board";
 import { PromotionDialog } from "./PromotionDialog";
 
-interface ChessGame2DProps {
-  game: any;
-  board: any;
-  selected: any;
-  lastMove: any;
-  isDragging: boolean;
-  pendingPromotion: boolean;
-  onSquareClick: (square: string) => void;
-  onDragStart: (e: string, piece: React.DragEvent) => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: string, square: React.DragEvent<Element>) => void;
-  onDragEnd: () => void;
-  onResetGame: () => void;
-  onPromotionChoice: (piece: string) => void;
+interface ChessGame2DProps
+{
+	game: any;
+	board: any;
+	selected: any;
+	lastMove: any;
+	dragSquare: string | null;
+	pendingPromotion: boolean;
+	onSquareClick: (square: string) => void;
+	onPiecePointerDown: (square: string, e: React.PointerEvent) => void;
+	onResetGame: () => void;
+	onPromotionChoice: (piece: string) => void;
 }
 
 export function ChessGame2D({
-  game,
-  board,
-  selected,
-  lastMove,
-  isDragging,
-  pendingPromotion,
-  onSquareClick,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  onDragEnd,
-  onResetGame,
-  onPromotionChoice,
-}: ChessGame2DProps) {
-  return (
-    <div className="Board">
-      <Board
-        board={board}
-        game={game}
-        selected={selected}
-        lastMove={lastMove}
-        isDragging={isDragging}
-        onSquareClick={onSquareClick}
-        onDragOver={onDragOver}
-        onDrop={onDrop}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
+	game,
+	board,
+	selected,
+	lastMove,
+	dragSquare,
+	pendingPromotion,
+	onSquareClick,
+	onPiecePointerDown,
+	onResetGame,
+	onPromotionChoice,
+}: ChessGame2DProps)
+{
+	return (
+		<div className="Board">
+			<Board
+				board={board}
+				game={game}
+				selected={selected}
+				lastMove={lastMove}
+				dragSquare={dragSquare}
+				onSquareClick={onSquareClick}
+				onPiecePointerDown={onPiecePointerDown}
+			/>
 
-      <button onClick={onResetGame} className="reset-board">
-        Réinitialiser
-      </button>
+			<button onClick={onResetGame} className="reset-board">
+				Réinitialiser
+			</button>
 
-      {pendingPromotion && (
-        <PromotionDialog
-          onChoose={onPromotionChoice}
-          playerColor={game.turn() === "w" ? "b" : "w"}
-        />
-      )}
-    </div>
-  );
+			{pendingPromotion && (
+				<PromotionDialog
+					onChoose={onPromotionChoice}
+					playerColor={game.turn() === "w" ? "b" : "w"}
+				/>
+			)}
+		</div>
+	);
 }

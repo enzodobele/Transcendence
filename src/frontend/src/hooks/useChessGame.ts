@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Chess } from "chess.js";
 
-// Import des sons
 import moveSound from "../assets/sounds/move-self.mp3";
 import captureSound from "../assets/sounds/capture.mp3";
 import castleSound from "../assets/sounds/castle.mp3";
@@ -15,19 +14,17 @@ const playSound = (soundFile: string) =>
 	audio.play().catch(() => {});
 };
 
-const extractCapturedPieces = (game: Chess): CapturedPiece[] => {
+const extractCapturedPieces = (game: Chess): CapturedPiece[] =>
+{
 	const captured: CapturedPiece[] = [];
 	const moves = game.history({ verbose: true });
 
-	moves.forEach((move) => {
-		if (move.captured) {
-			const captureColor: "w" | "b" =
-				move.color === "w" ? "b" : "w";
-
-			captured.push({
-				type: move.captured,
-				color: captureColor,
-			});
+	moves.forEach((move) =>
+	{
+		if (move.captured)
+		{
+			const captureColor: "w" | "b" = move.color === "w" ? "b" : "w";
+			captured.push({ type: move.captured, color: captureColor });
 		}
 	});
 
@@ -37,7 +34,7 @@ const extractCapturedPieces = (game: Chess): CapturedPiece[] => {
 interface CapturedPiece
 {
 	type: string;
-	color: 'w' | 'b';
+	color: "w" | "b";
 }
 
 interface PendingPromotion
@@ -46,55 +43,77 @@ interface PendingPromotion
 	to: string;
 }
 
+export interface DragPiece
+{
+	square: string;
+	x: number;
+	y: number;
+}
+
 export const useChessGame = () =>
 {
 	const [game] = useState(() => new Chess());
 	const [board, setBoard] = useState(game.board());
 	const [selected, setSelected] = useState<string | null>(null);
 	const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
-	const [isDragging, setIsDragging] = useState(false);
 	const [capturedPieces, setCapturedPieces] = useState<CapturedPiece[]>([]);
 	const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
+	const [dragPiece, setDragPiece] = useState<DragPiece | null>(null);
+
+	const dragRef = useRef<{ square: string; startX: number; startY: number; started: boolean } | null>(null);
+	const justDropped = useRef(false);
 
 	const playMoveSound = (move: any) =>
 	{
 		if (!move) return;
 
-		// Promotion
 		if (move.flags.includes("p"))
 			playSound(promoteSound);
-
-		// Roque
 		else if (move.flags.includes("k") || move.flags.includes("q"))
 			playSound(castleSound);
-
-		// Capture
 		else if (move.flags.includes("c") || move.flags.includes("e"))
 			playSound(captureSound);
-
-		// Échec
 		else if (game.inCheck())
 			playSound(checkSound);
-
-		// Coup normal
 		else
 			playSound(moveSound);
 
-		// Checkmate ou Stalemate
 		if (game.isCheckmate() || game.isStalemate())
 			setTimeout(() => playSound(gameEndSound), 300);
 	};
 
+	const makeMove = (from: string, to: string, promotion?: string) =>
+	{
+		const move = game.move({
+			from: from as any,
+			to: to as any,
+			...(promotion && { promotion: promotion as any })
+		});
+		if (move)
+		{
+			setBoard(game.board());
+			setSelected(null);
+			setLastMove({ from, to });
+			setCapturedPieces(extractCapturedPieces(game));
+			playMoveSound(move);
+		}
+		return move;
+	};
+
 	const handleSquareClick = (square: string) =>
 	{
-		// Si une promotion est en attente, traiter le clic comme un choix de pièce
+		if (justDropped.current)
+		{
+			justDropped.current = false;
+			return;
+		}
+
 		if (pendingPromotion)
 		{
 			handlePromotionChoice(square);
 			return;
 		}
 
-		// Si on clique sur la même case/pièce, on désélectionne
 		if (selected === square)
 		{
 			setSelected(null);
@@ -115,118 +134,85 @@ export const useChessGame = () =>
 
 			if (possibleMoves.includes(square))
 			{
-				// Vérifie si c'est un mouvement de promotion
 				const allMoves = game.moves({ square: selected as any, verbose: true });
 				const moveData = allMoves.find((m: any) => m.to === square);
 
-				if (moveData && moveData.flags.includes('p'))
+				if (moveData && moveData.flags.includes("p"))
 				{
-					// C'est une promotion, on attend le choix de l'utilisateur
 					setPendingPromotion({ from: selected, to: square });
 					setSelected(null);
 				}
 				else
-				{
-					const move = game.move({ from: selected as any, to: square as any });
-
-					if (move)
-					{
-						setBoard(game.board());
-						setSelected(null);
-						setLastMove({ from: selected, to: square });
-						setCapturedPieces(extractCapturedPieces(game));
-						playMoveSound(move);
-					}
-				}
+					makeMove(selected, square);
 			}
 			else
 				setSelected(null);
 		}
 	};
 
-	const handleDragStart = (square: string, e: React.DragEvent) =>
+	const handlePiecePointerDown = (square: string, e: React.PointerEvent) =>
 	{
 		const piece = game.get(square as any);
-		const currentTurn = game.turn();
-
-		if (piece && piece.color === currentTurn)
-		{
-			e.dataTransfer!.effectAllowed = "move";
-			e.dataTransfer!.setData("text/plain", square);
-			setSelected(square);
-			setIsDragging(true);
-
-			// Créer une image de drag propre sans le fond du carré
-			const img = e.target as HTMLImageElement;
-			const canvas = document.createElement('canvas');
-			canvas.width = 80;
-			canvas.height = 80;
-			const ctx = canvas.getContext('2d');
-
-			if (ctx)
-			{
-				ctx.drawImage(img, 0, 0, 80, 80);
-				e.dataTransfer!.setDragImage(canvas, 40, 40);
-			}
-		}
-		else
-		{
-			e.dataTransfer!.effectAllowed = "none";
-			e.preventDefault();
-		}
+		if (!piece || piece.color !== game.turn()) return;
+		e.preventDefault();
+		dragRef.current = { square, startX: e.clientX, startY: e.clientY, started: true };
+		setDragPiece({ square, x: e.clientX, y: e.clientY });
+		document.body.classList.add("dragging");
 	};
 
-	const handleDragOver = (e: React.DragEvent) =>
+	useEffect(() =>
 	{
-		e.preventDefault();
-		e.dataTransfer!.dropEffect = "move";
-	};
-
-	const handleDrop = (square: string, e: React.DragEvent) =>
-	{
-		e.preventDefault();
-		setIsDragging(false);
-
-		// Si une promotion est en attente, traiter le clic comme un choix de pièce
-		if (pendingPromotion)
+		const onMove = (e: PointerEvent) =>
 		{
-			handlePromotionChoice(square);
-			return;
-		}
+			if (!dragRef.current) return;
+			setDragPiece({ square: dragRef.current.square, x: e.clientX, y: e.clientY });
+		};
 
-		const fromSquare = e.dataTransfer!.getData("text/plain");
-		if (!fromSquare) return;
-
-		const possibleMoves = game
-			.moves({ square: fromSquare as any, verbose: true })
-			.map((m: any) => m.to);
-
-		if (possibleMoves.includes(square))
+		const onUp = (e: PointerEvent) =>
 		{
-			// Vérifie si c'est un mouvement de promotion
-			const allMoves = game.moves({ square: fromSquare as any, verbose: true });
-			const moveData = allMoves.find((m: any) => m.to === square);
+			const ref = dragRef.current;
+			dragRef.current = null;
+			document.body.classList.remove("dragging");
+			setDragPiece(null);
 
-			if (moveData && moveData.flags.includes('p'))
+			if (!ref) return;
+
+			const wasMoved = Math.hypot(e.clientX - ref.startX, e.clientY - ref.startY) > 3;
+
+			if (!wasMoved) return; // clic simple → laisser onClick gérer la sélection
+
+			justDropped.current = true;
+
+			const elem = document.elementFromPoint(e.clientX, e.clientY);
+			const squareEl = elem?.closest("[data-square]") as HTMLElement | null;
+			const targetSquare = squareEl?.dataset.square;
+
+			if (targetSquare && targetSquare !== ref.square)
 			{
-				// C'est une promotion, on attend le choix de l'utilisateur
-				setPendingPromotion({ from: fromSquare, to: square });
+				const allMoves = game.moves({ square: ref.square as any, verbose: true });
+				const moveData = allMoves.find((m: any) => m.to === targetSquare);
+
+				if (moveData && moveData.flags.includes("p"))
+				{
+					setPendingPromotion({ from: ref.square, to: targetSquare });
+					setSelected(null);
+				}
+				else
+					makeMove(ref.square, targetSquare);
 			}
 			else
-			{
-				const move = game.move({ from: fromSquare as any, to: square as any });
+				setSelected(null);
+		};
 
-				if (move)
-				{
-					playMoveSound(move);
-					setBoard(game.board());
-					setSelected(null);
-					setLastMove({ from: fromSquare, to: square });
-					setCapturedPieces(extractCapturedPieces(game));
-				}
-			}
-		}
-	};
+		document.addEventListener("pointermove", onMove);
+		document.addEventListener("pointerup", onUp);
+
+		return () =>
+		{
+			document.removeEventListener("pointermove", onMove);
+			document.removeEventListener("pointerup", onUp);
+		};
+	}, []);
 
 	const handlePromotionChoice = (piece: string) =>
 	{
@@ -234,34 +220,14 @@ export const useChessGame = () =>
 
 		const pieceMap: { [key: string]: string } =
 		{
-			queen: 'q',
-			rook: 'r',
-			bishop: 'b',
-			knight: 'n',
-			q: 'q',
-			r: 'r',
-			b: 'b',
-			n: 'n'
+			queen: "q", rook: "r", bishop: "b", knight: "n",
+			q: "q", r: "r", b: "b", n: "n"
 		};
 
 		const promotionType = pieceMap[piece.toLowerCase()];
-
 		if (!promotionType) return;
 
-		const move = game.move({
-			from: pendingPromotion.from as any,
-			to: pendingPromotion.to as any,
-			promotion: promotionType as any
-		});
-
-		if (move)
-		{
-			playMoveSound(move);
-			setBoard(game.board());
-			setLastMove({ from: pendingPromotion.from, to: pendingPromotion.to });
-			setCapturedPieces(extractCapturedPieces(game));
-		}
-
+		makeMove(pendingPromotion.from, pendingPromotion.to, promotionType);
 		setPendingPromotion(null);
 	};
 
@@ -273,6 +239,9 @@ export const useChessGame = () =>
 		setLastMove(null);
 		setCapturedPieces([]);
 		setPendingPromotion(null);
+		setDragPiece(null);
+		dragRef.current = null;
+		document.body.classList.remove("dragging");
 	};
 
 	return {
@@ -280,12 +249,10 @@ export const useChessGame = () =>
 		board,
 		selected,
 		lastMove,
-		isDragging,
-		setIsDragging,
+		makeMove,
+		dragPiece,
 		handleSquareClick,
-		handleDragStart,
-		handleDragOver,
-		handleDrop,
+		handlePiecePointerDown,
 		resetGame,
 		capturedPieces,
 		pendingPromotion,

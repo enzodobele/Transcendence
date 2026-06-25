@@ -5,6 +5,7 @@ import { ChessGame2D } from "./components/ChessGame2D";
 import { ProfileButton } from "./components/ProfileButton";
 import { Login } from "./components/Login";
 import { useAuth } from "./contexts/AuthContext";
+import { PIECE_SVG } from "./constants/pieces";
 import connexionLogo from "./assets/Logo/login.svg";
 import "./App.css";
 
@@ -13,14 +14,11 @@ export default function App() {
     game,
     board,
     selected,
-    handleSquareClick,
-    resetGame,
     lastMove,
-    isDragging,
-    setIsDragging,
-    handleDragStart,
-    handleDragOver,
-    handleDrop,
+    dragPiece,
+    handleSquareClick,
+    handlePiecePointerDown,
+    resetGame,
     capturedPieces,
     pendingPromotion,
     handlePromotionChoice,
@@ -29,6 +27,28 @@ export default function App() {
   const { isAuthenticated } = useAuth();
   const [is3D, setIs3D] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  const floatingPiece = (() => {
+    if (!dragPiece) return null;
+    const piece = game.get(dragPiece.square as any);
+    if (!piece) return null;
+    const key = `${piece.color}${piece.type.toUpperCase()}`;
+    return (
+      <img
+        src={PIECE_SVG[key as keyof typeof PIECE_SVG]}
+        style={{
+          position: "fixed",
+          left: dragPiece.x - 40,
+          top: dragPiece.y - 40,
+          width: 80,
+          height: 80,
+          pointerEvents: "none",
+          zIndex: 9999,
+          userSelect: "none",
+        }}
+      />
+    );
+  })();
 
   return (
     <div className={`app ${is3D ? "app-3d" : ""}`}>
@@ -49,17 +69,16 @@ export default function App() {
           board={board}
           selected={selected}
           lastMove={lastMove}
-          isDragging={isDragging}
+          dragSquare={dragPiece?.square ?? null}
           pendingPromotion={!!pendingPromotion}
           onSquareClick={handleSquareClick}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          onDragEnd={() => setIsDragging(false)}
+          onPiecePointerDown={handlePiecePointerDown}
           onResetGame={resetGame}
           onPromotionChoice={handlePromotionChoice}
         />
       )}
+
+      {floatingPiece}
 
       {isAuthenticated ? (
         <ProfileButton />

@@ -106,7 +106,7 @@
   width: min(92vw, 56rem, calc(100svh - 10rem)) !important;
   aspect-ratio: 1 / 1;
   grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
-  grid-template-rows: repeat(8, minmax(0, 1fr));
+  grid-template-rows: repeat(8, minmax(0, 1fr)) !important;
   gap: 0 !important;
   margin-bottom: 0 !important;
   border-radius: 1.5rem;
@@ -115,15 +115,13 @@
   box-shadow:
     0 24px 60px rgba(18, 26, 16, 0.18),
     0 2px 0 rgba(255, 255, 255, 0.35) inset;
-  background: rgba(255, 255, 255, 0.28);
-  backdrop-filter: blur(18px);
+  background: #b58863;
 }
 
 .Board > div:first-child > div {
   width: 100% !important;
-  height: auto !important;
-  aspect-ratio: 1 / 1;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  height: 100% !important;
+  border: none !important;
 }
 
 .Board > div:first-child > div img {
@@ -132,7 +130,7 @@
   max-width: 80%;
   max-height: 80%;
   object-fit: contain;
-  -webkit-user-drag: none;
+  -webkit-user-drag: element;
   user-select: none;
 }
 
@@ -486,6 +484,11 @@ button.profile-button {
 
 canvas {
   display: block;
+}
+
+body.dragging,
+body.dragging * {
+  cursor: grabbing !important;
 }
 
 
