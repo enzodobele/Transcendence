@@ -12,7 +12,7 @@ COMPOSE = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)
 SERVICE ?=  # Si non spécifié, gère tous les services
 
 .PHONY: up down build rebuild logs ps clean fclean \
-	db-push db-studio db-seed db-migrate shell-back shell-front
+	db-push db-seed db-migrate shell-back shell-front format
 
 # =============================================
 # 🚀 APPLICATION
@@ -52,6 +52,10 @@ db-migrate:
 	-e DATABASE_URL="postgresql://$$DB_USER:$$DB_PASSWORD@db:5432/$$DB_NAME?schema=public" \
 	-e SHADOW_DATABASE_URL="postgresql://$$DB_USER:$$DB_PASSWORD@db:5432/shadow_db?schema=public" \
 	backend npx prisma migrate dev
+
+format:
+	@$(COMPOSE) exec backend npm run format
+	@$(COMPOSE) exec frontend npm run format
 
 # =============================================
 # 🧹 CLEAN

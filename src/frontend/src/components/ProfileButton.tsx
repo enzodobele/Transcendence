@@ -1,3 +1,4 @@
+// src/frontend/src/components/ProfileButton.tsx
 import { useState } from "react";
 import "../styles/ProfileButton.css";
 import { useAuth } from "../contexts/AuthContext";
@@ -14,15 +15,8 @@ export function ProfileButton() {
 
   return (
     <>
-      <button
-        className="profile-button"
-        onClick={() => setShowMenu(true)}
-      >
-        <img
-          src={profileIcon}
-          alt="profil"
-          className="profile-icon"
-        />
+      <button className="profile-button" onClick={() => setShowMenu(true)}>
+        <img src={profileIcon} alt="profil" className="profile-icon" />
       </button>
 
       {showMenu && (
@@ -62,11 +56,7 @@ export function ProfileButton() {
                 setShowMenu(false);
               }}
             >
-              <img
-                src={logoutIcon}
-                alt="déconnexion"
-                className="logout-icon"
-              />
+              <img src={logoutIcon} alt="déconnexion" className="logout-icon" />
               Déconnexion
             </button>
           </div>

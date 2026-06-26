@@ -1,6 +1,9 @@
-import prisma from '../prisma';
+import prisma from "../prisma";
 
-export const addToWaitlist = async (userId: number, timeControl: string = "5+0") => {
+export const addToWaitlist = async (
+  userId: number,
+  timeControl: string = "5+0",
+) => {
   const existing = await prisma.waitlistEntry.findUnique({ where: { userId } });
   if (existing) {
     throw new Error("L'utilisateur est déjà dans la file d'attente.");
@@ -23,7 +26,7 @@ export const findOpponent = async (userId: number, timeControl: string) => {
       userId: { not: userId },
       timeControl,
     },
-    orderBy: { createdAt: 'asc' },
+    orderBy: { createdAt: "asc" },
     include: { user: true },
   });
 

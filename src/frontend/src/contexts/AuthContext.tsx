@@ -1,11 +1,12 @@
 // frontend/src/contexts/AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { fetchMe } from "../services/auth"; // 💡 On importe notre nouvelle fonction d'API
+import { fetchMe } from "../services/auth";
 
 interface User {
   id: number;
   username: string;
+  email: string;
   currentGame?: {
     id: number;
     status: string;
@@ -22,7 +23,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (userData: User, authToken: string) => void;
   logout: () => void;
-  refreshUserStatus: () => Promise<void>; // 💡 Utile pour forcer une réévaluation (ex: après un joinWaitlist)
+  refreshUserStatus: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Fonction pour valider le token et récupérer les infos fraîches du backend
   const refreshUserStatus = async () => {
     const storedToken = localStorage.getItem("token");
-    
+
     if (!storedToken) {
       logout();
       setIsLoading(false);
@@ -45,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // On interroge l'API /me
       const freshUserData = await fetchMe();
-      
+
       setToken(storedToken);
       setUser(freshUserData);
     } catch (error) {
@@ -84,11 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshUserStatus,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextType {

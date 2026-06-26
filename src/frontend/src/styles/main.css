@@ -1,0 +1,10 @@
+/* 1. Les bases et resets globaux */
+@import "./index.css";
+@import "./App.css";
+@import "./Buttons.css";
+@import "./FindGameButton.css";
+@import "./Login.css";
+@import "./ProfileButton.css";
+@import "./MoveHistory.css";
+@import "./ChessGame2D.css";
+@import "./ChessGame3D.css";

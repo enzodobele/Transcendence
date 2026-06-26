@@ -1,10 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 // 1. On crée un pool de connexion PostgreSQL natif
-const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
 });
 
 // 2. On l'associe à l'adaptateur Prisma 7

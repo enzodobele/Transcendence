@@ -6,15 +6,19 @@ function getAuthHeaders(): HeadersInit {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
-  
+
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  
+
   return headers;
 }
 
-export async function register(email: string, username: string, password: string) {
+export async function register(
+  email: string,
+  username: string,
+  password: string,
+) {
   const response = await fetch("/api/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -46,7 +50,8 @@ export async function login(email: string, password: string) {
 
 // 💡 Nouvelle fonction pour récupérer le profil au démarrage de l'app ou refresh
 export async function fetchMe() {
-  const response = await fetch("/api/lobby/me", { // Ajuste le préfixe si ta route est /api/me
+  const response = await fetch("/api/lobby/me", {
+    // Ajuste le préfixe si ta route est /api/me
     method: "GET",
     headers: getAuthHeaders(), // Injecte le Bearer token
   });

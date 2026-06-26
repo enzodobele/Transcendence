@@ -5,7 +5,7 @@ function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("token");
   return {
     "Content-Type": "application/json",
-    ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 }
 
@@ -23,7 +23,7 @@ export async function joinWaitlistApi() {
     throw new Error(error.error || "Impossible de rejoindre la file d'attente");
   }
 
-  return response.json(); 
+  return response.json();
 }
 
 /**
