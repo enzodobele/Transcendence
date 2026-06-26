@@ -1,3 +1,5 @@
+/* src/frontend/src/styles/App.css */
+
 /* 1️⃣ On force le reset global pour que les paddings n'ajoutent pas de hauteur */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -11,11 +13,11 @@ html, body, #root {
   overflow: hidden; /* Supprime définitivement le scroll global */
 }
 
-.app {
+/* .app {
   position: relative;
   isolation: isolate;
   width: 100%;
-  height: 100svh; /* 🔒 Strictement bloqué à la hauteur de l'écran, pas de "min-height" */
+  height: 100svh;
   overflow: hidden;
 
   display: flex;
@@ -23,11 +25,10 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   
-  /* 📐 On réduit le padding vertical pour éviter d'écraser le contenu centré */
   padding: clamp(3rem, 4.5vw, 4.5rem) clamp(0.4rem, 0.8vw, 0.6rem) clamp(1rem, 2vw, 2rem);
-}
+} */
 
-.app::before,
+/* .app::before,
 .app::after {
   content: "";
   position: absolute;
@@ -41,48 +42,42 @@ html, body, #root {
   right: -10rem;
   width: clamp(18rem, 38vw, 34rem);
   height: clamp(18rem, 38vw, 34rem);
-  background: radial-gradient(circle, rgba(181, 136, 99, 0.24) 0%, rgba(181, 136, 99, 0) 70%);
+  background: radial-gradient(circle, rgba(181, 136, 99, 0.24) 0%, rgba(181, 136, 99, 0) 100%);
 }
 
 .app::after {
   bottom: -9rem;
   left: -8rem;
-  width: clamp(16rem, 32vw, 28rem);
+  width: clamp(106rem, 32vw, 28rem);
   height: clamp(16rem, 32vw, 28rem);
-  background: radial-gradient(circle, rgba(14, 95, 64, 0.18) 0%, rgba(14, 95, 64, 0) 72%);
-}
+  background: radial-gradient(circle, rgba(14, 95, 64, 0.18) 0%, rgba(14, 95, 64, 0) 100%);
+} */
 
-.title-chess,
-.subtitle-chess-guard {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  margin: 0;
-  text-align: center;
-  pointer-events: none;
-  white-space: nowrap;
-}
+.app {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
 
-.title-chess {
-  top: clamp(0.4rem, 0.8vw, 0.6rem);
-  font-size: clamp(1.2rem, 2vw, 1.6rem);
-  letter-spacing: 0.16em;
-  line-height: 1;
-  color: #8d5f3f;
-  text-shadow: 0 12px 30px rgba(74, 46, 18, 0.12);
-}
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 4.5vw, 4.5rem) clamp(0.4rem, 0.8vw, 0.6rem) clamp(1rem, 2vw, 2rem);
 
-.title-guard {
-  color: #2d4d3a;
-}
 
-.subtitle-chess-guard {
-  top: clamp(1.8rem, 2.5vw, 2.4rem);
-  font-size: clamp(0.55rem, 0.8vw, 0.68rem);
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: rgba(34, 38, 34, 0.7);
+  background:
+  linear-gradient(135deg, rgba(181, 136, 99, 0) 0%, rgba(181, 136, 99, 0.1) 50%, rgba(181, 136, 99, 0) 100%),
+
+  linear-gradient(45deg, rgba(14, 95, 64, 0) 0%, rgba(14, 95, 64, 0.1) 50%, rgba(14, 95, 64, 0) 100%),
+
+  #ffffff
+
+	  /* background: 
+    radial-gradient(200vw 200vh at 0% 0%, rgba(181, 136, 99, 0.30) 0%, rgba(181, 136, 99, 0) 40%),
+    radial-gradient(200vw 200vh at 100% 100%, rgba(14, 95, 64, 0.3) 0%, rgba(14, 95, 64, 0) 40%),
+    #ffffff */
 }
 
 .game-container {
@@ -107,6 +102,15 @@ html, body, #root {
 
 .game-actions {
   display: contents;
+}
+
+.lobby-chessboard-preview {
+  width: min(80vw, 80vh);   /* ♟️ Prend 70% de la plus petite dimension de l'écran */
+  height: min(80vw, 80vh);  /* 📐 Reste un carré parfait pour l'échiquier */
+  margin: 1.5rem 0;
+  z-index: 2;
+  display: block;
+
 }
 
 /* --- RESPONSIVE MOBILE & TABLETTE --- */

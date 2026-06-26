@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { ChessGame3D } from "./ChessGame3D";
 import { ChessGame2D } from "./ChessGame2D";
-import { MoveHistory } from "./MoveHistory";
 
 interface GameViewProps {
   game: any;
@@ -17,6 +15,7 @@ interface GameViewProps {
   userUsername?: string;
   opponentUsername?: string;
   isLocalGame: boolean;
+  is3D: boolean;
   onSquareClick: (square: string) => void;
   onPiecePointerDown: (square: string, e: React.PointerEvent) => void;
   onResetGame: () => void;
@@ -33,19 +32,15 @@ export function GameView({
   animatingPiece,
   capturedPieces,
   pendingPromotion,
-  customHistory,
   playerColor,
-  userUsername,
-  opponentUsername,
   isLocalGame,
+  is3D, // 🚀 Récupéré ici
   onSquareClick,
   onPiecePointerDown,
   onResetGame,
   onPromotionChoice,
   onLeaveLocalGame,
 }: GameViewProps) {
-  const [is3D, setIs3D] = useState(false);
-
   return (
     <>
       <div className="game-container">
@@ -78,12 +73,6 @@ export function GameView({
             />
           )}
         </div>
-
-        <MoveHistory
-          history={customHistory}
-          player1Name={isLocalGame ? "Blancs (Local)" : userUsername || "Joueur 1"}
-          player2Name={isLocalGame ? "Noirs (Local)" : opponentUsername || "Joueur 2"}
-        />
       </div>
 
       <div className="game-actions">
@@ -92,9 +81,6 @@ export function GameView({
             Quitter la partie locale
           </button>
         )}
-        <button onClick={() => setIs3D(!is3D)} className="button-switch-2d-3d">
-          {is3D ? "Vue 2D" : "Vue 3D"}
-        </button>
       </div>
     </>
   );

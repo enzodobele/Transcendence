@@ -1,10 +1,19 @@
-/* 1. Les bases et resets globaux */
+/* src/frontend/src/styles/main.css */
+
+/* 1. Les polices et bases globales */
+@import "@fontsource/inter";
 @import "./index.css";
 @import "./App.css";
+
+/* 2. L'architecture globale des boutons */
 @import "./Buttons.css";
-@import "./FindGameButton.css";
+
+/* 3. Les styles spécifiques à chaque composant */
+@import "./Title.css";
 @import "./Login.css";
 @import "./ProfileButton.css";
-@import "./MoveHistory.css";
+@import "./FindGameButton.css";
+
+/* 4. Les plateaux de jeu */
 @import "./ChessGame2D.css";
 @import "./ChessGame3D.css";

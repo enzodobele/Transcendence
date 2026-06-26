@@ -1,8 +1,6 @@
-// src/frontend/src/components/ChessGame3D.tsx
 import { Canvas } from "@react-three/fiber";
 import "../styles/ChessGame3D.css";
 import { OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
 import { BoardRenderer } from "./BoardRenderer";
 import { ChessBoardPieces } from "./ChessBoardPieces";
 import { CapturedPieces } from "./CapturedPieces";
@@ -19,6 +17,7 @@ interface ChessGame3DProps {
   onSquareClick: (square: string) => void;
   onResetGame: () => void;
   onPromotionChoice: (piece: string) => void;
+  isDemoMode?: boolean;
 }
 
 export function ChessGame3D({
@@ -30,10 +29,15 @@ export function ChessGame3D({
   onSquareClick,
   onResetGame,
   onPromotionChoice,
+  isDemoMode = false,
 }: ChessGame3DProps) {
   return (
     <>
-      <Canvas camera={{ position: [0, 10, 13], fov: 50 }}>
+      {/* 🚀 gl={{ alpha: true }} libère le fond opaque du Canvas pour le rendre transparent */}
+      <Canvas 
+        camera={{ position: isDemoMode ? [0, 8, 14] : [0, 10, 13], fov: 50 }}
+        gl={{ alpha: true }}
+      >
         <ambientLight intensity={0.5} />
         <directionalLight
           position={[20, 100, 20]}
@@ -42,40 +46,37 @@ export function ChessGame3D({
         />
         <pointLight position={[-10, 100, -10]} intensity={0.8} />
 
-        <fog attach="fog" args={["#696969", 10, 200]} />
-
-        <mesh>
-          <boxGeometry args={[500, 300, 500]} />
-          <meshStandardMaterial color="#6b7280" side={THREE.BackSide} />
-        </mesh>
+        {/* ❌ Le brouillard et la boîte géante grise ont été supprimés d'ici pour laisser passer le fond du site */}
 
         <BoardRenderer
-          selected={selected}
-          onSquareClick={onSquareClick}
+          selected={isDemoMode ? null : selected}
+          onSquareClick={isDemoMode ? () => {} : onSquareClick}
           game={game}
           board={board}
         />
 
         <ChessBoardPieces
           board={board}
-          selected={selected}
-          onSquareClick={onSquareClick}
+          selected={isDemoMode ? null : selected}
+          onSquareClick={isDemoMode ? () => {} : onSquareClick}
         />
 
-        <CapturedPieces capturedPieces={capturedPieces} />
-        <BoardCoordinates />
+        {!isDemoMode && <CapturedPieces capturedPieces={capturedPieces} />}
+        {!isDemoMode && <BoardCoordinates />}
+
         <PlatformBase />
 
         <OrbitControls
-          autoRotate
-          autoRotateSpeed={0}
-          minPolarAngle={Math.PI * 0}
+          autoRotate={isDemoMode}
+          autoRotateSpeed={isDemoMode ? 0.6 : 0}
+          minPolarAngle={isDemoMode ? Math.PI * 0.2 : Math.PI * 0}
           maxPolarAngle={Math.PI * 0.5}
           minDistance={2}
           maxDistance={30}
         />
       </Canvas>
-      {pendingPromotion && (
+
+      {pendingPromotion && !isDemoMode && (
         <PromotionDialog
           onChoose={onPromotionChoice}
           playerColor={game.turn() === "w" ? "w" : "b"}
