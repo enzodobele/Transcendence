@@ -105,8 +105,8 @@ export const useChessGame = (
     makeMove,
   });
 
-  const handleSquareClick = (square: string) => {
-    if (!isMyTurn()) return;
+  const handleSquareClick = (square: string, bypassTurnCheck = false) => {
+    if (!bypassTurnCheck && !isMyTurn()) return;
     if (dragEndedAt.current === square) {
       dragEndedAt.current = null;
       return;

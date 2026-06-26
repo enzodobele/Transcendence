@@ -15,12 +15,12 @@
   font-size: clamp(1.2rem, 2vw, 1.6rem);
   letter-spacing: 0.16em;
   line-height: 1;
-  color: #8d5f3f;
+  color: var(--color-primary-beige);
   text-shadow: 0 12px 30px rgba(74, 46, 18, 0.12);
 }
 
 .title-guard {
-  color: #2d4d3a;
+  color: var(--color-secondary-green);
 }
 
 .subtitle-chess-guard {

@@ -1,0 +1,28 @@
+#root {
+	--color-primary-beige: #8d5f3f;
+	--rgb-beige: 141, 95, 63;
+	--color-primary-beige-light: #f5e8c9;
+	--rgb-beige-light: 248, 246, 241;
+	--color-primary-beige-dark: #612b07;
+	--rgb-beige-dark: 92, 62, 42;
+	
+	--color-secondary-green: #2d4d3a;
+	--rgb-green: 45, 77, 58;
+	--color-secondary-green-light: #4b8060;
+	--rgb-green-light: 248, 246, 241;
+	--color-secondary-green-dark: #1f2e23;
+	--rgb-green-dark: 31, 46, 35;
+
+	--app-background: 
+        linear-gradient(45deg, 
+          rgba(var(--rgb-beige), 0) 20%,
+          rgba(var(--rgb-beige), 0.25) 65%,
+          rgba(var(--rgb-beige), 0) 100%
+        ),
+        linear-gradient(225deg, 
+          rgba(var(--rgb-green), 0) 20%, 
+          rgba(var(--rgb-green), 0.18) 65%, 
+          rgba(var(--rgb-green), 0) 100%
+        ),
+        #ffffff;
+}

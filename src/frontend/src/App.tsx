@@ -1,5 +1,5 @@
 // src/frontend/src/App.tsx
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useChessGame } from "./hooks/chess/useChessGame";
 import { useAuth } from "./contexts/AuthContext";
 import { useGameWebSocket } from "./hooks/chess/useGameWebSocket";
@@ -24,6 +24,10 @@ export default function App() {
   const [isLocalGame, setIsLocalGame] = useState(false);
   const [showModeMenu, setShowModeMenu] = useState(false); // 🚀 État pour le menu des modes
   const [is3D, setIs3D] = useState(false); // 🚀 Remonté ici pour être contrôlé depuis le header
+  
+  // ⏱️ États pour piloter l'interaction avec le mode démo du lobby
+  const [isDemoMode, setIsDemoMode] = useState(true);
+  const demoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Calculs des configurations
   const isInActiveGame = isLocalGame || !!user?.currentGame?.id;
@@ -61,6 +65,35 @@ export default function App() {
 
   triggerServerMove = sendMoveToServer;
 
+  // 🔄 Coupe la démo et gère le coup (Reçoit optionnellement la case cliquée)
+  const handleLobbyInteraction = (square?: string) => {
+    if (isDemoMode) {
+      setIsDemoMode(false); // Arrête proprement la rotation cinématique
+    }
+
+    // On efface le précédent chrono
+    if (demoTimeoutRef.current) {
+      clearTimeout(demoTimeoutRef.current);
+    }
+
+    // On lance le compte à rebours d'une minute d'inactivité
+    demoTimeoutRef.current = setTimeout(() => {
+      setIsDemoMode(true);
+    }, 3000);
+
+    // Si on a cliqué sur une case 3D valide, on joue le coup en activant le bypass du tour
+    if (square) {
+      handleSquareClick(square, true);
+    }
+  };
+
+  // Sécurité : On nettoie le timeout si le composant est démonté
+  useEffect(() => {
+    return () => {
+      if (demoTimeoutRef.current) clearTimeout(demoTimeoutRef.current);
+    };
+  }, []);
+
   if (isLoading) {
     return (
       <div className="app-loading">
@@ -77,13 +110,13 @@ export default function App() {
           {isAuthenticated ? <ProfileButton /> : (
             <button className="connexion-button" onClick={() => setIsLoginOpen(true)}>
               <img src={connexionLogo} alt="connexion" className="connexion-logo" />
-              <span className="connexion-label">Connexion</span>
+              <span>Connexion</span>
             </button>
           )}
         </div>
 
         <div className="header-right">
-          {/* 🔄 Conditionnelle magique : Switch VUE en jeu, Menu de recherche au Lobby */}
+          {/* 🔄 Conditionnelle : Switch VUE en jeu, Menu de recherche au Lobby */}
           {isInActiveGame ? (
             <button onClick={() => setIs3D(!is3D)} className="button-switch-2d-3d">
               {is3D ? "Vue 2D" : "Vue 3D"}
@@ -127,17 +160,18 @@ export default function App() {
           <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
           
           {/* ♟️ Vitrine 3D animée au milieu du lobby */}
-          <div className="lobby-chessboard-preview">
+          {/* Le onClick ici intercepte n'importe quel geste de caméra pour couper la rotation */}
+          <div className="lobby-chessboard-preview" onClick={() => handleLobbyInteraction()}>
             <ChessGame3D
               game={game}
               board={board}
-              selected={null}
-              capturedPieces={[]}
-              pendingPromotion={false}
-              onSquareClick={() => {}}
-              onResetGame={() => {}}
-              onPromotionChoice={() => {}}
-              isDemoMode={true} // 🚀 Mode cinématique activé !
+              selected={selected}
+              capturedPieces={capturedPieces}
+              pendingPromotion={!!pendingPromotion}
+              onSquareClick={(square) => handleLobbyInteraction(square)} /* 🚀 Transmet la case à notre intercepteur */
+              onResetGame={resetGame}
+              onPromotionChoice={handlePromotionChoice}
+              isDemoMode={isDemoMode}
             />
           </div>
 
@@ -151,7 +185,7 @@ export default function App() {
         </div>
       )}
 
-      {/* 📋 Modale de sélection des modes de jeu (Temporaire en attendant son composant) */}
+      {/* 📋 Modale de sélection des modes de jeu */}
       {showModeMenu && (
         <div className="modal-overlay" onClick={() => setShowModeMenu(false)}>
           <div className="modes-menu-content" onClick={(e) => e.stopPropagation()}>

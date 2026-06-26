@@ -46,11 +46,9 @@ export function ChessGame3D({
         />
         <pointLight position={[-10, 100, -10]} intensity={0.8} />
 
-        {/* ❌ Le brouillard et la boîte géante grise ont été supprimés d'ici pour laisser passer le fond du site */}
-
         <BoardRenderer
           selected={isDemoMode ? null : selected}
-          onSquareClick={isDemoMode ? () => {} : onSquareClick}
+          onSquareClick={onSquareClick}
           game={game}
           board={board}
         />
@@ -58,7 +56,7 @@ export function ChessGame3D({
         <ChessBoardPieces
           board={board}
           selected={isDemoMode ? null : selected}
-          onSquareClick={isDemoMode ? () => {} : onSquareClick}
+          onSquareClick={onSquareClick}
         />
 
         {!isDemoMode && <CapturedPieces capturedPieces={capturedPieces} />}

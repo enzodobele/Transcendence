@@ -1,5 +1,6 @@
 /* src/frontend/src/styles/App.css */
 
+
 /* 1️⃣ On force le reset global pour que les paddings n'ajoutent pas de hauteur */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -67,17 +68,7 @@ html, body, #root {
   padding: clamp(3rem, 4.5vw, 4.5rem) clamp(0.4rem, 0.8vw, 0.6rem) clamp(1rem, 2vw, 2rem);
 
 
-  background:
-  linear-gradient(135deg, rgba(181, 136, 99, 0) 0%, rgba(181, 136, 99, 0.1) 50%, rgba(181, 136, 99, 0) 100%),
-
-  linear-gradient(45deg, rgba(14, 95, 64, 0) 0%, rgba(14, 95, 64, 0.1) 50%, rgba(14, 95, 64, 0) 100%),
-
-  #ffffff
-
-	  /* background: 
-    radial-gradient(200vw 200vh at 0% 0%, rgba(181, 136, 99, 0.30) 0%, rgba(181, 136, 99, 0) 40%),
-    radial-gradient(200vw 200vh at 100% 100%, rgba(14, 95, 64, 0.3) 0%, rgba(14, 95, 64, 0) 40%),
-    #ffffff */
+  background: var(--app-background);
 }
 
 .game-container {

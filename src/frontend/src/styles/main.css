@@ -4,6 +4,7 @@
 @import "@fontsource/inter";
 @import "./index.css";
 @import "./App.css";
+@import "./Colors.css";
 
 /* 2. L'architecture globale des boutons */
 @import "./Buttons.css";

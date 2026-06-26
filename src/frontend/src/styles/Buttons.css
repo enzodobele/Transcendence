@@ -1,70 +1,76 @@
-/*  */
-.connexion-button,
-.reset-board,
-.button-find-game,
-.button-switch-2d-3d,
-.profile-button,
-.profile-logout-button,
-.login-submit-button,
-.login-switch-button,
-.app > button {
-  font-family: inherit;
-  border: none;
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease;
-}
-
+/* ==========================================================================
+   1. LE MOULE UNIQUE & L'EFFET POCHOIR (Identique pour TOUS les boutons)
+   ========================================================================== */
 .connexion-button,
 .reset-board,
 .button-find-game,
 .button-switch-2d-3d,
 .app > button {
+  /* Structure et alignement */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: 2.9rem;
-  padding: 0.85rem 1.1rem;
+  border: none;
+  cursor: pointer;
+  background: var(--color-secondary-green-dark);
+  color: var(--color-primary-beige-light);
+  
+  /* Dimensions strictement identiques */
+  min-height: 2rem;
+  padding: 0.4rem 0.75rem;
   border-radius: 999px;
-  color: #f8f6f1;
-  background: rgba(16, 18, 20, 0.84);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 14px 30px rgba(14, 16, 18, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.08) inset;
-  backdrop-filter: blur(14px);
+  width: max-content;
+  
+  /* Typographie unique */
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 400;
+  
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
 }
 
+/* ==========================================================================
+   2. ÉTATS UNIQUES (Survol & Accessibilité)
+   ========================================================================== */
+
+/* Effet au survol identique pour tout le monde */
 .connexion-button:hover,
 .reset-board:hover,
 .button-find-game:hover,
 .button-switch-2d-3d:hover,
-.profile-button:hover,
-.profile-logout-button:hover,
-.login-submit-button:hover,
 .app > button:hover {
   transform: translateY(-1px);
-  box-shadow:
-    0 18px 34px rgba(14, 16, 18, 0.24),
-    0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  /* color: var(--color-secondary-green-light); */
+  /* background: var(--color-primary-beige-dark); */
 }
 
+/* Focus-visible identique pour tout le monde */
 .connexion-button:focus-visible,
 .reset-board:focus-visible,
 .button-find-game:focus-visible,
 .button-switch-2d-3d:focus-visible,
-.profile-button:focus-visible,
-.profile-logout-button:focus-visible,
-.login-submit-button:focus-visible,
-.login-switch-button:focus-visible,
 .app > button:focus-visible {
   outline: 2px solid rgba(181, 136, 99, 0.8);
   outline-offset: 3px;
+}
+
+/* ==========================================================================
+   3. UNIQUEMENT LE POSITIONNEMENT & LES CONTENANTS
+   ========================================================================== */
+
+/* --- Connexion (En haut à gauche) --- */
+.connexion-button {
+  position: absolute;
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  left: clamp(0.4rem, 0.8vw, 0.6rem);
+  z-index: 6;
 }
 
 .connexion-logo {
@@ -74,38 +80,31 @@
   opacity: 0.9;
 }
 
-.reset-board {
-  width: min(100%, 14rem);
-  font-size: 0.82rem;
-  min-height: 2rem;
-  padding: 0.4rem 0.8rem;
-  background: linear-gradient(135deg, #2e6b46 0%, #1f4c34 100%);
-}
-
-.connexion-button {
+/* --- Switch 2D/3D (En haut à droite) --- */
+.button-switch-2d-3d {
   position: absolute;
   top: clamp(0.4rem, 0.8vw, 0.6rem);
-  left: clamp(0.4rem, 0.8vw, 0.6rem);
+  right: clamp(0.4rem, 0.8vw, 0.6rem);
   z-index: 6;
-  width: max-content;
-  font-size: 0.80rem;
-  min-height: 2rem;
-  padding: 0.4rem 0.75rem;
 }
 
-.connexion-button:hover,
-.button-find-game:hover,
-.button-switch-2d-3d:hover {
-  background: rgba(27, 29, 31, 0.94);
+/* --- Find Game (En dessous du switch 2D/3D) --- */
+.button-find-game {
+  position: absolute;
+  top: calc(clamp(0.4rem, 0.8vw, 0.6rem) + 2.6rem);
+  right: clamp(0.4rem, 0.8vw, 0.6rem);
+  z-index: 6;
 }
 
-/* RESPONSIVE */
-@media (max-width: 720px) {
-  .button-switch-2d-3d {
-    min-width: auto;
-  }
+/* --- Reset Board (Reste dans le flux normal) --- */
+.reset-board {
+  /* On lui laisse juste sa restriction de largeur max si besoin, ou rien */
+  width: min(100%, 14rem);
 }
 
+/* ==========================================================================
+   4. RESPONSIVE
+   ========================================================================== */
 @media (max-width: 700px) {
   .game-actions {
     display: flex;
@@ -114,29 +113,28 @@
     justify-content: center;
     width: 100%;
   }
+
   .button-find-game,
   .button-switch-2d-3d {
     position: static;
-    min-width: 0;
     width: auto;
     flex: 1;
-    font-size: 0.88rem;
     padding: 0.75rem 0.8rem;
   }
-  .connexion-label {
+
+  /* .connexion-label {
     display: none;
-  }
+  } */
+
   .connexion-button {
-    width: 2.9rem;
-    height: 2.9rem;
+    width: 2rem;
+    height: 2rem;
     padding: 0;
-    min-height: unset;
   }
 }
 
 @media (max-width: 480px) {
   .reset-board {
     width: 100%;
-    font-size: 0.78rem;
   }
 }
