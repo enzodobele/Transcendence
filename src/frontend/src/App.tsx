@@ -8,9 +8,12 @@ import { ProfileButton } from "./components/ProfileButton";
 import { Login } from "./components/Login";
 import { useAuth } from "./contexts/AuthContext";
 import connexionLogo from "./assets/Logo/login.svg";
+import { AIControls } from "./components/AIControls";
 import "./App.css";
 
 export default function App() {
+  const [isAIMode, setIsAIMode] = useState(false);
+  const [difficulty, setDifficulty] = useState(3);
   const {
     game,
     board,
@@ -25,8 +28,7 @@ export default function App() {
     capturedPieces,
     pendingPromotion,
     handlePromotionChoice,
-  } = useChessGame();
-
+  } = useChessGame({ isAIMode, difficulty });
   const { isAuthenticated } = useAuth();
   const [is3D, setIs3D] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -87,6 +89,12 @@ export default function App() {
 
       <div className="game-actions">
         <button className="button-find-game">Chercher une partie</button>
+        <AIControls
+          isAIMode={isAIMode}
+          difficulty={difficulty}
+          onToggleAI={() => setIsAIMode(!isAIMode)}
+          onDifficultyChange={setDifficulty}
+        />
         <button onClick={() => setIs3D(!is3D)} className="button-switch-2d-3d">
           {is3D ? "Vue 2D" : "Vue 3D"}
         </button>

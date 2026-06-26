@@ -7,6 +7,7 @@ import castleSound from "../assets/sounds/castle.mp3";
 import checkSound from "../assets/sounds/move-check.mp3";
 import promoteSound from "../assets/sounds/promote.mp3";
 import gameEndSound from "../assets/sounds/game-end.mp3";
+import { useStockfish } from "./useStockfish";
 
 const playSound = (soundFile: string) =>
 {
@@ -30,6 +31,12 @@ const extractCapturedPieces = (game: Chess): CapturedPiece[] =>
 
 	return captured;
 };
+
+interface ChessGameConfig {
+  isAIMode?: boolean;
+  aiColor?: "w" | "b";
+  difficulty?: number;
+}
 
 interface CapturedPiece
 {
@@ -60,8 +67,10 @@ export interface AnimatingPiece
 	toY: number;
 }
 
-export const useChessGame = () =>
+export const useChessGame = (config: ChessGameConfig = {}) =>
 {
+	const [isAIThinking, setIsAIThinking] = useState(false);
+	const { isAIMode = false, aiColor = "b", difficulty = 3 } = config;
 	const [game] = useState(() => new Chess());
 	const [board, setBoard] = useState(game.board());
 	const [selected, setSelected] = useState<string | null>(null);
@@ -73,6 +82,11 @@ export const useChessGame = () =>
 
 	const dragRef = useRef<{ square: string; startX: number; startY: number; started: boolean } | null>(null);
 	const dragEndedAt = useRef<string | null>(null);
+
+	const { requestMove } = useStockfish((from, to, promotion) => {
+  		makeMove(from, to, promotion);
+  		setIsAIThinking(false);
+	});
 
 	const playMoveSound = (move: any) =>
 	{
@@ -129,11 +143,18 @@ export const useChessGame = () =>
 				}
 			}
 		}
+
+		if (isAIMode && !game.isGameOver() && game.turn() === aiColor) {
+			setIsAIThinking(true);
+			requestMove(game.fen(), difficulty);
+		}
 		return move;
 	};
 
 	const handleSquareClick = (square: string) =>
 	{
+		if (isAIThinking) return;
+
 		if (dragEndedAt.current === square)
 		{
 			dragEndedAt.current = null;
@@ -184,6 +205,8 @@ export const useChessGame = () =>
 
 	const handlePiecePointerDown = (square: string, e: React.PointerEvent) =>
 	{
+		if (isAIThinking) return;
+
 		const piece = game.get(square as any);
 		if (!piece || piece.color !== game.turn()) return;
 		e.preventDefault();
@@ -280,6 +303,7 @@ export const useChessGame = () =>
 		setDragPiece(null);
 		dragRef.current = null;
 		document.body.classList.remove("dragging");
+		setIsAIThinking(false);
 	};
 
 	return {
@@ -297,5 +321,7 @@ export const useChessGame = () =>
 		capturedPieces,
 		pendingPromotion,
 		handlePromotionChoice,
+		isAIThinking,
+		isAIMode,
 	};
 };
