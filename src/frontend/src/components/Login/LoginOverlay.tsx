@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login, register } from "../../services/auth";
 import { useAuth } from "../../contexts/AuthContext";
+import "../../styles/Login/LoginOverlay.css";
 
 interface LoginProps {
   isOpen: boolean;
@@ -22,14 +23,15 @@ export function Login({ isOpen, onClose }: LoginProps) {
     setError("");
   }
 
-  // 🌟 Une fonction de fermeture propre qui nettoie tout
   function handleCloseAll() {
     setIsRegister(false);
     resetFields();
     onClose();
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    
     try {
       setError("");
 
@@ -58,11 +60,14 @@ export function Login({ isOpen, onClose }: LoginProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="login-overlay" onClick={handleCloseAll}> {/* 🌟 Optionnel : Ferme la modale si on clique à côté */}
-      <div className="login-content" onClick={(e) => e.stopPropagation()}>
+    <div className="login-overlay" onClick={handleCloseAll}>
+      <form 
+        className="login-content" 
+        onSubmit={handleSubmit} 
+        onClick={(e) => e.stopPropagation()}
+      >
         
-        {/* 🌟 Bouton de fermeture nettoyé et fiable */}
-        <button onClick={handleCloseAll} className="login-close-button">
+        <button type="button" onClick={handleCloseAll} className="login-close-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -123,11 +128,12 @@ export function Login({ isOpen, onClose }: LoginProps) {
           className="login-input"
         />
 
-        <button onClick={handleSubmit} className="login-submit-button">
+        <button type="submit" className="login-submit-button">
           {isRegister ? "Créer un compte" : "Se connecter"}
         </button>
 
         <button
+          type="button"
           onClick={() => {
             setIsRegister(!isRegister);
             resetFields();
@@ -138,7 +144,7 @@ export function Login({ isOpen, onClose }: LoginProps) {
             ? "Déjà un compte ? Se connecter"
             : "Pas encore de compte ? S'inscrire"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }

@@ -10,7 +10,7 @@ export function FindGameButton() {
       <div className="find-game-wrapper">
         {error && <p className="lobby-error">{error}</p>}
         <button onClick={startSearch} className="button-find-game">
-          Chercher une partie en ligne
+          Jouer
         </button>
       </div>
 
