@@ -1,16 +1,19 @@
-// src/frontend/src/components/Login/LoginButton.tsx
+import { useState } from "react";
+import { Login } from "./LoginOverlay";
 import LoginIcon from "../../assets/Logo/login.svg?react"; 
 import "../../styles/Login/LoginButton.css";
 
-interface LoginButtonProps {
-  onClick: () => void;
-}
+export function LoginButton() {
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-export function LoginButton({ onClick }: LoginButtonProps) {
   return (
-    <button className="login-button" onClick={onClick}>
-      <LoginIcon className="login-logo" />
-      <span>Connexion</span>
-    </button>
+    <>
+      <button className="login-button" onClick={() => setIsLoginOpen(true)}>
+        <LoginIcon className="login-logo" />
+        <span>Connexion</span>
+      </button>
+
+      <Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+    </>
   );
 }

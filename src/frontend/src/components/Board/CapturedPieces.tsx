@@ -1,7 +1,7 @@
 import React from "react";
 import { ChessPiece } from "./ChessPiece";
-import { PIECE_TYPE_MAP } from "../constants/boardConstants";
-import type { CapturedPiece } from "../types/types";
+import { PIECE_TYPE_MAP } from "../../constants/boardConstants";
+import type { CapturedPiece } from "../../types/types";
 
 
 

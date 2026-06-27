@@ -7,17 +7,18 @@ import { useGameWebSocket } from "./hooks/chess/useGameWebSocket";
 import "./styles/main.css";
 
 // Composants
-import { GameView } from "./components/GameView";
-import { FloatingPiece } from "./components/FloatingPiece";
-import { AnimatedPiece } from "./components/AnimatedPiece";
+import { GameView } from "./components/Board/GameView";
+import { FloatingPiece } from "./components/Board/FloatingPiece";
+import { AnimatedPiece } from "./components/Board/AnimatedPiece";
+import { ChessGame3D } from "./components/Board/ChessGame3D";
+
+import { LoginButton } from "./components/Login/LoginButton"; // 🌟 Gère son propre overlay en interne désormais
 import { ProfileButton } from "./components/Profile/ProfileButton";
-import { LoginButton } from "./components/Login/LoginButton"; // 🌟 Ajouté
-import { Login } from "./components/Login/LoginOverlay";
-import { ChessGame3D } from "./components/ChessGame3D";
+import { FindGameButton } from "./components/FindGame/FindGameButton";
+import { Switch3DButton } from "./components/Board/Switch3DButton";
 
 export default function App() {
   const { isAuthenticated, isLoading, user, token } = useAuth();
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLocalGame, setIsLocalGame] = useState(false);
   const [showModeMenu, setShowModeMenu] = useState(false);
   const [is3D, setIs3D] = useState(false);
@@ -67,31 +68,20 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* HEADER ACTIONS */}
-      <div className="app-header">
-        <div className="header-left">
-          {/* 🌟 Intégration modulaire propre et unifiée */}
-          {isAuthenticated ? (
-            <ProfileButton />
-          ) : (
-            <LoginButton onClick={() => setIsLoginOpen(true)} />
-          )}
-        </div>
+      {/* 🌟 ZONE DES BOUTONS DE NAVIGATION ABSOLUS */}
+      {/* Coin haut droit : Authentification */}
+      {isAuthenticated ? (
+        <ProfileButton />
+      ) : (
+        <LoginButton /> 
+      )}
 
-        <div className="header-right">
-          {isInActiveGame ? (
-            <button onClick={() => setIs3D(!is3D)} className="button-switch-2d-3d">
-              {is3D ? "Vue 2D" : "Vue 3D"}
-            </button>
-          ) : (
-            isAuthenticated && (
-              <button onClick={() => setShowModeMenu(true)} className="button-find-game">
-                Chercher une partie
-              </button>
-            )
-          )}
-        </div>
-      </div>
+      {/* Coin haut gauche : Actions de jeu interchangées automatiquement */}
+      {isInActiveGame ? (
+        <Switch3DButton is3D={is3D} setIs3D={setIs3D} />
+      ) : (
+        isAuthenticated && <FindGameButton />
+      )}
 
       {/* RENDER PRINCIPAL */}
       {isInActiveGame ? (
@@ -141,7 +131,8 @@ export default function App() {
 
       <FloatingPiece dragPiece={dragPiece} game={game} />
       {animatingPiece && <AnimatedPiece data={animatingPiece} onDone={clearAnimation} />}
-      <Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      
+      {/* 🌟 L'ancien composant <Login /> en bas a été supprimé puisqu'il vit maintenant dans LoginButton.tsx */}
     </div>
   );
 }

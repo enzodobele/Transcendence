@@ -1,6 +1,6 @@
 import React from "react";
 import { Square } from "./Square";
-import { FILES, RANKS } from "../constants/boardConstants";
+import { FILES, RANKS } from "../../constants/boardConstants";
 
 interface BoardRendererProps {
   selected: string | null;

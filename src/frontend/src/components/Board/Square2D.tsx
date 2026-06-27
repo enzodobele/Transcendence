@@ -1,5 +1,5 @@
 import React from "react";
-import { PIECE_SVG } from "../constants/pieces";
+import { PIECE_SVG } from "../../constants/pieces";
 
 interface Square2DProps {
   square: string;

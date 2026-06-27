@@ -1,6 +1,6 @@
 import React from "react";
 import { Board } from "./Board";
-import "../styles/ChessGame2D.css";
+import "../../styles/Board/ChessGame2D.css";
 import { PromotionDialog } from "./PromotionDialog";
 
 interface ChessGame2DProps {

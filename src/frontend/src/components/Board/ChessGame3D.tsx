@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import "../styles/ChessGame3D.css";
+import "../../styles/Board/ChessGame3D.css";
 import { OrbitControls } from "@react-three/drei";
 import { BoardRenderer } from "./BoardRenderer";
 import { ChessBoardPieces } from "./ChessBoardPieces";

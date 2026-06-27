@@ -12,13 +12,5 @@
 /* 3. Les styles spécifiques à chaque composant */
 @import "./Title.css";
 
-
-/* 4. Les plateaux de jeu */
-@import "./ChessGame2D.css";
-@import "./ChessGame3D.css";
-
 /* Les css spécifiques seront à supprimmer d'ici
 et à importer dans chaque composant */
-@import "./Login/LoginOverlay.css";
-@import "./Profile/ProfileOverlay.css";
-@import "./FindGameButton.css";

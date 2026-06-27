@@ -1,6 +1,6 @@
 import React from "react";
 import { Text } from "@react-three/drei";
-import { FILES, RANKS } from "../constants/boardConstants";
+import { FILES, RANKS } from "../../constants/boardConstants";
 
 export const BoardCoordinates: React.FC = () => {
   const coordinateSize = 0.4;

@@ -1,0 +1,75 @@
+.matchmaking-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.matchmaking-content {
+  background: var(--color-primary-beige-light, #f5f3ef);
+  color: var(--color-primary-dark, #2c2c2c);
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  max-width: 380px;
+  width: 90%;
+}
+
+.matchmaking-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.pulse-text {
+  font-size: 0.95rem;
+  opacity: 0.7;
+  margin: 0;
+  animation: matchmakingPulse 1.8s infinite ease-in-out;
+}
+
+.button-cancel-game {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #dc3545;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button-cancel-game:hover {
+  background: #bd2130;
+}
+
+.matchmaking-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--color-primary-dark, #2c2c2c);
+  border-radius: 50%;
+  animation: matchmakingSpin 1s infinite linear;
+}
+
+@keyframes matchmakingSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes matchmakingPulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}

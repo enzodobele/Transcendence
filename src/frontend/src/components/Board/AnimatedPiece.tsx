@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { PIECE_SVG } from "../constants/pieces";
-import type { AnimatingPiece as AnimatingPieceData } from "../types/types";
+import { PIECE_SVG } from "../../constants/pieces";
+import type { AnimatingPiece as AnimatingPieceData } from "../../types/types";
 
 interface AnimatedPieceProps {
   data: AnimatingPieceData;

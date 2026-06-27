@@ -1,6 +1,6 @@
 import React from "react";
 import { ChessPiece } from "./ChessPiece";
-import { FILES, RANKS, PIECE_TYPE_MAP } from "../constants/boardConstants";
+import { FILES, RANKS, PIECE_TYPE_MAP } from "../../constants/boardConstants";
 
 interface ChessBoardPiecesProps {
   board: any[];

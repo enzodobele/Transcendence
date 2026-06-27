@@ -1,6 +1,6 @@
 import React from "react";
 import { Square2D } from "./Square2D";
-import { FILES, RANKS } from "../constants/pieces";
+import { FILES, RANKS } from "../../constants/pieces";
 
 interface BoardProps {
   board: any[][];

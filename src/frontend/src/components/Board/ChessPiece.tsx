@@ -2,7 +2,7 @@ import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import * as THREE from "three";
-import { pieceConfig } from "../constants/pieceConfig";
+import { pieceConfig } from "../../constants/pieceConfig";
 
 interface ChessPieceProps {
   position: number[];

@@ -1,5 +1,5 @@
-import { PIECE_SVG } from "../constants/pieces";
-import type { DragPiece } from "../types/types";
+import { PIECE_SVG } from "../../constants/pieces";
+import type { DragPiece } from "../../types/types";
 
 interface FloatingPieceProps {
   dragPiece: DragPiece | null;

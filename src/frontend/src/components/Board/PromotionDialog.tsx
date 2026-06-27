@@ -1,14 +1,14 @@
 import React from "react";
 import { ChessPiece } from "./ChessPiece";
-import { PIECE_TYPE_MAP } from "../constants/boardConstants";
-import wQ from "../assets/pieces/wQ.svg";
-import wR from "../assets/pieces/wR.svg";
-import wB from "../assets/pieces/wB.svg";
-import wN from "../assets/pieces/wN.svg";
-import bQ from "../assets/pieces/bQ.svg";
-import bR from "../assets/pieces/bR.svg";
-import bB from "../assets/pieces/bB.svg";
-import bN from "../assets/pieces/bN.svg";
+import { PIECE_TYPE_MAP } from "../../constants/boardConstants";
+import wQ from "../../assets/pieces/wQ.svg";
+import wR from "../../assets/pieces/wR.svg";
+import wB from "../../assets/pieces/wB.svg";
+import wN from "../../assets/pieces/wN.svg";
+import bQ from "../../assets/pieces/bQ.svg";
+import bR from "../../assets/pieces/bR.svg";
+import bB from "../../assets/pieces/bB.svg";
+import bN from "../../assets/pieces/bN.svg";
 
 interface PromotionDialogProps {
   onChoose: (pieceName: string) => void;
