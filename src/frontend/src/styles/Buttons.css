@@ -1,10 +1,11 @@
 /* ==========================================================================
    1. LE MOULE UNIQUE & L'EFFET POCHOIR (Identique pour TOUS les boutons)
    ========================================================================== */
-.connexion-button,
+.login-button,
 .reset-board,
 .button-find-game,
 .button-switch-2d-3d,
+.profile-button,
 .app > button {
   /* Structure et alignement */
   display: inline-flex;
@@ -13,12 +14,13 @@
   gap: 0.5rem;
   border: none;
   cursor: pointer;
-  background: var(--color-secondary-green-dark);
+  background: var(--color-secondary-green);
   color: var(--color-primary-beige-light);
   
   /* Dimensions strictement identiques */
-  min-height: 2rem;
-  padding: 0.4rem 0.75rem;
+  height: 2.1rem; 
+  box-sizing: border-box;
+  padding: 0 0.75rem; 
   border-radius: 999px;
   width: max-content;
   
@@ -39,10 +41,11 @@
    ========================================================================== */
 
 /* Effet au survol identique pour tout le monde */
-.connexion-button:hover,
+.login-button:hover,
 .reset-board:hover,
 .button-find-game:hover,
 .button-switch-2d-3d:hover,
+.profile-button:hover,
 .app > button:hover {
   transform: translateY(-1px);
   -webkit-background-clip: border-box;
@@ -52,10 +55,11 @@
 }
 
 /* Focus-visible identique pour tout le monde */
-.connexion-button:focus-visible,
+.login-button:focus-visible,
 .reset-board:focus-visible,
 .button-find-game:focus-visible,
 .button-switch-2d-3d:focus-visible,
+.profile-button:focus-visible,
 .app > button:focus-visible {
   outline: 2px solid rgba(181, 136, 99, 0.8);
   outline-offset: 3px;
@@ -66,19 +70,7 @@
    ========================================================================== */
 
 /* --- Connexion (En haut à gauche) --- */
-.connexion-button {
-  position: absolute;
-  top: clamp(0.4rem, 0.8vw, 0.6rem);
-  left: clamp(0.4rem, 0.8vw, 0.6rem);
-  z-index: 6;
-}
 
-.connexion-logo {
-  width: 1rem;
-  height: 1rem;
-  filter: invert(1);
-  opacity: 0.9;
-}
 
 /* --- Switch 2D/3D (En haut à droite) --- */
 .button-switch-2d-3d {
@@ -88,10 +80,10 @@
   z-index: 6;
 }
 
-/* --- Find Game (En dessous du switch 2D/3D) --- */
+/* --- Find Game (En haut à droite) --- */
 .button-find-game {
   position: absolute;
-  top: calc(clamp(0.4rem, 0.8vw, 0.6rem) + 2.6rem);
+  top: calc(clamp(0.4rem, 0.8vw, 0.6rem));
   right: clamp(0.4rem, 0.8vw, 0.6rem);
   z-index: 6;
 }
@@ -101,6 +93,24 @@
   /* On lui laisse juste sa restriction de largeur max si besoin, ou rien */
   width: min(100%, 14rem);
 }
+
+.login-submit-button {
+  margin-top: 0.75rem;
+  background: linear-gradient(135deg, #d8a86c 0%, #b87e45 100%);
+  color: #23160e;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.85rem 1.1rem;
+}
+
+.login-switch-button {
+  margin-top: 0.15rem;
+  background: transparent;
+  color: #4c654f;
+  padding: 0.4rem 0;
+}
+
+
 
 /* ==========================================================================
    4. RESPONSIVE
@@ -126,7 +136,7 @@
     display: none;
   } */
 
-  .connexion-button {
+  .login-button {
     width: 2rem;
     height: 2rem;
     padding: 0;

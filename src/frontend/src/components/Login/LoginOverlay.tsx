@@ -1,9 +1,6 @@
-// src/frontend/src/components/Login.tsx
-
 import { useState } from "react";
-import "../styles/Login.css";
-import { login, register } from "../services/auth";
-import { useAuth } from "../contexts/AuthContext";
+import { login, register } from "../../services/auth";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface LoginProps {
   isOpen: boolean;
@@ -25,6 +22,13 @@ export function Login({ isOpen, onClose }: LoginProps) {
     setError("");
   }
 
+  // 🌟 Une fonction de fermeture propre qui nettoie tout
+  function handleCloseAll() {
+    setIsRegister(false);
+    resetFields();
+    onClose();
+  }
+
   async function handleSubmit() {
     try {
       setError("");
@@ -32,7 +36,6 @@ export function Login({ isOpen, onClose }: LoginProps) {
       if (isRegister) {
         const data = await register(email, username, password);
         console.log(data);
-        // Après inscription, connecter automatiquement
         if (data.user && data.token) {
           loginUser(data.user, data.token);
           resetFields();
@@ -41,7 +44,6 @@ export function Login({ isOpen, onClose }: LoginProps) {
       } else {
         const data = await login(email, password);
         console.log(data);
-        // Après connexion, sauvegarder le token et utilisateur
         if (data.user && data.token) {
           loginUser(data.user, data.token);
           resetFields();
@@ -56,14 +58,12 @@ export function Login({ isOpen, onClose }: LoginProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="login-overlay">
-      <div className="login-content">
-        <button onClick={onClose} className="login-close-button">
+    <div className="login-overlay" onClick={handleCloseAll}> {/* 🌟 Optionnel : Ferme la modale si on clique à côté */}
+      <div className="login-content" onClick={(e) => e.stopPropagation()}>
+        
+        {/* 🌟 Bouton de fermeture nettoyé et fiable */}
+        <button onClick={handleCloseAll} className="login-close-button">
           <svg
-            onClick={() => {
-              setIsRegister(false);
-              resetFields();
-            }}
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
@@ -93,7 +93,6 @@ export function Login({ isOpen, onClose }: LoginProps) {
         {isRegister && (
           <>
             <strong className="login-label">Pseudo</strong>
-
             <input
               type="text"
               value={username}
@@ -105,7 +104,6 @@ export function Login({ isOpen, onClose }: LoginProps) {
         )}
 
         <strong className="login-label">Email</strong>
-
         <input
           type="text"
           value={email}
@@ -117,7 +115,6 @@ export function Login({ isOpen, onClose }: LoginProps) {
         <strong className="login-label login-password-label">
           Mot de passe
         </strong>
-
         <input
           type="password"
           value={password}

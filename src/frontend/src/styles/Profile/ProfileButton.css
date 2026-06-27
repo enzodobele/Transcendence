@@ -1,0 +1,16 @@
+/* src/styles/Profile/ProfileButton.css */
+button.profile-button {
+  position: absolute;
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  left: clamp(0.4rem, 0.8vw, 0.6rem);
+  width: 2.1rem;
+  z-index: 6;
+  
+}
+
+.profile-icon {
+	width: 1.35rem;
+	height: 1.35rem;
+	flex-shrink: 0;
+}
+

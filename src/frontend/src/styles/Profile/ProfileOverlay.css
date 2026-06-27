@@ -1,0 +1,101 @@
+/* src/frontend/src/styles/Profile/ProfileOverlay.css */
+
+/* 🌟 Remplacement de .profile-container par .profile-overlay (Plein écran noir transparent) */
+.profile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4); /* Assombrit le fond de l'écran derrière */
+  z-index: 100; /* Passe au-dessus du lobby et de l'échiquier */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🌟 Remplacement de .profile-menu par .profile-content (La boîte au centre) */
+.profile-content {
+  position: relative;
+  min-width: 15.5rem;
+  padding: 1.8rem;
+  border-radius: 1rem;
+  background: rgba(251, 248, 241, 0.97);
+  color: #1f1c17;
+  border: 1px solid rgba(30, 25, 18, 0.1);
+  box-shadow: 0 22px 50px rgba(14, 16, 18, 0.3);
+  text-align: left;
+}
+
+/* Bouton de fermeture en forme de X */
+.profile-close-button {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1f1c17;
+  opacity: 0.5;
+}
+.profile-close-button:hover {
+  opacity: 1;
+}
+
+.profile-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.profile-subtitle {
+  margin: 0 0 1.2rem 0;
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.profile-info {
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.4rem;
+}
+
+.profile-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.5;
+  display: block;
+  margin-top: 0.6rem;
+}
+
+.profile-value {
+  margin: 0.1rem 0 0.6rem 0;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.profile-logout-button {
+  width: 100%;
+  padding: 0.72rem 0.9rem;
+  border: none;
+  border-radius: 0.85rem;
+  background: linear-gradient(135deg, #f3d1a7 0%, #dfab70 100%);
+  color: #23160e;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.profile-logout-button:hover {
+  opacity: 0.9;
+}
+
+.logout-icon {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+}

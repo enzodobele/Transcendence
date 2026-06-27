@@ -1,0 +1,14 @@
+/* src/frontend/src/styles/Login/LoginButton.css */
+.login-button {
+  position: absolute;
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  left: clamp(0.4rem, 0.8vw, 0.6rem);
+  
+  z-index: 6;
+}
+
+.login-logo {
+	width: 1.35rem;
+	height: 1.35rem;
+	flex-shrink: 0;
+}
