@@ -1,67 +1,167 @@
+/* ==========================================================================
+   1. CONTENEUR GLOBAL DE L'OVERLAY (FIXÉ EN HAUT À DROITE)
+   ========================================================================== */
 .matchmaking-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: fixed; 
+  inset: 0;        
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.7);
   z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: transparent;
 }
 
 .matchmaking-content {
+  position: absolute;
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  right: clamp(0.4rem, 0.8vw, 0.6rem);
+  width: 16rem;
+
   background: var(--color-primary-beige-light, #f5f3ef);
   color: var(--color-primary-dark, #2c2c2c);
-  padding: 2.5rem;
+  padding: 0.5rem;
   border-radius: 1rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  text-align: center;
+  box-shadow: 0 1.5rem 3.75rem rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: visible;
+}
+
+.modes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: visible;
+}
+
+/* ==========================================================================
+   2. STYLE COMMUN DES CARTES (AU REPOS)
+   ========================================================================== */
+.mode-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #fffdfa;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  height: 2.5rem; 
+  box-sizing: border-box;
+  z-index: 1; 
+  transition: 
+    background-color 0.2s, 
+    border-color 0.2s, 
+    box-shadow 0.25s, 
+    border-radius 0.15s,
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mode-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.mode-info h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-primary-dark, #2c2c2c);
+}
+
+/* ==========================================================================
+   3. BASE COMMUNE DES DESCRIPTIONS (TOUJOURS EN DESSOUS DU TITRE)
+   ========================================================================== */
+.mode-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6e675b;
+  line-height: 1.2;
+  position: absolute;
+  left: -0.0625rem;
+  right: -0.0625rem;
+  top: 100%; /* Reste ancré sous le titre */
+  background: #ffffff;
+  border: 0.0625rem solid rgba(181, 136, 99, 0.5);
+  border-top: none;
+  border-radius: 0 0 0.75rem 0.75rem;
+  
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height 0.2s ease, opacity 0.15s ease;
+  box-shadow: 0 0.625rem 1.25rem rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   4. LOGIQUE HOVER : DÉPLOYAGE VERS LE BAS (Partie Libre & Entraînement)
+   ========================================================================== */
+.mode-card.open-down:hover {
+  z-index: 99;
+  background: #ffffff;
+  border-color: rgba(181, 136, 99, 0.5);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.mode-card.open-down:hover p {
+  max-height: 4.5rem;
+  opacity: 1;
+  padding: 0rem 1rem 0.5rem 1rem;
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   5. LOGIQUE HOVER : GLISSEMENT VERS LE HAUT (Matchmaking & Duel)
+   ========================================================================== */
+.mode-card.open-up:hover {
+  z-index: 99;
+  background: #ffffff;
+  border-color: rgba(181, 136, 99, 0.5);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  transform: translateY(-2.5rem); 
+}
+
+.mode-card.open-up:hover p {
+  max-height: 2.5rem;
+  opacity: 1;
+  padding: 0rem 1rem 0.5rem 1rem;
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   6. VUE RECHERCHE EN COURS (MATCHMAKING ACTIF)
+   ========================================================================== */
+.matchmaking-searching-view {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.2rem;
-  max-width: 380px;
-  width: 90%;
+  padding: 1rem 0;
 }
 
-.matchmaking-title {
-  margin: 0;
-  font-size: 1.4rem;
-  font-weight: 700;
+.matchmaking-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0.25rem solid rgba(0, 0, 0, 0.08);
+  border-top-color: var(--color-primary-dark, #2c2c2c);
+  border-radius: 50%;
+  animation: matchmakingSpin 1s infinite linear;
 }
 
 .pulse-text {
   font-size: 0.95rem;
   opacity: 0.7;
   margin: 0;
+  text-align: center;
   animation: matchmakingPulse 1.8s infinite ease-in-out;
-}
-
-.button-cancel-game {
-  width: 100%;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 0.5rem;
-  background: #dc3545;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.button-cancel-game:hover {
-  background: #bd2130;
-}
-
-.matchmaking-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-top-color: var(--color-primary-dark, #2c2c2c);
-  border-radius: 50%;
-  animation: matchmakingSpin 1s infinite linear;
 }
 
 @keyframes matchmakingSpin {
@@ -69,7 +169,6 @@
 }
 
 @keyframes matchmakingPulse {
-  0% { opacity: 0.4; }
+  0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
-  100% { opacity: 0.4; }
 }

@@ -14,3 +14,22 @@ button.profile-button {
 	flex-shrink: 0;
 }
 
+.profile-logout-button {
+  width: 100%;
+  padding: 0.72rem 0.9rem;
+  border: none;
+  border-radius: 0.85rem;
+  background: linear-gradient(135deg, #f3d1a7 0%, #dfab70 100%);
+  color: #23160e;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.profile-logout-button:hover {
+  opacity: 0.9;
+}

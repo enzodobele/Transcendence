@@ -1,33 +1,38 @@
-/* src/frontend/src/styles/Profile/ProfileOverlay.css */
-
-/* 🌟 Remplacement de .profile-container par .profile-overlay (Plein écran noir transparent) */
+/* ==========================================================================
+   1. OVERLAY TRANSPARENT GLOBAL (SENSITIVE AUX CLICS SUR TOUT L'ÉCRAN)
+   ========================================================================== */
 .profile-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4); /* Assombrit le fond de l'écran derrière */
-  z-index: 100; /* Passe au-dessus du lobby et de l'échiquier */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: transparent; /* 🌟 Invisible pour capter les clics sur l'échiquier */
+  z-index: 100;
+  overflow: visible;
 }
 
-/* 🌟 Remplacement de .profile-menu par .profile-content (La boîte au centre) */
+/* ==========================================================================
+   2. PANNEAU DE PROFIL ANCRÉ EN HAUT À GAUCHE
+   ========================================================================== */
 .profile-content {
-  position: relative;
+  position: absolute; /* Se repère par rapport au coin supérieur gauche de l'overlay */
+  top: clamp(0.4rem, 0.8vw, 0.6rem);  /* Même alignement vertical que ton sélecteur de modes */
+  left: clamp(0.4rem, 0.8vw, 0.6rem); /* Calé à gauche */
+  
   min-width: 15.5rem;
   padding: 1.8rem;
   border-radius: 1rem;
   background: rgba(251, 248, 241, 0.97);
+  backdrop-filter: blur(0.625rem); /* Optionnel : léger flou sous la modale pour le style */
   color: #1f1c17;
-  border: 1px solid rgba(30, 25, 18, 0.1);
-  box-shadow: 0 22px 50px rgba(14, 16, 18, 0.3);
+  border: 0.0625rem solid rgba(30, 25, 18, 0.1);
+  box-shadow: 0 1.375rem 3.125rem rgba(14, 16, 18, 0.3); /* Converti en rem */
   text-align: left;
 }
 
-/* Bouton de fermeture en forme de X */
+/* ==========================================================================
+   3. ÉLÉMENTS INTERNES DU PROFIL (CONVERTIS EN REM / NETTOYÉS)
+   ========================================================================== */
 .profile-close-button {
   position: absolute;
   top: 0.8rem;
@@ -37,7 +42,9 @@
   cursor: pointer;
   color: #1f1c17;
   opacity: 0.5;
+  font-size: 1rem;
 }
+
 .profile-close-button:hover {
   opacity: 1;
 }
@@ -72,26 +79,6 @@
   margin: 0.1rem 0 0.6rem 0;
   font-size: 1.05rem;
   font-weight: 500;
-}
-
-.profile-logout-button {
-  width: 100%;
-  padding: 0.72rem 0.9rem;
-  border: none;
-  border-radius: 0.85rem;
-  background: linear-gradient(135deg, #f3d1a7 0%, #dfab70 100%);
-  color: #23160e;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.profile-logout-button:hover {
-  opacity: 0.9;
 }
 
 .logout-icon {

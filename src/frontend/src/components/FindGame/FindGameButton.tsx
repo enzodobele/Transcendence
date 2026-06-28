@@ -1,21 +1,33 @@
+import { useState } from "react";
 import { useFindGame } from "../../hooks/useFindGame";
-import { FindGameOverlay } from "./FindGameOverlay"; // 🌟 Import de l'overlay
+import { FindGameOverlay } from "./FindGameOverlay";
 import "../../styles/FindGame/FindGameButton.css";
 
-export function FindGameButton() {
+interface FindGameButtonProps {
+  onStartLocalGame: () => void;
+}
+
+export function FindGameButton({ onStartLocalGame }: FindGameButtonProps) {
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const { isSearching, error, startSearch, cancelSearch } = useFindGame();
 
   return (
     <>
       <div className="find-game-wrapper">
         {error && <p className="lobby-error">{error}</p>}
-        <button onClick={startSearch} className="button-find-game">
+        <button onClick={() => setIsOverlayOpen(true)} className="button-find-game">
           Jouer
         </button>
       </div>
 
-      {/* 🌟 L'overlay est piloté directement ici */}
-      <FindGameOverlay isOpen={isSearching} onCancel={cancelSearch} />
+      <FindGameOverlay 
+        isOpen={isOverlayOpen}
+        onClose={() => setIsOverlayOpen(false)}
+        isSearching={isSearching}
+        onStartMatchmaking={startSearch}
+        onCancelMatchmaking={cancelSearch}
+        onSelectLocalGame={onStartLocalGame}
+      />
     </>
   );
 }

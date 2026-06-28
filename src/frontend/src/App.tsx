@@ -3,7 +3,7 @@ import { useChessGame } from "./hooks/chess/useChessGame";
 import { useAuth } from "./contexts/AuthContext";
 import { useGameWebSocket } from "./hooks/chess/useGameWebSocket";
 
-// 🚀 Styles globaux (qui contiennent le moule de hauteur à 2.1rem)
+// 🚀 Styles globaux
 import "./styles/main.css";
 
 // Composants
@@ -12,7 +12,7 @@ import { FloatingPiece } from "./components/Board/FloatingPiece";
 import { AnimatedPiece } from "./components/Board/AnimatedPiece";
 import { ChessGame3D } from "./components/Board/ChessGame3D";
 
-import { LoginButton } from "./components/Login/LoginButton"; // 🌟 Gère son propre overlay en interne désormais
+import { LoginButton } from "./components/Login/LoginButton";
 import { ProfileButton } from "./components/Profile/ProfileButton";
 import { FindGameButton } from "./components/FindGame/FindGameButton";
 import { Switch3DButton } from "./components/Board/Switch3DButton";
@@ -20,7 +20,6 @@ import { Switch3DButton } from "./components/Board/Switch3DButton";
 export default function App() {
   const { isAuthenticated, isLoading, user, token } = useAuth();
   const [isLocalGame, setIsLocalGame] = useState(false);
-  const [showModeMenu, setShowModeMenu] = useState(false);
   const [is3D, setIs3D] = useState(false);
   
   const [isDemoMode, setIsDemoMode] = useState(true);
@@ -73,14 +72,14 @@ export default function App() {
       {isAuthenticated ? (
         <ProfileButton />
       ) : (
-        <LoginButton /> 
+        <LoginButton />
       )}
 
-      {/* Coin haut gauche : Actions de jeu interchangées automatiquement */}
+      {/* Coin haut gauche : Actions de jeu interchangeables */}
       {isInActiveGame ? (
         <Switch3DButton is3D={is3D} setIs3D={setIs3D} />
       ) : (
-        isAuthenticated && <FindGameButton />
+        isAuthenticated && <FindGameButton onStartLocalGame={() => setIsLocalGame(true)} />
       )}
 
       {/* RENDER PRINCIPAL */}
@@ -115,24 +114,8 @@ export default function App() {
         </div>
       )}
 
-      {/* MODALE DE SÉLECTION */}
-      {showModeMenu && (
-        <div className="modal-overlay" onClick={() => setShowModeMenu(false)}>
-          <div className="modes-menu-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Choisir un mode de jeu</h2>
-            <button onClick={() => setShowModeMenu(false)} className="menu-mode-btn">🌐 En ligne</button>
-            <button onClick={() => alert("IA en cours...")} className="menu-mode-btn">🤖 Entraînement</button>
-            <button onClick={() => alert("Duel...")} className="menu-mode-btn">⚔️ Duel</button>
-            <button onClick={() => { setIsLocalGame(true); setShowModeMenu(false); }} className="menu-mode-btn">🖥️ Libre / Local</button>
-            <button onClick={() => setShowModeMenu(false)} className="menu-close-btn">Fermer</button>
-          </div>
-        </div>
-      )}
-
       <FloatingPiece dragPiece={dragPiece} game={game} />
       {animatingPiece && <AnimatedPiece data={animatingPiece} onDone={clearAnimation} />}
-      
-      {/* 🌟 L'ancien composant <Login /> en bas a été supprimé puisqu'il vit maintenant dans LoginButton.tsx */}
     </div>
   );
 }
