@@ -87,8 +87,9 @@ html, body, #root {
 .chessboard-wrapper {
   grid-column: 1;
   justify-self: center;
-  width: 100%;
-  max-width: min(100%, calc(100svh - 16rem)); 
+  width: min(80vw, 80vh);   
+  height: min(80vw, 80vh);
+  z-index: 2;
 }
 
 .game-actions {
@@ -101,7 +102,15 @@ html, body, #root {
   margin: 1.5rem 0;
   z-index: 2;
   display: block;
+}
 
+.lobby-actions {
+  display: flex;
+  justify-content: center;
+  color: var(--color-primary-green-dark, #2c2c2c);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  z-index: 2;
 }
 
 /* --- RESPONSIVE MOBILE & TABLETTE --- */

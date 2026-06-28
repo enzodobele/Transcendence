@@ -4,6 +4,7 @@
 .login-button,
 .reset-board,
 .button-find-game,
+.button-leave-game,
 .button-switch-2d-3d,
 .profile-button,
 .app > button {
@@ -14,8 +15,8 @@
   gap: 0.5rem;
   border: none;
   cursor: pointer;
-  background: var(--color-secondary-green);
-  color: var(--color-primary-beige-light);
+  background: var(--color-secondary);
+  color: var(--color-primary-light);
   
   /* Dimensions strictement identiques */
   height: 2.1rem; 
@@ -45,13 +46,14 @@
 .reset-board:hover,
 .button-find-game:hover,
 .button-switch-2d-3d:hover,
+.button-leave-game:hover,
 .profile-button:hover,
 .app > button:hover {
   transform: translateY(-1px);
   -webkit-background-clip: border-box;
   background-clip: border-box;
-  /* color: var(--color-secondary-green-light); */
-  /* background: var(--color-primary-beige-dark); */
+  /* color: var(--color-secondary-light); */
+  /* background: var(--color-primary-dark); */
 }
 
 /* Focus-visible identique pour tout le monde */
@@ -59,6 +61,7 @@
 .reset-board:focus-visible,
 .button-find-game:focus-visible,
 .button-switch-2d-3d:focus-visible,
+.button-leave-game:focus-visible,
 .profile-button:focus-visible,
 .app > button:focus-visible {
   outline: 2px solid rgba(181, 136, 99, 0.8);
@@ -89,8 +92,6 @@
   color: #4c654f;
   padding: 0.4rem 0;
 }
-
-
 
 /* ==========================================================================
    4. RESPONSIVE

@@ -1,28 +1,24 @@
 #root {
-	--color-primary-beige: #8d5f3f;
-	--rgb-beige: 141, 95, 63;
-	--color-primary-beige-light: #f5e8c9;
-	--rgb-beige-light: 248, 246, 241;
-	--color-primary-beige-dark: #612b07;
-	--rgb-beige-dark: 92, 62, 42;
-	
-	--color-secondary-green: #2d4d3a;
-	--rgb-green: 45, 77, 58;
-	--color-secondary-green-light: #4b8060;
-	--rgb-green-light: 248, 246, 241;
-	--color-secondary-green-dark: #1f2e23;
-	--rgb-green-dark: 31, 46, 35;
+    --color-primary: #8d5f3f;
+    --color-primary-light: #f5e8c9;
+    --color-primary-dark: #612b07;
+    
+    --color-secondary: #2d4d3a;
+    --color-secondary-light: #4b8060;
+    --color-secondary-dark: #1f2e23;
 
-	--app-background: 
+    --color-overlay-background: rgba(251, 248, 241, 0.96);
+
+    --app-background: 
         linear-gradient(45deg, 
-          rgba(var(--rgb-beige), 0) 20%,
-          rgba(var(--rgb-beige), 0.25) 65%,
-          rgba(var(--rgb-beige), 0) 100%
+          color-mix(in srgb, var(--color-primary) 0%, transparent) 20%,
+          color-mix(in srgb, var(--color-primary) 25%, transparent) 65%,
+          color-mix(in srgb, var(--color-primary) 0%, transparent) 100%
         ),
         linear-gradient(225deg, 
-          rgba(var(--rgb-green), 0) 20%, 
-          rgba(var(--rgb-green), 0.18) 65%, 
-          rgba(var(--rgb-green), 0) 100%
+          color-mix(in srgb, var(--color-secondary) 0%, transparent) 20%, 
+          color-mix(in srgb, var(--color-secondary) 18%, transparent) 65%, 
+          color-mix(in srgb, var(--color-secondary) 0%, transparent) 100%
         ),
         #ffffff;
 }

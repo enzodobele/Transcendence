@@ -1,11 +1,12 @@
 import "../../styles/FindGame/FindGameOverlay.css";
+import { ModeCard } from "./ModeCard";
 
 interface FindGameOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   onStartMatchmaking: () => void;
   onCancelMatchmaking: () => void;
-  isSearching: boolean; // État provenant du hook useFindGame
+  isSearching: boolean;
   onSelectLocalGame: () => void;
 }
 
@@ -20,47 +21,67 @@ export function FindGameOverlay({
   
   if (!isOpen) return null;
 
+// ======================================================================
+// fonctions manquantes à placer dans 
+// src/frontend/src/hooks/useFindGame.ts
+
+  const handleStartAiGame = () => {
+    alert("IA bientôt disponible ! (En attente du backend)");
+  };
+
+  const handleCreateFriendDuel = () => {
+    alert("Lien d'invitation bientôt dispo ! (En attente du backend)");
+  };
+// ======================================================================
+
+  const GAME_MODES = [
+    {
+      id: "local",
+      title: "Partie Libre",
+      description: "Jouez tranquillement sur un échiquier local, sans pression.",
+      direction: "down" as const,
+      action: () => { onSelectLocalGame(); onClose(); },
+    },
+    {
+      id: "ai",
+      title: "Entraînement",
+      description: "Affrontez Stockfish pour parfaire vos ouvertures.",
+      direction: "down" as const,
+      action: handleStartAiGame,
+    },
+    {
+      id: "matchmaking",
+      title: "Matchmaking Aléatoire",
+      description: "Trouvez un adversaire à votre taille en ligne (Classement Elo).",
+      direction: "up" as const,
+      action: onStartMatchmaking,
+    },
+    {
+      id: "duel",
+      title: "Duel d'amis",
+      description: "Créez une salle privée et envoyez un lien de défi.",
+      direction: "up" as const,
+      action: handleCreateFriendDuel,
+    }
+  ];
+
   return (
     <div className="matchmaking-overlay" onClick={onClose}>
       <div className="matchmaking-content" onClick={(e) => e.stopPropagation()}>
         
         {!isSearching ? (
-          <>
-            <div className="modes-grid">
-  {/* 🔽 CES DEUX-LÀ S'ÉTIRENT VERS LE BAS */}
-  <button 
-    className="mode-card open-down" 
-    onClick={() => { onSelectLocalGame(); onClose(); }}
-  >
-    <div className="mode-info">
-      <h3>Partie Libre</h3>
-      <p>Jouez tranquillement sur un échiquier local, sans pression.</p>
-    </div>
-  </button>
-
-  <button className="mode-card open-down" onClick={() => alert("IA bientôt disponible !")}>
-    <div className="mode-info">
-      <h3>Entraînement</h3>
-      <p>Affrontez Stockfish pour parfaire vos ouvertures.</p>
-    </div>
-  </button>
-
-  {/* 🔼 CES DEUX-LÀ S'ÉTIRENT VERS LE HAUT */}
-  <button className="mode-card open-up" onClick={onStartMatchmaking}>
-    <div className="mode-info">
-      <h3>Matchmaking Aléatoire</h3>
-      <p>Trouvez un adversaire à votre taille en ligne (Classement Elo).</p>
-    </div>
-  </button>
-
-  <button className="mode-card open-up" onClick={() => alert("Lien d'invitation bientôt dispo !")}>
-    <div className="mode-info">
-      <h3>Duel d'amis</h3>
-      <p>Créez une salle privée et envoyez un lien de défi.</p>
-    </div>
-  </button>
-</div>
-          </>
+          <div className="modes-grid">
+            {/* 🚀 Boucle dynamique sur le tableau préparé */}
+            {GAME_MODES.map((mode) => (
+              <ModeCard
+                key={mode.id}
+                title={mode.title}
+                description={mode.description}
+                direction={mode.direction}
+                onClick={mode.action}
+              />
+            ))}
+          </div>
         ) : (
           /* ════════ SUB-ÉCRAN 2 : ATTENTE MATCHMAKING ════════ */
           <div className="matchmaking-searching-view">
