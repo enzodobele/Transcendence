@@ -1,6 +1,6 @@
 
 /* ==========================================================================
-   2. STYLE COMMUN DES CARTES (AU REPOS)
+   STYLE COMMUN DES CARTES (AU REPOS)
    ========================================================================== */
 .mode-card {
   position: relative;
@@ -37,7 +37,7 @@
 }
 
 /* ==========================================================================
-   3. BASE COMMUNE DES DESCRIPTIONS (TOUJOURS EN DESSOUS DU TITRE)
+   BASE COMMUNE DES DESCRIPTIONS (TOUJOURS EN DESSOUS DU TITRE)
    ========================================================================== */
 .mode-info p {
   margin: 0;
@@ -62,7 +62,7 @@
 }
 
 /* ==========================================================================
-   4. LOGIQUE HOVER : DÉPLOYAGE VERS LE BAS (Partie Libre & Entraînement)
+   LOGIQUE HOVER : DÉPLOYAGE VERS LE BAS (Partie Libre & Entraînement)
    ========================================================================== */
 .mode-card.open-down:hover {
   z-index: 99;
@@ -81,7 +81,7 @@
 }
 
 /* ==========================================================================
-   5. LOGIQUE HOVER : GLISSEMENT VERS LE HAUT (Matchmaking & Duel)
+   LOGIQUE HOVER : GLISSEMENT VERS LE HAUT (Matchmaking & Duel)
    ========================================================================== */
 .mode-card.open-up:hover {
   z-index: 99;
