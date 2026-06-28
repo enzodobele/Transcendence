@@ -54,23 +54,23 @@ for i in $(seq 1 $MAX_RETRIES); do
 done
 
 # =============================================
-# Application du schéma Prisma
+# Application du schéma Prisma via les Migrations
 # =============================================
-echo "[+] Applying Prisma schema..."
-if ! npx prisma db push --skip-generate; then
-  echo "[-] ERROR: Failed to apply Prisma schema." >&2
+echo "[+] Applying Prisma migrations..."
+if ! npx prisma migrate deploy; then
+  echo "[-] ERROR: Failed to apply Prisma migrations." >&2
   exit 1
 fi
-
-echo "[+] Prisma schema applied successfully."
+echo "[+] Prisma migrations applied successfully."
 
 # =============================================
-# Génération du client Prisma (optionnel)
+# Lancement de la seed (Automatique si configuré)
 # =============================================
-echo "[+] Generating Prisma client..."
-if ! npx prisma generate; then
-  echo "[-] WARNING: Failed to generate Prisma client." >&2
-  # ✅ Ne pas échouer ici (le backend peut démarrer sans le client généré)
+# Note : 'prisma migrate deploy' ne lance pas le seed tout seul,
+# on peut donc garder ton appel manuel ici si tu veux qu'il se joue à chaque reset de pile.
+echo "[+] Checking or applying database seed..."
+if ! npx prisma db seed; then
+  echo "[-] WARNING: Failed to seed the database. Moving on..." >&2
 fi
 
 # =============================================

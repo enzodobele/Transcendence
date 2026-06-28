@@ -1,0 +1,24 @@
+#root {
+    --color-primary: #8d5f3f;
+    --color-primary-light: #f5e8c9;
+    --color-primary-dark: #612b07;
+    
+    --color-secondary: #2d4d3a;
+    --color-secondary-light: #4b8060;
+    --color-secondary-dark: #1f2e23;
+
+    --color-overlay-background: rgba(251, 248, 241, 0.96);
+
+    --app-background: 
+        linear-gradient(45deg, 
+          color-mix(in srgb, var(--color-primary) 0%, transparent) 20%,
+          color-mix(in srgb, var(--color-primary) 25%, transparent) 65%,
+          color-mix(in srgb, var(--color-primary) 0%, transparent) 100%
+        ),
+        linear-gradient(225deg, 
+          color-mix(in srgb, var(--color-secondary) 0%, transparent) 20%, 
+          color-mix(in srgb, var(--color-secondary) 18%, transparent) 65%, 
+          color-mix(in srgb, var(--color-secondary) 0%, transparent) 100%
+        ),
+        #ffffff;
+}

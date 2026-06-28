@@ -1,0 +1,74 @@
+/* ==========================================================================
+   1. CONTENEUR GLOBAL DE L'OVERLAY (FIXÉ EN HAUT À DROITE)
+   ========================================================================== */
+.matchmaking-overlay {
+  position: fixed; 
+  inset: 0;        
+  width: 100vw;
+  height: 100vh;
+  z-index: 200;
+  background: transparent;
+}
+
+.matchmaking-content {
+  position: absolute;
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  right: clamp(0.4rem, 0.8vw, 0.6rem);
+  width: 16rem;
+
+  background: var(--color-overlay-background);
+  color: var(--color-primary-dark, #2c2c2c);
+  padding: 0.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 1.5rem 3.75rem rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: visible;
+}
+
+.modes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  overflow: visible;
+}
+
+
+/* ==========================================================================
+   6. VUE RECHERCHE EN COURS (MATCHMAKING ACTIF)
+   ========================================================================== */
+.matchmaking-searching-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1rem 0;
+}
+
+.matchmaking-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0.25rem solid rgba(0, 0, 0, 0.08);
+  border-top-color: var(--color-primary-dark, #2c2c2c);
+  border-radius: 50%;
+  animation: matchmakingSpin 1s infinite linear;
+}
+
+.pulse-text {
+  font-size: 0.95rem;
+  opacity: 0.7;
+  margin: 0;
+  text-align: center;
+  align-items: center;
+  animation: matchmakingPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes matchmakingSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes matchmakingPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}

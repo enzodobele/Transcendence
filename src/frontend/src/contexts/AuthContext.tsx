@@ -1,10 +1,19 @@
-import { createContext, useContext, useState, useEffect} from "react";
+// frontend/src/contexts/AuthContext.tsx
+import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
+import { fetchMe } from "../services/auth";
 
 interface User {
   id: number;
-  email: string;
   username: string;
+  email: string;
+  currentGame?: {
+    id: number;
+    status: string;
+    timeControl: string;
+    player1: { username: string };
+    player2: { username: string };
+  } | null;
 }
 
 interface AuthContextType {
@@ -14,6 +23,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (userData: User, authToken: string) => void;
   logout: () => void;
+  refreshUserStatus: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,31 +33,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Charger l'utilisateur du localStorage au montage
-  useEffect(() => {
+  // Fonction pour valider le token et récupérer les infos fraîches du backend
+  const refreshUserStatus = async () => {
     const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    if (!storedToken) {
+      logout();
+      setIsLoading(false);
+      return;
     }
 
-    setIsLoading(false);
+    try {
+      // On interroge l'API /me
+      const freshUserData = await fetchMe();
+
+      setToken(storedToken);
+      setUser(freshUserData);
+    } catch (error) {
+      console.error("Échec de la reconnexion automatique :", error);
+      // Token invalide ou expiré -> on nettoie tout
+      logout();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Charger et vérifier l'utilisateur au montage (refresh ou ouverture d'onglet)
+  useEffect(() => {
+    refreshUserStatus();
   }, []);
 
   const login = (userData: User, authToken: string) => {
-    setUser(userData);
     setToken(authToken);
+    setUser(userData);
     localStorage.setItem("token", authToken);
-    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
   };
 
   const value: AuthContextType = {
@@ -57,13 +82,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: !!user && !!token,
     login,
     logout,
+    refreshUserStatus,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextType {

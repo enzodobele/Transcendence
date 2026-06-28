@@ -1,0 +1,71 @@
+.Board {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 52rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0;
+  padding-bottom: 0.4rem;
+}
+
+.Board > div:first-child {
+  width: 100% !important;
+  aspect-ratio: 1 / 1;
+  grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  gap: 0 !important;
+  margin-bottom: 0 !important;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(31, 39, 28, 0.18);
+  box-shadow:
+    0 24px 60px rgba(18, 26, 16, 0.18),
+    0 2px 0 rgba(255, 255, 255, 0.35) inset;
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(18px);
+}
+
+.Board > div:first-child > div {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.Board > div:first-child > div img {
+  width: 78px !important;
+  height: 78px !important;
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 720px) {
+  .Board {
+    width: 100%;
+    padding-top: clamp(5rem, 8vw, 5.5rem);
+  }
+  .Board > div:first-child {
+    width: min(94vw, 36rem, calc(100svh - 10rem)) !important;
+    border-radius: 1rem;
+  }
+  .Board > div:first-child > div img {
+    width: 70px !important;
+    height: 70px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .Board > div:first-child {
+    width: min(95vw, 30rem, calc(100svh - 10rem)) !important;
+  }
+  .Board > div:first-child > div img {
+    width: 58px !important;
+    height: 58px !important;
+  }
+}

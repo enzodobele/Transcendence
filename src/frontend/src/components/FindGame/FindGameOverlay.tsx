@@ -1,0 +1,100 @@
+import "../../styles/FindGame/FindGameOverlay.css";
+import { ModeCard } from "./ModeCard";
+
+interface FindGameOverlayProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onStartMatchmaking: () => void;
+  onCancelMatchmaking: () => void;
+  isSearching: boolean;
+  onSelectLocalGame: () => void;
+}
+
+export function FindGameOverlay({
+  isOpen,
+  onClose,
+  onStartMatchmaking,
+  onCancelMatchmaking,
+  isSearching,
+  onSelectLocalGame,
+}: FindGameOverlayProps) {
+  
+  if (!isOpen) return null;
+
+// ======================================================================
+// fonctions manquantes à placer dans 
+// src/frontend/src/hooks/useFindGame.ts
+
+  const handleStartAiGame = () => {
+    alert("IA bientôt disponible ! (En attente du backend)");
+  };
+
+  const handleCreateFriendDuel = () => {
+    alert("Lien d'invitation bientôt dispo ! (En attente du backend)");
+  };
+// ======================================================================
+
+  const GAME_MODES = [
+    {
+      id: "local",
+      title: "Partie Libre",
+      description: "Jouez tranquillement sur un échiquier local, sans pression.",
+      direction: "down" as const,
+      action: () => { onSelectLocalGame(); onClose(); },
+    },
+    {
+      id: "ai",
+      title: "Entraînement",
+      description: "Affrontez Stockfish pour parfaire vos ouvertures.",
+      direction: "down" as const,
+      action: handleStartAiGame,
+    },
+    {
+      id: "matchmaking",
+      title: "Matchmaking Aléatoire",
+      description: "Trouvez un adversaire à votre taille en ligne (Classement Elo).",
+      direction: "up" as const,
+      action: onStartMatchmaking,
+    },
+    {
+      id: "duel",
+      title: "Duel d'amis",
+      description: "Créez une salle privée et envoyez un lien de défi.",
+      direction: "up" as const,
+      action: handleCreateFriendDuel,
+    }
+  ];
+
+  return (
+    <div className="matchmaking-overlay" onClick={onClose}>
+      <div className="matchmaking-content" onClick={(e) => e.stopPropagation()}>
+        
+        {!isSearching ? (
+          <div className="modes-grid">
+            {/* 🚀 Boucle dynamique sur le tableau préparé */}
+            {GAME_MODES.map((mode) => (
+              <ModeCard
+                key={mode.id}
+                title={mode.title}
+                description={mode.description}
+                direction={mode.direction}
+                onClick={mode.action}
+              />
+            ))}
+          </div>
+        ) : (
+          /* ════════ SUB-ÉCRAN 2 : ATTENTE MATCHMAKING ════════ */
+          <div className="matchmaking-searching-view">
+            <div className="matchmaking-spinner"></div>
+            <h3 className="matchmaking-title">Recherche d'un adversaire</h3>
+            <p className="pulse-text">Veuillez patienter pendant que nous vous trouvons un rival...</p>
+            
+            <button onClick={onCancelMatchmaking} className="button-cancel-game">
+              Annuler la recherche
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

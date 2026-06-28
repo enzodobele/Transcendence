@@ -1,15 +1,19 @@
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { hashPassword, comparePassword, generateToken } from '../services/authService';
-
-const prisma = new PrismaClient();
+import { Request, Response } from "express";
+import prisma from "../prisma";
+import {
+  hashPassword,
+  comparePassword,
+  generateToken,
+} from "../services/authService";
 
 export const register = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
 
   // Validation basique
-  if (!email ||  !username || !password) { 
-    return res.status(400).json({ error: "Tous les champs sont obligatoires." });
+  if (!email || !username || !password) {
+    return res
+      .status(400)
+      .json({ error: "Tous les champs sont obligatoires." });
   }
 
   // Validation de l'email
@@ -19,7 +23,9 @@ export const register = async (req: Request, res: Response) => {
 
   // Validation du mot de passe (6 caractères minimum)
   if (password.length < 6) {
-    return res.status(400).json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
+    return res
+      .status(400)
+      .json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
   }
 
   try {
@@ -27,20 +33,23 @@ export const register = async (req: Request, res: Response) => {
     const user = await prisma.user.create({
       data: { email, username, hashedPassword },
     });
-    
+
     const token = generateToken(user.id, user.email, user.username);
-    
-    res.status(201).json({ 
+
+    res.status(201).json({
       token,
       user: {
         id: user.id,
         email: user.email,
-        username: user.username
-      }
+        username: user.username,
+      },
     });
   } catch (error) {
     // Gestion des erreurs Prisma (ex: email ou username déjà existant)
-    if (error instanceof Error && error.message.includes("Unique constraint failed")) {
+    if (
+      error instanceof Error &&
+      error.message.includes("Unique constraint failed")
+    ) {
       return res.status(400).json({ error: "Email ou username déjà utilisé." });
     }
     res.status(500).json({ error: "Erreur lors de l'inscription." });
@@ -56,20 +65,23 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Utilisateur non trouvé" });
     }
 
-    const isPasswordValid = await comparePassword(password, user.hashedPassword);
+    const isPasswordValid = await comparePassword(
+      password,
+      user.hashedPassword,
+    );
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Mot de passe incorrect" });
     }
 
     const token = generateToken(user.id, user.email, user.username);
 
-    res.status(200).json({ 
+    res.status(200).json({
       token,
       user: {
         id: user.id,
         email: user.email,
-        username: user.username
-      }
+        username: user.username,
+      },
     });
   } catch (error) {
     res.status(400).json({ error: "Erreur lors de la connexion" });

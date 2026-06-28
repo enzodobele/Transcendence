@@ -11,8 +11,7 @@ import bBishopSvg from "../assets/pieces/bB.svg";
 import bKnightSvg from "../assets/pieces/bN.svg";
 import bPawnSvg from "../assets/pieces/bP.svg";
 
-export const PIECE_SVG = 
-{
+export const PIECE_SVG = {
   wK: wKingSvg,
   wQ: wQueenSvg,
   wR: wRookSvg,

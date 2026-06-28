@@ -1,16 +1,20 @@
 // backend/src/middlewares/authMiddleware.ts
-import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../services/jwtService';
+import { Request, Response, NextFunction } from "express";
+import { verifyToken } from "../services/jwtService";
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   // 1. Récupère le token depuis les headers (format: "Bearer <token>")
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Token manquant." });
   }
 
   // 2. Extrait le token
-  const token = authHeader.split(' ')[1];
+  const token = authHeader.split(" ")[1];
 
   // 3. Vérifie et décode le token
   const decoded = verifyToken(token);

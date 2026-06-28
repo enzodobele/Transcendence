@@ -1,0 +1,64 @@
+/* L'historique des coups a maintenant une taille fixe et se colle à droite */
+.move-history-container {
+  grid-column: 2;
+  justify-self: end;
+  width: 20vw;
+  /* height: min(100vw - 40px, calc(100svh - 16rem)); */
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(26, 26, 26, 0.9);
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+
+
+/* On force la liste des coups à prendre tout l'espace interne de sa boîte fixe */
+.move-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.move-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.move-list::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 2px;
+}
+
+.move-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
+}
+
+.move-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.move-number {
+  color: #6b7280;
+  width: 20%;
+}
+
+.move-notation {
+  width: 40%;
+  text-align: left;
+  font-weight: 600;
+}
+
+.no-moves {
+  color: #9ca3af;
+  font-style: italic;
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}

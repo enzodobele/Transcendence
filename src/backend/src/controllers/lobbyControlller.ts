@@ -1,97 +1,65 @@
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+// src/backend/src/controllers/lobbyControlller.ts
+import { Request, Response } from "express";
+import prisma from "../prisma";
 
-const prisma = new PrismaClient();
-const INITIAL_FEN = 'rn1qkbnr/ppp1pppp/8/3p4/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-
-const toUserId = (value: unknown) => {
-	if (typeof value === 'number' && Number.isInteger(value)) {
-		return value;
-	}
-
-	if (typeof value === 'string' && value.trim() !== '') {
-		const parsedValue = Number.parseInt(value, 10);
-		return Number.isInteger(parsedValue) ? parsedValue : null;
-	}
-
-	return null;
-};
-
-// retourne la liste des personnes connectées. On ajustera la requête en fonction de ce qu'on veut afifcher
-export const getConnectedUsers = async (_req: Request, res: Response) => {
-  const users = await prisma.user.findMany({
-    where: {
-      isActive: true
-    },
-    select: {
-      id: true,
-      username: true,
-      eloRating: true,
-      avatarUrl: true
-    }
-  });
-
-  res.json(users);
-};
-
-// ajoute un utilisateur à la liste d'attente
-export const joinWaitlist = async (req: Request, res: Response) => {
+export const getMe = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
 
   if (!userId) {
-    return res.sendStatus(401);
+    return res.status(401).json({ error: "Non autorisé" });
   }
 
-  const existing = await prisma.waitlistEntry.findUnique({
-    where: { userId }
-  });
-
-  if (existing) {
-    return res.json({
-      waiting: true
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+		email: true,
+        currentGame: {
+          select: {
+            id: true,
+            status: true,
+            timeControl: true,
+            player1: {
+              select: { username: true },
+            },
+            player2: {
+              select: { username: true },
+            },
+          },
+        },
+      },
     });
-  }
 
-  await prisma.waitlistEntry.create({
-    data: {
-      userId
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
-  });
 
-  // regarde si on peut faire un match
-  await tryMatch();
-
-  res.json({
-    waiting: true
-  });
+    return res.json(user);
+  } catch (error) {
+    console.error("Erreur lors de la récupération du profil :", error);
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
 };
 
-// lance la partie automatiquement si deux joueurs sont dans la liste d'attente
-const tryMatch = async () => {
-  const players = await prisma.waitlistEntry.findMany({
-    take: 2,
-    orderBy: {
-      createdAt: 'asc'
-    }
-  });
-
-  if (players.length < 2) {
-    return;
+export const getConnectedUsers = async (_req: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        username: true,
+        eloRating: true,
+        avatarUrl: true,
+      },
+    });
+    return res.json(users);
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des utilisateurs connectés:",
+      error,
+    );
+    return res.status(500).json({ error: "Erreur serveur" });
   }
-
-  await prisma.game.create({
-    data: {
-      player1Id: players[0].userId,
-      player2Id: players[1].userId,
-      fenString: INITIAL_FEN
-    }
-  });
-
-  await prisma.waitlistEntry.deleteMany({
-    where: {
-      userId: {
-        in: players.map(p => p.userId)
-      }
-    }
-  });
 };
