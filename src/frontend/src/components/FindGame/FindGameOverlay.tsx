@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "../../styles/FindGame/FindGameOverlay.css";
 
 interface FindGameOverlayProps {
