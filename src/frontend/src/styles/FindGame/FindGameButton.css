@@ -1,0 +1,17 @@
+/* src/frontend/src/styles/FindGame/FindGameButton.css */
+.button-find-game {
+  position: absolute;
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  right: clamp(0.4rem, 0.8vw, 0.6rem);
+  z-index: 6;
+}
+
+.button-find-game {
+  cursor: pointer;
+}
+
+.lobby-error {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin: 0 0 0.2rem 0;
+}

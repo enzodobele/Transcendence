@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // =============================================
@@ -23,19 +22,18 @@ model User {
   isActive       Boolean @default(true)
   avatarUrl      String?
   bio            String?
+  currentGameId  Int?
+  currentGame    Game?    @relation("CurrentGame", fields: [currentGameId], references: [id], onDelete: SetNull)
 
   // Relations
-  gamesAsPlayer1 Game[]       @relation("Player1")
-  gamesAsPlayer2 Game[]       @relation("Player2")
-  gamesWon        Game[]       @relation("Winner")
+  gamesAsPlayer1 Game[]          @relation("Player1")
+  gamesAsPlayer2 Game[]          @relation("Player2")
+  gamesWon        Game[]          @relation("Winner")
   moves           Move[]
-  // ✅ Relations inverses pour les amis (avec noms uniques)
-  friendsAsUser1 Friend[] @relation("User1Friends")
-  friendsAsUser2 Friend[] @relation("User2Friends")
-//   sentMessages    ChatMessage @relation("Sender")
-//   receivedMessages ChatMessage @relation("Receiver")
+  friendsAsUser1  Friend[]        @relation("User1Friends")
+  friendsAsUser2  Friend[]        @relation("User2Friends")
   stats           UserStats?
-  waitlistEntry        waitlistEntry?
+  waitlistEntry    waitlistEntry?
 
   @@map("users")
 }
@@ -51,6 +49,7 @@ model Game {
   endTime      DateTime?
   status       String     @default("en_cours") // "en_cours" | "terminee" | "abandonnee" | "nulle"
   winnerId     Int?
+  timeControl  String     @default("5+0")
   isRated      Boolean    @default(true)
   fenString    String     // État actuel du plateau (FEN)
 
@@ -59,9 +58,8 @@ model Game {
   player2 User   @relation("Player2", fields: [player2Id], references: [id])
   winner  User?  @relation("Winner", fields: [winnerId], references: [id])
   moves   Move[]
+  activeUser   User[]      @relation("CurrentGame")
 
-  // Contrainte: player1 != player2 (à valider côté application)
-  @@unique([player1Id, player2Id])
   @@map("games")
 }
 
@@ -92,8 +90,6 @@ model Move {
   @@map("moves")
 }
 
-
-
 // =============================================
 // MODEL: Friend (Amis)
 // =============================================
@@ -102,7 +98,7 @@ model Friend {
   user2Id    Int
   createdAt  DateTime @default(now())
 
-  // Relations (avec les mêmes noms que dans User)
+  // Relations
   user1 User @relation("User1Friends", fields: [user1Id], references: [id], onDelete: Cascade)
   user2 User @relation("User2Friends", fields: [user2Id], references: [id], onDelete: Cascade)
 
@@ -113,20 +109,20 @@ model Friend {
   @@map("friends")
 }
 
-
 // =============================================
 // MODEL: waitlistEntry (File d'attente)
 // =============================================
 model waitlistEntry {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
-  createdAt DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  timeControl  String   @default("5+0")
+  createdAt    DateTime @default(now())
 
+  // Relation avec User
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("waitlistEntrys")
+  @@map("waitlistEntry")
 }
-
 
 // =============================================
 // MODEL: UserStats (Statistiques)
@@ -137,7 +133,7 @@ model UserStats {
   wins          Int     @default(0)
   losses        Int     @default(0)
   draws         Int     @default(0)
-  eloHistory    Json?   // Historique des ratings ELO
+  eloHistory    Json?
   favoriteOpening String?
 
   // Relation 1:1 avec User

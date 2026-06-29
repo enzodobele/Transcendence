@@ -1,0 +1,16 @@
+/* src/frontend/src/styles/main.css */
+
+/* 1. Les polices et bases globales */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+@import "./index.css";
+@import "./App.css";
+@import "./Colors.css";
+
+/* 2. L'architecture globale des boutons */
+@import "./Buttons.css";
+
+/* 3. Les styles spécifiques à chaque composant */
+@import "./Title.css";
+
+/* Les css spécifiques seront à supprimmer d'ici
+et à importer dans chaque composant */

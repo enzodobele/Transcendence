@@ -17,6 +17,7 @@ A terme cette page va dégager.
 Pgadmin permet d'aller consulter la base de données.
 login : admin@example.com
 mot de passe : admin
+mot de passe bdd : p
 
 Portainer est une UI Docker qui permet d'examiner en détail les containers.
 login : admin
@@ -50,3 +51,9 @@ make exec : Permet d'ouvrir rapidement un shell dans le conteneur ciblé
 # Node
 si vous devez ajouter des dépendances dans le back ou le front.
 Si vous codez en faisant tourner le réseau docker, pensez à faire vos npm install depuis le bon répertoire et pas depuis la racine.
+
+# BDD Seed
+Pour remplir la base de données, lancez `make db-seed` après avoir démarré les conteneurs.
+Utilisateurs : alice bob carla david
+mails : login@example.com
+mdp : password123

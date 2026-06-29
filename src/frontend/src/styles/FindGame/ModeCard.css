@@ -1,0 +1,102 @@
+
+/* ==========================================================================
+   STYLE COMMUN DES CARTES (AU REPOS)
+   ========================================================================== */
+.mode-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #fffdfa;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  height: 2.5rem; 
+  box-sizing: border-box;
+  z-index: 1; 
+  transition: 
+    background-color 0.2s, 
+    border-color 0.2s, 
+    box-shadow 0.25s, 
+    border-radius 0.15s,
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mode-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.mode-info h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-secondary-dark);
+}
+
+/* ==========================================================================
+   BASE COMMUNE DES DESCRIPTIONS (TOUJOURS EN DESSOUS DU TITRE)
+   ========================================================================== */
+.mode-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-primary-dark);
+  line-height: 1.2;
+  position: absolute;
+  left: -0.0625rem;
+  right: -0.0625rem;
+  top: 100%;
+  background: #ffffff;
+  border: 0.0625rem solid rgba(181, 136, 99, 0.5);
+  border-top: none;
+  border-radius: 0 0 0.75rem 0.75rem;
+  
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height 0.2s ease, opacity 0.15s ease;
+  box-shadow: 0 0.625rem 1.25rem rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   LOGIQUE HOVER : DÉPLOYAGE VERS LE BAS (Partie Libre & Entraînement)
+   ========================================================================== */
+.mode-card.open-down:hover {
+  z-index: 99;
+  background: #ffffff;
+  border-color: rgba(181, 136, 99, 0.5);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.mode-card.open-down:hover p {
+  max-height: 4.5rem;
+  opacity: 1;
+  padding: 0rem 1rem 0.5rem 1rem;
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   LOGIQUE HOVER : GLISSEMENT VERS LE HAUT (Matchmaking & Duel)
+   ========================================================================== */
+.mode-card.open-up:hover {
+  z-index: 99;
+  background: #ffffff;
+  border-color: rgba(181, 136, 99, 0.5);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  transform: translateY(-2.5rem); 
+}
+
+.mode-card.open-up:hover p {
+  max-height: 2.5rem;
+  opacity: 1;
+  padding: 0rem 1rem 0.5rem 1rem;
+  pointer-events: auto;
+}

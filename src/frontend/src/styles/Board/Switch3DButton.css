@@ -1,0 +1,13 @@
+/* --- Switch 2D/3D (En haut à droite) --- */
+.button-switch-2d-3d {
+  position: absolute;
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  right: clamp(0.4rem, 0.8vw, 0.6rem);
+  z-index: 6;
+}
+
+/* --- Reset Board (Reste dans le flux normal) --- */
+.reset-board {
+  /* On lui laisse juste sa restriction de largeur max si besoin, ou rien */
+  width: min(100%, 14rem);
+}

@@ -1,0 +1,131 @@
+/* ==========================================================================
+   1. LE MOULE UNIQUE & L'EFFET POCHOIR (Identique pour TOUS les boutons)
+   ========================================================================== */
+.login-button,
+.reset-board,
+.button-find-game,
+.button-leave-game,
+.button-switch-2d-3d,
+.profile-button,
+.app > button {
+  /* Structure et alignement */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  background: var(--color-secondary);
+  color: var(--color-primary-light);
+  
+  /* Dimensions strictement identiques */
+  height: 2.1rem; 
+  box-sizing: border-box;
+  padding: 0 0.75rem; 
+  border-radius: 999px;
+  width: max-content;
+  
+  /* Typographie unique */
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 400;
+  
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+/* ==========================================================================
+   2. ÉTATS UNIQUES (Survol & Accessibilité)
+   ========================================================================== */
+
+/* Effet au survol identique pour tout le monde */
+.login-button:hover,
+.reset-board:hover,
+.button-find-game:hover,
+.button-switch-2d-3d:hover,
+.button-leave-game:hover,
+.profile-button:hover,
+.app > button:hover {
+  transform: translateY(-1px);
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  /* color: var(--color-secondary-light); */
+  /* background: var(--color-primary-dark); */
+}
+
+/* Focus-visible identique pour tout le monde */
+.login-button:focus-visible,
+.reset-board:focus-visible,
+.button-find-game:focus-visible,
+.button-switch-2d-3d:focus-visible,
+.button-leave-game:focus-visible,
+.profile-button:focus-visible,
+.app > button:focus-visible {
+  outline: 2px solid rgba(181, 136, 99, 0.8);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   3. UNIQUEMENT LE POSITIONNEMENT & LES CONTENANTS
+   ========================================================================== */
+
+/* --- Connexion (En haut à gauche) --- */
+
+
+
+
+.login-submit-button {
+  margin-top: 0.75rem;
+  background: linear-gradient(135deg, #d8a86c 0%, #b87e45 100%);
+  color: #23160e;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.85rem 1.1rem;
+}
+
+.login-switch-button {
+  margin-top: 0.15rem;
+  background: transparent;
+  color: #4c654f;
+  padding: 0.4rem 0;
+}
+
+/* ==========================================================================
+   4. RESPONSIVE
+   ========================================================================== */
+@media (max-width: 700px) {
+  .game-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .button-find-game,
+  .button-switch-2d-3d {
+    position: static;
+    width: auto;
+    flex: 1;
+    padding: 0.75rem 0.8rem;
+  }
+
+  /* .connexion-label {
+    display: none;
+  } */
+
+  .login-button {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .reset-board {
+    width: 100%;
+  }
+}
