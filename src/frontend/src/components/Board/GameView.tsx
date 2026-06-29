@@ -42,7 +42,7 @@ export function GameView({
   onLeaveLocalGame,
 }: GameViewProps) {
   return (
-    <>
+    <div className="game-layout">
       <div className="game-container">
         <div className="chessboard-wrapper">
           {is3D ? (
@@ -67,7 +67,6 @@ export function GameView({
               pendingPromotion={!!pendingPromotion}
               onSquareClick={onSquareClick}
               onPiecePointerDown={onPiecePointerDown}
-              onResetGame={onResetGame}
               onPromotionChoice={onPromotionChoice}
               playerColor={playerColor}
             />
@@ -82,6 +81,6 @@ export function GameView({
           </button>
         )}
       </div>
-    </>
+    </div>
   );
 }

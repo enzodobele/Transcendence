@@ -12,8 +12,10 @@
 
 .title-chess {
   top: clamp(0.4rem, 0.8vw, 0.6rem);
+  font-family: 'Playfair Display', serif;
   font-size: clamp(1.2rem, 2vw, 1.6rem);
-  letter-spacing: 0.16em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   line-height: 1;
   color: var(--color-primary);
   text-shadow: 0 12px 30px rgba(74, 46, 18, 0.12);

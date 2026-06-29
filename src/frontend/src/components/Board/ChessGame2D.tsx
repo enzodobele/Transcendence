@@ -8,14 +8,13 @@ interface ChessGame2DProps {
   board: any;
   selected: any;
   lastMove: any;
-  dragSquare: string | null; // ⚡ Nouveau : Drag de ton mate
-  animatingToSquare: string | null; // ⚡ Nouveau : Animation de ton mate
+  dragSquare: string | null;
+  animatingToSquare: string | null;
   pendingPromotion: boolean;
   onSquareClick: (square: string) => void;
-  onPiecePointerDown: (square: string, e: React.PointerEvent) => void; // ⚡ Nouveau : Pointer Events
-  onResetGame: () => void;
+  onPiecePointerDown: (square: string, e: React.PointerEvent) => void;
   onPromotionChoice: (piece: string) => void;
-  playerColor: "white" | "black"; // 👑 Préservé : Couleur assignée
+  playerColor: "white" | "black";
 }
 
 export function ChessGame2D({
@@ -28,9 +27,8 @@ export function ChessGame2D({
   pendingPromotion,
   onSquareClick,
   onPiecePointerDown,
-  onResetGame,
   onPromotionChoice,
-  playerColor, // 👑 Préservé
+  playerColor,
 }: ChessGame2DProps) {
   return (
     <div className="Board">
@@ -46,9 +44,6 @@ export function ChessGame2D({
         playerColor={playerColor} // 👑 Passé au Board pour l'inversion
       />
 
-      <button onClick={onResetGame} className="reset-board">
-        Réinitialiser
-      </button>
 
       {pendingPromotion && (
         <PromotionDialog

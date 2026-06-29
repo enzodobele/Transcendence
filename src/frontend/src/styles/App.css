@@ -71,29 +71,31 @@ html, body, #root {
   background: var(--app-background);
 }
 
-.game-container {
-  display: grid;
-  grid-template-columns: 1fr 10%;
+.game-layout {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 40px;
-  margin: 0;
-  width: 100vw;
-  max-width: 100%;
-  padding: 0 4rem 0 2rem;
+  gap: 0.75rem;
   z-index: 2;
-  box-sizing: border-box;
+}
+
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
 }
 
 .chessboard-wrapper {
-  grid-column: 1;
-  justify-self: center;
-  width: min(80vw, 80vh);   
-  height: min(80vw, 80vh);
+  width: min(80vw, 80svh);
+  height: min(80vw, 80svh);
   z-index: 2;
 }
 
 .game-actions {
-  display: contents;
+  display: flex;
+  justify-content: center;
+  z-index: 2;
 }
 
 .lobby-chessboard-preview {
@@ -114,23 +116,9 @@ html, body, #root {
 }
 
 /* --- RESPONSIVE MOBILE & TABLETTE --- */
-@media (max-width: 1024px) {
-  .game-container {
-    grid-template-columns: 1fr; /* On passe sur une seule colonne */
-    gap: 20px;
-    padding: 0 1rem;
-  }
-
+@media (max-width: 700px) {
   .chessboard-wrapper {
-    justify-self: center;
-    max-width: min(100%, calc(100svh - 24rem));
-  }
-
-  .move-history-container {
-    grid-column: 1;
-    justify-self: center;
-    width: 100%;
-    max-width: 500px;
-    height: 200px; /* Hauteur réduite sur mobile sous le plateau */
+    width: min(94vw, 70svh);
+    height: min(94vw, 70svh);
   }
 }

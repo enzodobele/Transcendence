@@ -1,7 +1,7 @@
 /* src/frontend/src/styles/main.css */
 
 /* 1. Les polices et bases globales */
-@import "@fontsource/inter";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
 @import "./index.css";
 @import "./App.css";
 @import "./Colors.css";

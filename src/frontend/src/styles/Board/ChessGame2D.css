@@ -46,12 +46,7 @@
 
 /* RESPONSIVE */
 @media (max-width: 720px) {
-  .Board {
-    width: 100%;
-    padding-top: clamp(5rem, 8vw, 5.5rem);
-  }
   .Board > div:first-child {
-    width: min(94vw, 36rem, calc(100svh - 10rem)) !important;
     border-radius: 1rem;
   }
   .Board > div:first-child > div img {
@@ -61,9 +56,6 @@
 }
 
 @media (max-width: 480px) {
-  .Board > div:first-child {
-    width: min(95vw, 30rem, calc(100svh - 10rem)) !important;
-  }
   .Board > div:first-child > div img {
     width: 58px !important;
     height: 58px !important;

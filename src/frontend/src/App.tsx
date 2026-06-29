@@ -66,7 +66,7 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app${is3D && isInActiveGame ? " app-3d" : ""}`}>
       {/* 🌟 ZONE DES BOUTONS DE NAVIGATION ABSOLUS */}
       {/* Coin haut droit : Authentification */}
       {isAuthenticated ? (
