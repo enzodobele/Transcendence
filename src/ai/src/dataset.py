@@ -1,33 +1,26 @@
+import chess
 import torch
 from torch.utils.data import IterableDataset
-import numpy as np
-import glob
-import random
+
+from parse import parse_pgn
+from encode import fen_to_tensor
+
 
 class ChessDataset(IterableDataset):
-    def __init__(self, preprocessed_dir):
-        self.chunk_files = sorted(glob.glob(f"{preprocessed_dir}/chunk_*.npz"))
-
-        if not self.chunk_files:
-            raise FileNotFoundError(f"Aucun chunk trouvé dans {preprocessed_dir}")
-
-        print(f"{len(self.chunk_files)} chunk(s) trouvé(s)")
+    def __init__(self, pgn_path, min_elo=1500, max_games=1_000_000):
+        self.pgn_path  = pgn_path
+        self.min_elo   = min_elo
+        self.max_games = max_games
 
     def __iter__(self):
-        chunk_files = self.chunk_files.copy()
-        random.shuffle(chunk_files)
+        for fen, uci, outcome in parse_pgn(self.pgn_path, self.min_elo, self.max_games):
+            tensor     = fen_to_tensor(fen)
+            from_sq    = chess.parse_square(uci[:2])
+            to_sq      = chess.parse_square(uci[2:4])
+            move_index = from_sq * 64 + to_sq
 
-        for chunk_path in chunk_files:
-            data     = np.load(chunk_path)
-            tensors  = data["tensors"]
-            moves    = data["moves"]
-            outcomes = data["outcomes"]
-
-            indices = np.random.permutation(len(tensors))
-
-            for i in indices:
-                yield (
-                    torch.FloatTensor(tensors[i]),
-                    torch.tensor(moves[i], dtype=torch.long),
-                    torch.tensor(outcomes[i], dtype=torch.float32),
-                )
+            yield (
+                torch.FloatTensor(tensor),
+                torch.tensor(move_index, dtype=torch.long),
+                torch.tensor(outcome,    dtype=torch.float32),
+            )
