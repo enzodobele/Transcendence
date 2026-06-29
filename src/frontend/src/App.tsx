@@ -3,6 +3,7 @@ import { useChessGame } from "./hooks/chess/useChessGame";
 import { useAuth } from "./contexts/AuthContext";
 import { useGameWebSocket } from "./hooks/chess/useGameWebSocket";
 import { useStockfish } from "./hooks/useStockfish";
+import { useChessAI } from "./hooks/useChessAI";
 
 import "./styles/main.css";
 
@@ -20,12 +21,12 @@ export default function App() {
   const { isAuthenticated, isLoading, user, token, refreshUserStatus } = useAuth();
   const [isLocalGame, setIsLocalGame] = useState(false);
   const [isAIGame, setIsAIGame] = useState(false);
+  const [isCustomAI, setIsCustomAI] = useState(false);
   const [aiDifficulty, setAiDifficulty] = useState(3);
   const [customGameOver, setCustomGameOver] = useState<string | null>(null);
   const [drawOfferPending, setDrawOfferPending] = useState(false);
   const [is3D, setIs3D] = useState(false);
 
-  // Découplage : garde le plateau visible même après refreshUserStatus
   const [isGameViewActive, setIsGameViewActive] = useState(false);
   const [activeGameId, setActiveGameId] = useState<number | undefined>(undefined);
   const [onlinePlayerColor, setOnlinePlayerColor] = useState<"white" | "black">("white");
@@ -39,7 +40,11 @@ export default function App() {
 
   let triggerServerMove = (_moveData: any) => {};
 
-  const { requestMove } = useStockfish((from, to, promotion) => {
+  const { requestMove: requestStockfishMove } = useStockfish((from, to, promotion) => {
+    makeMove(from, to, promotion, true, true);
+  });
+
+  const { requestMove: requestCustomAIMove } = useChessAI((from, to, promotion) => {
     makeMove(from, to, promotion, true, true);
   });
 
@@ -49,8 +54,11 @@ export default function App() {
     pendingPromotion, handlePromotionChoice, makeMove, syncWithServerFen, customHistory,
   } = useChessGame(playerColor, (move) => {
     triggerServerMove(move);
-    if (isAIGame) requestMove(game.fen(), aiDifficulty);
-  });
+    if (isAIGame) {
+      if (isCustomAI) requestCustomAIMove(game.fen());
+      else requestStockfishMove(game.fen(), aiDifficulty);
+    }
+  }, isLocalGame);
 
   const { sendMoveToServer, sendResign, sendDrawOffer, sendDrawAccept, sendDrawRefuse } = useGameWebSocket({
     token,
@@ -64,7 +72,6 @@ export default function App() {
           ? winnerColor === "white" ? "Les blancs gagnent !" : "Les noirs gagnent !"
           : "Partie nulle !"
       );
-      // Libère le slot matchmaking immédiatement, le plateau reste visible via isGameViewActive
       refreshUserStatus();
     },
     onDrawOffer: () => setDrawOfferPending(true),
@@ -73,7 +80,6 @@ export default function App() {
 
   triggerServerMove = sendMoveToServer;
 
-  // Quand un nouveau match en ligne est trouvé, on active la vue de jeu
   useEffect(() => {
     if (user?.currentGame?.id) {
       setActiveGameId(user.currentGame.id);
@@ -92,6 +98,7 @@ export default function App() {
     setActiveGameId(undefined);
     setIsLocalGame(false);
     setIsAIGame(false);
+    setIsCustomAI(false);
     setCustomGameOver(null);
     setDrawOfferPending(false);
     resetGame();
@@ -100,6 +107,13 @@ export default function App() {
   const handleStartAiGame = (difficulty: number) => {
     handleReturnToMenu();
     setAiDifficulty(difficulty);
+    setIsCustomAI(false);
+    setIsAIGame(true);
+  };
+
+  const handleStartCustomAI = () => {
+    handleReturnToMenu();
+    setIsCustomAI(true);
     setIsAIGame(true);
   };
 
@@ -109,19 +123,13 @@ export default function App() {
   };
 
   const handleResign = () => {
-    if (isOnlineGame) {
-      sendResign();
-    } else {
-      setCustomGameOver(playerColor === "white" ? "Les noirs gagnent !" : "Les blancs gagnent !");
-    }
+    if (isOnlineGame) sendResign();
+    else setCustomGameOver(playerColor === "white" ? "Les noirs gagnent !" : "Les blancs gagnent !");
   };
 
   const handleOfferDraw = () => {
-    if (isOnlineGame) {
-      sendDrawOffer();
-    } else {
-      setCustomGameOver("Partie nulle !");
-    }
+    if (isOnlineGame) sendDrawOffer();
+    else setCustomGameOver("Partie nulle !");
   };
 
   const handleDrawAccept = () => { setDrawOfferPending(false); sendDrawAccept(); };
@@ -156,7 +164,11 @@ export default function App() {
       {isInActiveGame && !gameIsOver ? (
         <Switch3DButton is3D={is3D} setIs3D={setIs3D} />
       ) : (
-        isAuthenticated && <FindGameButton onStartLocalGame={handleStartLocalGame} onStartAiGame={handleStartAiGame} />
+        isAuthenticated && <FindGameButton
+          onStartLocalGame={handleStartLocalGame}
+          onStartAiGame={handleStartAiGame}
+          onStartCustomAI={handleStartCustomAI}
+        />
       )}
 
       {isInActiveGame ? (

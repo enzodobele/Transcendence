@@ -13,6 +13,7 @@ import { useChessDragAndDrop } from "./useChessDragAndDrop"; // 🚀 Import du s
 export const useChessGame = (
   playerColor: "white" | "black" = "white",
   onMovePlayed?: (moveData: { from: string; to: string; promotion?: string }) => void,
+  isLocalMultiplayer = false,
 ) => {
   const [game] = useState(() => new Chess());
   const [board, setBoard] = useState(game.board());
@@ -24,6 +25,7 @@ export const useChessGame = (
   const [customHistory, setCustomHistory] = useState<CustomMove[]>([]);
 
   const isMyTurn = () => {
+    if (isLocalMultiplayer) return true;
     const currentTurn = game.turn();
     const expectedTurn = playerColor === "white" ? "w" : "b";
     return currentTurn === expectedTurn;

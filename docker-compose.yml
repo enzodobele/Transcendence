@@ -39,6 +39,8 @@ services:
         condition: service_healthy
       db:
         condition: service_healthy
+      ai:
+        condition: service_healthy
     networks:
       - chessguard_network
     healthcheck:
@@ -89,6 +91,26 @@ services:
       retries: 8
       start_period: 60s
 
+    restart: unless-stopped
+
+  # =============================================
+  # 🤖 IA MAISON (FastAPI + PyTorch)
+  # =============================================
+  ai:
+    build: ./src/ai
+    container_name: ai
+    expose:
+      - "8000"
+    volumes:
+      - ./src/ai:/app
+    networks:
+      - chessguard_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
   # =============================================

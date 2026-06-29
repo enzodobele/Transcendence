@@ -11,6 +11,7 @@ interface FindGameOverlayProps {
   isSearching: boolean;
   onSelectLocalGame: () => void;
   onStartAiGame: (difficulty: number) => void;
+  onStartCustomAI: () => void;
 }
 
 export function FindGameOverlay({
@@ -21,6 +22,7 @@ export function FindGameOverlay({
   isSearching,
   onSelectLocalGame,
   onStartAiGame,
+  onStartCustomAI,
 }: FindGameOverlayProps) {
   const [isTrainingOpen, setIsTrainingOpen] = useState(false);
 
@@ -52,6 +54,13 @@ export function FindGameOverlay({
       description: "Affrontez Stockfish pour parfaire vos ouvertures.",
       direction: "down" as const,
       action: handleStartAiGame,
+    },
+    {
+      id: "custom-ai",
+      title: "IA Maison",
+      description: "Affrontez notre IA entraînée sur 1M de parties Lichess.",
+      direction: "down" as const,
+      action: onStartCustomAI,
     },
     {
       id: "matchmaking",
