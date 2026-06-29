@@ -1,5 +1,7 @@
+import { useState } from "react";
 import "../../styles/FindGame/FindGameOverlay.css";
 import { ModeCard } from "./ModeCard";
+import { TrainingOverlay } from "../Training/TrainingOverlay";
 
 interface FindGameOverlayProps {
   isOpen: boolean;
@@ -8,6 +10,7 @@ interface FindGameOverlayProps {
   onCancelMatchmaking: () => void;
   isSearching: boolean;
   onSelectLocalGame: () => void;
+  onStartAiGame: (difficulty: number) => void;
 }
 
 export function FindGameOverlay({
@@ -17,22 +20,23 @@ export function FindGameOverlay({
   onCancelMatchmaking,
   isSearching,
   onSelectLocalGame,
+  onStartAiGame,
 }: FindGameOverlayProps) {
-  
+  const [isTrainingOpen, setIsTrainingOpen] = useState(false);
+
   if (!isOpen) return null;
 
-// ======================================================================
-// fonctions manquantes à placer dans 
-// src/frontend/src/hooks/useFindGame.ts
+  const handleStartAiGame = () => setIsTrainingOpen(true);
 
-  const handleStartAiGame = () => {
-    alert("IA bientôt disponible ! (En attente du backend)");
+  const handleTrainingStart = (difficulty: number) => {
+    setIsTrainingOpen(false);
+    onClose();
+    onStartAiGame(difficulty);
   };
 
   const handleCreateFriendDuel = () => {
     alert("Lien d'invitation bientôt dispo ! (En attente du backend)");
   };
-// ======================================================================
 
   const GAME_MODES = [
     {
@@ -66,6 +70,12 @@ export function FindGameOverlay({
   ];
 
   return (
+    <>
+    <TrainingOverlay
+      isOpen={isTrainingOpen}
+      onClose={() => setIsTrainingOpen(false)}
+      onStart={handleTrainingStart}
+    />
     <div className="matchmaking-overlay" onClick={onClose}>
       <div className="matchmaking-content" onClick={(e) => e.stopPropagation()}>
         
@@ -96,5 +106,6 @@ export function FindGameOverlay({
         )}
       </div>
     </div>
+    </>
   );
 }

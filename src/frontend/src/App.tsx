@@ -2,11 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { useChessGame } from "./hooks/chess/useChessGame";
 import { useAuth } from "./contexts/AuthContext";
 import { useGameWebSocket } from "./hooks/chess/useGameWebSocket";
+import { useStockfish } from "./hooks/useStockfish";
 
-// 🚀 Styles globaux
 import "./styles/main.css";
 
-// Composants
 import { GameView } from "./components/Board/GameView";
 import { FloatingPiece } from "./components/Board/FloatingPiece";
 import { AnimatedPiece } from "./components/Board/AnimatedPiece";
@@ -18,43 +17,126 @@ import { FindGameButton } from "./components/FindGame/FindGameButton";
 import { Switch3DButton } from "./components/Board/Switch3DButton";
 
 export default function App() {
-  const { isAuthenticated, isLoading, user, token } = useAuth();
+  const { isAuthenticated, isLoading, user, token, refreshUserStatus } = useAuth();
   const [isLocalGame, setIsLocalGame] = useState(false);
+  const [isAIGame, setIsAIGame] = useState(false);
+  const [aiDifficulty, setAiDifficulty] = useState(3);
+  const [customGameOver, setCustomGameOver] = useState<string | null>(null);
+  const [drawOfferPending, setDrawOfferPending] = useState(false);
   const [is3D, setIs3D] = useState(false);
-  
+
+  // Découplage : garde le plateau visible même après refreshUserStatus
+  const [isGameViewActive, setIsGameViewActive] = useState(false);
+  const [activeGameId, setActiveGameId] = useState<number | undefined>(undefined);
+  const [onlinePlayerColor, setOnlinePlayerColor] = useState<"white" | "black">("white");
+
   const [isDemoMode, setIsDemoMode] = useState(true);
   const demoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const isInActiveGame = isLocalGame || !!user?.currentGame?.id;
-  const isOnlineWhite = user?.username === user?.currentGame?.player1?.username;
-  const playerColor: "white" | "black" = isLocalGame || isOnlineWhite ? "white" : "black";
+  const isOnlineGame = !isLocalGame && !isAIGame && isGameViewActive;
+  const isInActiveGame = isLocalGame || isAIGame || isGameViewActive;
+  const playerColor: "white" | "black" = isLocalGame || isAIGame ? "white" : onlinePlayerColor;
 
-  let triggerServerMove = (moveData: any) => {};
+  let triggerServerMove = (_moveData: any) => {};
+
+  const { requestMove } = useStockfish((from, to, promotion) => {
+    makeMove(from, to, promotion, true, true);
+  });
 
   const {
     game, board, selected, lastMove, dragPiece, animatingPiece, clearAnimation,
     handleSquareClick, handlePiecePointerDown, resetGame, capturedPieces,
     pendingPromotion, handlePromotionChoice, makeMove, syncWithServerFen, customHistory,
-  } = useChessGame(playerColor, (move) => triggerServerMove(move));
+  } = useChessGame(playerColor, (move) => {
+    triggerServerMove(move);
+    if (isAIGame) requestMove(game.fen(), aiDifficulty);
+  });
 
-  const { sendMoveToServer } = useGameWebSocket({
-    token, gameId: user?.currentGame?.id, isLocalGame, syncWithServerFen, makeMove,
+  const { sendMoveToServer, sendResign, sendDrawOffer, sendDrawAccept, sendDrawRefuse } = useGameWebSocket({
+    token,
+    gameId: activeGameId,
+    isLocalGame,
+    syncWithServerFen,
+    makeMove,
+    onGameOver: (reason, winnerColor) => {
+      setCustomGameOver(
+        reason === "resign"
+          ? winnerColor === "white" ? "Les blancs gagnent !" : "Les noirs gagnent !"
+          : "Partie nulle !"
+      );
+      // Libère le slot matchmaking immédiatement, le plateau reste visible via isGameViewActive
+      refreshUserStatus();
+    },
+    onDrawOffer: () => setDrawOfferPending(true),
+    onDrawRefused: () => alert("La nulle a été refusée."),
   });
 
   triggerServerMove = sendMoveToServer;
+
+  // Quand un nouveau match en ligne est trouvé, on active la vue de jeu
+  useEffect(() => {
+    if (user?.currentGame?.id) {
+      setActiveGameId(user.currentGame.id);
+      setOnlinePlayerColor(
+        user.username === user.currentGame.player1?.username ? "white" : "black"
+      );
+      setIsGameViewActive(true);
+      setCustomGameOver(null);
+      setDrawOfferPending(false);
+      resetGame();
+    }
+  }, [user?.currentGame?.id]);
+
+  const handleReturnToMenu = () => {
+    setIsGameViewActive(false);
+    setActiveGameId(undefined);
+    setIsLocalGame(false);
+    setIsAIGame(false);
+    setCustomGameOver(null);
+    setDrawOfferPending(false);
+    resetGame();
+  };
+
+  const handleStartAiGame = (difficulty: number) => {
+    handleReturnToMenu();
+    setAiDifficulty(difficulty);
+    setIsAIGame(true);
+  };
+
+  const handleStartLocalGame = () => {
+    handleReturnToMenu();
+    setIsLocalGame(true);
+  };
+
+  const handleResign = () => {
+    if (isOnlineGame) {
+      sendResign();
+    } else {
+      setCustomGameOver(playerColor === "white" ? "Les noirs gagnent !" : "Les blancs gagnent !");
+    }
+  };
+
+  const handleOfferDraw = () => {
+    if (isOnlineGame) {
+      sendDrawOffer();
+    } else {
+      setCustomGameOver("Partie nulle !");
+    }
+  };
+
+  const handleDrawAccept = () => { setDrawOfferPending(false); sendDrawAccept(); };
+  const handleDrawRefuse = () => { setDrawOfferPending(false); sendDrawRefuse(); };
+  const handleResetGame = () => { resetGame(); setCustomGameOver(null); };
 
   const handleLobbyInteraction = (square?: string) => {
     if (isDemoMode) setIsDemoMode(false);
     if (demoTimeoutRef.current) clearTimeout(demoTimeoutRef.current);
     demoTimeoutRef.current = setTimeout(() => setIsDemoMode(true), 3000);
-
     if (square) handleSquareClick(square, true);
   };
 
   useEffect(() => {
-    return () => {
-      if (demoTimeoutRef.current) clearTimeout(demoTimeoutRef.current);
-    };
+    return () => { if (demoTimeoutRef.current) clearTimeout(demoTimeoutRef.current); };
   }, []);
 
   if (isLoading) {
@@ -65,39 +147,43 @@ export default function App() {
     );
   }
 
+  const gameIsOver = !!(customGameOver || game.isGameOver());
+
   return (
     <div className={`app${is3D && isInActiveGame ? " app-3d" : ""}`}>
-      {/* 🌟 ZONE DES BOUTONS DE NAVIGATION ABSOLUS */}
-      {/* Coin haut droit : Authentification */}
-      {isAuthenticated ? (
-        <ProfileButton />
-      ) : (
-        <LoginButton />
-      )}
+      {isAuthenticated ? <ProfileButton /> : <LoginButton />}
 
-      {/* Coin haut gauche : Actions de jeu interchangeables */}
-      {isInActiveGame ? (
+      {isInActiveGame && !gameIsOver ? (
         <Switch3DButton is3D={is3D} setIs3D={setIs3D} />
       ) : (
-        isAuthenticated && <FindGameButton onStartLocalGame={() => setIsLocalGame(true)} />
+        isAuthenticated && <FindGameButton onStartLocalGame={handleStartLocalGame} onStartAiGame={handleStartAiGame} />
       )}
 
-      {/* RENDER PRINCIPAL */}
       {isInActiveGame ? (
         <GameView
           game={game} board={board} selected={selected} lastMove={lastMove}
           dragPiece={dragPiece} animatingPiece={animatingPiece} capturedPieces={capturedPieces}
           pendingPromotion={pendingPromotion} customHistory={customHistory} playerColor={playerColor}
-          isLocalGame={isLocalGame} is3D={is3D} userUsername={user?.currentGame?.player1?.username}
-          opponentUsername={user?.currentGame?.player2?.username} onSquareClick={handleSquareClick}
-          onPiecePointerDown={handlePiecePointerDown} onResetGame={resetGame}
-          onPromotionChoice={handlePromotionChoice} onLeaveLocalGame={() => setIsLocalGame(false)}
+          isLocalGame={isLocalGame} isAIGame={isAIGame} is3D={is3D} customGameOver={customGameOver}
+          drawOfferPending={drawOfferPending}
+          userUsername={user?.currentGame?.player1?.username}
+          opponentUsername={user?.currentGame?.player2?.username}
+          onSquareClick={handleSquareClick}
+          onPiecePointerDown={handlePiecePointerDown}
+          onResetGame={handleResetGame}
+          onPromotionChoice={handlePromotionChoice}
+          onLeaveLocalGame={handleReturnToMenu}
+          onReturnToMenu={handleReturnToMenu}
+          onResign={handleResign}
+          onOfferDraw={handleOfferDraw}
+          onDrawAccept={handleDrawAccept}
+          onDrawRefuse={handleDrawRefuse}
         />
       ) : (
         <div className="lobby-container">
           <h1 className="title-chess">CHESS <span className="title-guard">GUARD</span></h1>
           <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
-          
+
           <div className="lobby-chessboard-preview" onClick={() => handleLobbyInteraction()}>
             <ChessGame3D
               game={game} board={board} selected={selected} capturedPieces={capturedPieces}

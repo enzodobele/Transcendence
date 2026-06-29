@@ -5,9 +5,10 @@ import "../../styles/FindGame/FindGameButton.css";
 
 interface FindGameButtonProps {
   onStartLocalGame: () => void;
+  onStartAiGame: (difficulty: number) => void;
 }
 
-export function FindGameButton({ onStartLocalGame }: FindGameButtonProps) {
+export function FindGameButton({ onStartLocalGame, onStartAiGame }: FindGameButtonProps) {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const { isSearching, error, startSearch, cancelSearch } = useFindGame();
 
@@ -20,13 +21,14 @@ export function FindGameButton({ onStartLocalGame }: FindGameButtonProps) {
         </button>
       </div>
 
-      <FindGameOverlay 
+      <FindGameOverlay
         isOpen={isOverlayOpen}
         onClose={() => setIsOverlayOpen(false)}
         isSearching={isSearching}
         onStartMatchmaking={startSearch}
         onCancelMatchmaking={cancelSearch}
         onSelectLocalGame={onStartLocalGame}
+        onStartAiGame={onStartAiGame}
       />
     </>
   );

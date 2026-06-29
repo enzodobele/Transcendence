@@ -7,6 +7,9 @@ interface UseGameWebSocketProps {
   isLocalGame: boolean;
   syncWithServerFen: (fen: string, history?: CustomMove[]) => void;
   makeMove: (from: string, to: string, promotion?: string, animate?: boolean, isExternal?: boolean) => void;
+  onGameOver: (reason: "resign" | "draw", winnerColor?: "white" | "black") => void;
+  onDrawOffer: () => void;
+  onDrawRefused: () => void;
 }
 
 export function useGameWebSocket({
@@ -15,19 +18,36 @@ export function useGameWebSocket({
   isLocalGame,
   syncWithServerFen,
   makeMove,
+  onGameOver,
+  onDrawOffer,
+  onDrawRefused,
 }: UseGameWebSocketProps) {
   const wsRef = useRef<WebSocket | null>(null);
 
   const sendMoveToServer = (moveData: { from: string; to: string; promotion?: string }) => {
     if (isLocalGame) return;
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: "move",
-          data: moveData,
-        })
-      );
-    }
+    wsRef.current?.readyState === WebSocket.OPEN &&
+      wsRef.current.send(JSON.stringify({ type: "move", data: moveData }));
+  };
+
+  const sendResign = () => {
+    wsRef.current?.readyState === WebSocket.OPEN &&
+      wsRef.current.send(JSON.stringify({ type: "resign" }));
+  };
+
+  const sendDrawOffer = () => {
+    wsRef.current?.readyState === WebSocket.OPEN &&
+      wsRef.current.send(JSON.stringify({ type: "draw_offer" }));
+  };
+
+  const sendDrawAccept = () => {
+    wsRef.current?.readyState === WebSocket.OPEN &&
+      wsRef.current.send(JSON.stringify({ type: "draw_accept" }));
+  };
+
+  const sendDrawRefuse = () => {
+    wsRef.current?.readyState === WebSocket.OPEN &&
+      wsRef.current.send(JSON.stringify({ type: "draw_refuse" }));
   };
 
   useEffect(() => {
@@ -50,8 +70,16 @@ export function useGameWebSocket({
             syncWithServerFen(message.fen, message.history);
             break;
           case "opponent_move":
-            const { from, to, promotion } = message.move;
-            makeMove(from, to, promotion, true, true);
+            makeMove(message.move.from, message.move.to, message.move.promotion, true, true);
+            break;
+          case "game_over":
+            onGameOver(message.reason, message.winnerColor);
+            break;
+          case "draw_offer":
+            onDrawOffer();
+            break;
+          case "draw_refused":
+            onDrawRefused();
             break;
           case "error":
             console.error("[ChessGuard WS] Erreur Backend :", message.message);
@@ -66,10 +94,10 @@ export function useGameWebSocket({
     ws.onclose = (e) => console.log(`[ChessGuard WS] Connexion close (${e.code}) : ${e.reason}`);
 
     return () => {
-      if (ws) ws.close();
+      ws.close();
       wsRef.current = null;
     };
   }, [gameId, isLocalGame, token]);
 
-  return { sendMoveToServer };
+  return { sendMoveToServer, sendResign, sendDrawOffer, sendDrawAccept, sendDrawRefuse };
 }

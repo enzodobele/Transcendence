@@ -72,3 +72,31 @@
   0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
 }
+
+.button-cancel-game {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.1rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(31, 28, 23, 0.2);
+  background: transparent;
+  color: rgba(31, 28, 23, 0.7);
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.button-cancel-game:hover {
+  border-color: rgba(31, 28, 23, 0.5);
+  color: #1f1c17;
+  transform: translateY(-1px);
+}
+
+.button-cancel-game:focus-visible {
+  outline: 2px solid rgba(181, 136, 99, 0.8);
+  outline-offset: 3px;
+}

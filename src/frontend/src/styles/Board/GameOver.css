@@ -1,0 +1,68 @@
+.gameover-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 12, 14, 0.55);
+  backdrop-filter: blur(6px);
+  border-radius: inherit;
+  z-index: 100;
+}
+
+.gameover-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 2rem 2.5rem;
+  border-radius: 1.25rem;
+  background: var(--color-overlay-background, #fffdf9);
+  border: 1px solid rgba(30, 25, 18, 0.1);
+  box-shadow: 0 24px 60px rgba(14, 16, 18, 0.3);
+}
+
+.gameover-message {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f1c17;
+  text-align: center;
+}
+
+.gameover-replay-btn {
+  background: linear-gradient(135deg, #d8a86c 0%, #b87e45 100%);
+  color: #23160e;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.75rem 2rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: opacity 0.15s;
+}
+
+.gameover-replay-btn:hover {
+  opacity: 0.88;
+}
+
+.gameover-draw-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.gameover-refuse-btn {
+  background: rgba(31, 28, 23, 0.1);
+  color: #1f1c17;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.75rem 2rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: opacity 0.15s;
+}
+
+.gameover-refuse-btn:hover {
+  opacity: 0.7;
+}

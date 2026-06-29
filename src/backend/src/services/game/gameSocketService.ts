@@ -8,7 +8,7 @@ import {
   removePlayerFromRoom,
   checkGameStatus,
 } from "./gameRoomManager";
-import { findGameWithMoves, saveMoveToDatabase } from "./gameDbService";
+import { findGameWithMoves, saveMoveToDatabase, saveGameOverNoMove } from "./gameDbService";
 
 export const initGameWebSocket = (server: http.Server) => {
   const wss = new WebSocketServer({ server, path: "/ws" });
@@ -64,7 +64,18 @@ export const initGameWebSocket = (server: http.Server) => {
 
     // Gestionnaires d'événements
     socket.on("message", async (data) => {
-      await handlePlayerMove(socket, data, userId, gameId, room, dbGame);
+      const parsed = JSON.parse(data.toString());
+      if (parsed.type === "move") {
+        await handlePlayerMove(socket, data, userId, gameId, room, dbGame);
+      } else if (parsed.type === "resign") {
+        handleResign(userId, gameId, room, dbGame);
+      } else if (parsed.type === "draw_offer") {
+        handleDrawOffer(socket, userId, room, dbGame);
+      } else if (parsed.type === "draw_accept") {
+        handleDrawAccept(userId, gameId, room, dbGame);
+      } else if (parsed.type === "draw_refuse") {
+        handleDrawRefuse(userId, room, dbGame);
+      }
     });
 
     socket.on("close", () => {
@@ -107,6 +118,40 @@ async function handleAuthAndValidation(socket: WebSocket, token: string | null, 
     socket.close(1008, "Accès refusé / Token invalide");
     return null;
   }
+}
+
+function broadcast(room: Room, dbGame: any, payload: object) {
+  const msg = JSON.stringify(payload);
+  for (const id of [dbGame.player1Id, dbGame.player2Id]) {
+    room.players[id]?.send(msg);
+  }
+}
+
+async function handleResign(userId: number, gameId: number, room: Room, dbGame: any) {
+  const winnerId = userId === dbGame.player1Id ? dbGame.player2Id : dbGame.player1Id;
+  const winnerColor = winnerId === dbGame.player1Id ? "white" : "black";
+  await saveGameOverNoMove(gameId, "terminee", winnerId, dbGame);
+  broadcast(room, dbGame, { type: "game_over", reason: "resign", winnerColor });
+}
+
+function handleDrawOffer(socket: WebSocket, userId: number, room: Room, dbGame: any) {
+  room.pendingDrawOfferId = userId;
+  const opponentId = userId === dbGame.player1Id ? dbGame.player2Id : dbGame.player1Id;
+  room.players[opponentId]?.send(JSON.stringify({ type: "draw_offer" }));
+}
+
+async function handleDrawAccept(userId: number, gameId: number, room: Room, dbGame: any) {
+  if (room.pendingDrawOfferId === undefined || room.pendingDrawOfferId === userId) return;
+  room.pendingDrawOfferId = undefined;
+  await saveGameOverNoMove(gameId, "nulle", null, dbGame);
+  broadcast(room, dbGame, { type: "game_over", reason: "draw" });
+}
+
+function handleDrawRefuse(userId: number, room: Room, dbGame: any) {
+  if (room.pendingDrawOfferId === undefined || room.pendingDrawOfferId === userId) return;
+  room.pendingDrawOfferId = undefined;
+  const offeringPlayerId = userId === dbGame.player1Id ? dbGame.player2Id : dbGame.player1Id;
+  room.players[offeringPlayerId]?.send(JSON.stringify({ type: "draw_refused" }));
 }
 
 /**

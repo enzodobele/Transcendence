@@ -13,6 +13,25 @@ export async function findGameWithMoves(gameId: number) {
 }
 
 /**
+ * Termine une partie sans coup (abandon ou nulle proposée)
+ */
+export async function saveGameOverNoMove(
+  gameId: number,
+  status: string,
+  winnerId: number | null,
+  dbGame: any,
+) {
+  await prisma.$transaction([
+    prisma.game.update({
+      where: { id: gameId },
+      data: { status, endTime: new Date(), winnerId },
+    }),
+    prisma.user.update({ where: { id: dbGame.player1Id }, data: { currentGameId: null } }),
+    prisma.user.update({ where: { id: dbGame.player2Id }, data: { currentGameId: null } }),
+  ]);
+}
+
+/**
  * Exécute la transaction Prisma de sauvegarde en tâche de fond
  */
 export function saveMoveToDatabase(

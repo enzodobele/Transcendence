@@ -32,7 +32,7 @@ export const Square2D: React.FC<Square2DProps> = ({
   let backgroundColor = baseColor;
 
   if (lastMove && (lastMove.from === square || lastMove.to === square))
-    backgroundColor = "#baca44";
+    backgroundColor = isLight ? "#f6f669" : "#cdd16e";
 
   if (isSelected) backgroundColor = "#7ec850";
   else if (isPossibleMove) backgroundColor = isCapture ? "#e84c3d" : "#baca44";
