@@ -1,9 +1,17 @@
 {
   "name": "chessguard-auth",
   "version": "1.0.0",
-  "main": "src/app.ts",
+  "main": "dist/app.js",
   "scripts": {
-    "dev": "prisma generate && tsx watch src/app.ts"
+    "dev": "prisma generate && tsx watch src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:generate": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
@@ -13,18 +21,6 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0"
   },
-  "overrides": {
-    "prisma": {
-      "@prisma/dev": {
-        "@hono/node-server": "1.19.13"
-      }
-    },
-    "@prisma/client": {
-      "@prisma/dev": {
-        "@hono/node-server": "1.19.13"
-      }
-    }
-  },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
@@ -32,7 +28,8 @@
     "@types/node": "^25.9.1",
     "@types/pg": "^8.20.0",
     "prisma": "^7.8.0",
-    "tsx": "^4.22.4"
+    "tsx": "^4.22.4",
+    "typescript": "^5.4.5"
   },
   "allowScripts": {
     "prisma@7.8.0": true,

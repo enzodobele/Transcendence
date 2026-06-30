@@ -1,0 +1,68 @@
+# =========================================================================
+# 🏗️ STAGE 1: Build (Compilation TypeScript)
+# =========================================================================
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Copie des configurations nécessaires au build
+COPY package*.json tsconfig.json ./
+COPY prisma ./prisma/
+
+# Installe TOUTES les dépendances (y compris le compilateur tsc)
+RUN npm ci --allow-scripts
+
+# Génère le client Prisma natif
+RUN npx prisma generate
+
+# Copie le reste du code source
+COPY src ./src
+
+# 🎯 Action Prod 1 : Compile le TypeScript en JavaScript (génère /dist)
+RUN npm run build
+
+# 🎯 Action Prod 2 : Supprime les outils de dev du dossier node_modules
+RUN npm prune --production
+
+# =========================================================================
+# 🚀 STAGE 2: Runtime (Image finale légère pour le Game Engine)
+# =========================================================================
+FROM node:22-alpine
+
+# Installe uniquement les binaires requis (wget pour les healthchecks, psql au cas où)
+RUN apk add --no-cache wget postgresql-client
+
+# Sécurité : création de l'utilisateur non-root
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -u 1001 -S nodejs -G nodejs
+
+RUN mkdir -p /run/secrets && \
+    chmod 750 /run/secrets && \
+    chown nodejs:nodejs /run/secrets
+
+WORKDIR /app
+
+# On copie uniquement le strict nécessaire depuis le builder
+COPY --chown=nodejs:nodejs --from=builder /app/node_modules ./node_modules
+COPY --chown=nodejs:nodejs --from=builder /app/package*.json ./
+COPY --chown=nodejs:nodejs --from=builder /app/prisma ./prisma
+
+# 🎯 Action Prod 3 : On copie le code JavaScript compilé, on oublie le dossier /src
+COPY --chown=nodejs:nodejs --from=builder /app/dist ./dist
+
+# Gestion de l'entrypoint
+COPY --chown=nodejs:nodejs entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+ENV NPM_CONFIG_CACHE=/tmp/.npm
+ENV NODE_ENV=production
+
+USER nodejs
+
+# 🎯 Port ajusté pour le Game Engine
+EXPOSE 3002
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# 🎯 Action Prod 4 : Node lance directement le JS compilé
+CMD ["node", "dist/app.js"]
