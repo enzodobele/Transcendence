@@ -9,18 +9,44 @@ DOCKER_COMPOSE := $(shell command -v docker-compose 2>/dev/null || echo "docker 
 COMPOSE_DEV  = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)_dev
 COMPOSE_PROD = $(DOCKER_COMPOSE) -f docker-compose.prod.yml -p $(NAME)_prod
 
-# ⚙️ Variable dynamique (ex: make logs SERVICE=backend-auth)
-SERVICE ?=  
+SERVICE ?=
+
+SECRETS_DIR := src/secrets
+REQUIRED_PROD_SECRETS := \
+    $(SECRETS_DIR)/prod_db_user.txt \
+    $(SECRETS_DIR)/prod_db_name.txt \
+    $(SECRETS_DIR)/prod_db_password.txt \
+    $(SECRETS_DIR)/prod_jwt_secret.txt
+
+REQUIRED_DEV_SECRETS := \
+    $(SECRETS_DIR)/db_user.txt \
+    $(SECRETS_DIR)/db_name.txt \
+    $(SECRETS_DIR)/db_password.txt \
+    $(SECRETS_DIR)/jwt_secret.txt \
+    $(SECRETS_DIR)/pgadmin_password.txt \
+    $(SECRETS_DIR)/portainer_password.txt
+
 
 .PHONY: up down rebuild restart logs ps exec db-seed db-migrate format \
         prod prod-down prod-rebuild prod-logs prod-ps prod-exec prod-db-seed \
-        clean fclean
+        clean fclean prod-clean prod-fclean
 
 # =========================================================================
 # 🛠️ ENVIRONNEMENT DE DÉVELOPPEMENT (Local)
 # =========================================================================
 
+define check_dev_secrets
+    @for file in $(REQUIRED_DEV_SECRETS); do \
+        if [ ! -f $$file ]; then \
+            echo "\033[0;31m❌ ERREUR CRITIQUE (DEV) : Le fichier de secret '$$file' est manquant !\033[0m"; \
+            echo "\033[0;33m💡 Lance ton script de génération de secrets avant de démarrer.\033[0m"; \
+            exit 1; \
+        fi \
+    done
+endef
+
 up:
+	$(call check_dev_secrets)
 	@echo "[+] Lancement de l'environnement de DEV..."
 	@$(COMPOSE_DEV) up -d --build $(SERVICE)
 
@@ -67,7 +93,18 @@ format:
 # 🚀 ENVIRONNEMENT DE PRODUCTION (VPS / Serveur)
 # =========================================================================
 
+define check_prod_secrets
+    @for file in $(REQUIRED_PROD_SECRETS); do \
+        if [ ! -f $$file ]; then \
+            echo "\033[0;31m❌ ERREUR CRITIQUE (PROD) : Le fichier de secret '$$file' est manquant !\033[0m"; \
+            echo "\033[0;33m💡 Lance ton script de génération de secrets avant de lancer la production.\033[0m"; \
+            exit 1; \
+        fi \
+    done
+endef
+
 prod:
+	$(call check_prod_secrets)
 	@echo "[+] Lancement de l'environnement de PRODUCTION..."
 	@$(COMPOSE_PROD) up -d --build $(SERVICE)
 	@echo "[+] Infrastructure de production opérationnelle !"
@@ -95,30 +132,23 @@ prod-db-seed:
 # 🧹 NETTOYAGE & MAINTENANCE (DÉVELOPPEMENT)
 # =========================================================================
 
-# Supprime les conteneurs de dev mais GARDE les volumes (ta DB de test reste intacte)
 clean:
 	@echo "[-] Nettoyage des conteneurs de Dev..."
 	@$(COMPOSE_DEV) down --remove-orphans
 
-# Rase TOUT le dev (Conteneurs, images de dev et volumes/DB de test)
 fclean:
 	@echo "[!] Purge complète de l'environnement de DEV..."
 	@$(COMPOSE_DEV) down -v --rmi all --remove-orphans
-	@echo "[+] Nettoyage du cache de build de dev..."
-	docker builder prune -f
 
 # =========================================================================
-# 🚨 NETTOYAGE & MAINTENANCE (PRODUCTION - À manipuler avec précaution)
+# 🚨 NETTOYAGE & MAINTENANCE (PRODUCTION)
 # =========================================================================
 
-# Arrête proprement la prod sans toucher aux données des joueurs
 prod-clean:
 	@echo "[-] Arrêt et nettoyage des conteneurs de PRODUCTION..."
 	@$(COMPOSE_PROD) down --remove-orphans
 
-# ATTENTION : Supprime la prod, réinitialise la DB de prod et supprime les images de prod
 prod-fclean:
 	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
 	@sleep 5
 	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
-	docker builder prune -f

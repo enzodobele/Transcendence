@@ -25,11 +25,14 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.4",
     "@types/pg": "^8.20.0",
     "prisma": "^7.8.0",
     "tsx": "^4.22.4",
     "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "@hono/node-server": "^1.19.13"
   },
   "allowScripts": {
     "prisma@7.8.0": true,

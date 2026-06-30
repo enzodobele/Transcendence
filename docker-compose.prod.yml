@@ -1,3 +1,5 @@
+name: chessguard_prod
+
 services:
   # =========================================================================
   # 🌐 NGINX GATEWAY (Le seul point d'entrée public)
@@ -6,9 +8,7 @@ services:
     build:
       context: ./src/nginx
       dockerfile: Dockerfile.prod
-    container_name: chessguard-nginx-gateway
     ports:
-      - "80:80"
       - "443:443"
     depends_on:
       frontend:
@@ -19,8 +19,18 @@ services:
         condition: service_healthy
       backend-game:
         condition: service_healthy
+      ai:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     networks:
       - chessguard_prod_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-check-certificate", "-qO-", "https://127.0.0.1:443"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: always
 
   # =========================================================================
@@ -30,11 +40,10 @@ services:
     build:
       context: ./src/frontend
       dockerfile: Dockerfile.prod
-    container_name: chessguard-frontend-prod
     networks:
       - chessguard_prod_network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5173/"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -47,7 +56,6 @@ services:
     build:
       context: ./src/backend-auth
       dockerfile: Dockerfile.prod
-    container_name: chessguard-backend-auth
     user: "nodejs"
     environment:
       DB_USER_FILE: /run/secrets/db_user
@@ -80,7 +88,6 @@ services:
     build:
       context: ./src/backend-matchmaking
       dockerfile: Dockerfile.prod
-    container_name: chessguard-backend-matchmaking
     user: "nodejs"
     environment:
       DB_USER_FILE: /run/secrets/db_user
@@ -113,7 +120,6 @@ services:
     build:
       context: ./src/backend-game
       dockerfile: Dockerfile.prod
-    container_name: chessguard-backend-game
     user: "nodejs"
     environment:
       DB_USER_FILE: /run/secrets/db_user
@@ -139,12 +145,29 @@ services:
       retries: 3
     restart: always
 
+# =========================================================================
+  # 🤖 MICROSERVICE : IA Maison (FastAPI + PyTorch)
+  # =========================================================================
+  ai:
+    build:
+      context: ./src/ai
+      dockerfile: Dockerfile.prod
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      # Utilise curl (installé via le Dockerfile) pour taper le endpoint de santé
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: always
+
   # =========================================================================
   # 🗃️ DATABASE (PostgreSQL)
   # =========================================================================
   db:
     image: postgres:16-alpine
-    container_name: chessguard-db-prod
     environment:
       POSTGRES_USER_FILE: /run/secrets/db_user
       POSTGRES_DB_FILE: /run/secrets/db_name
@@ -156,7 +179,9 @@ services:
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     networks:
-      - chessguard_prod_network
+      chessguard_prod_network:
+        aliases:
+          - chessguard-db  # 🛡️ Permet à Prisma de trouver la DB avec son ancien nom
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/db_user) -d $$(cat /run/secrets/db_name)"]
       interval: 5s

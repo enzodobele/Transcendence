@@ -2,6 +2,7 @@ import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import * as THREE from "three";
+import type { GLTF } from "three-stdlib";
 import { pieceConfig } from "../../constants/pieceConfig";
 
 interface ChessPieceProps {
@@ -22,7 +23,7 @@ export const ChessPiece: React.FC<ChessPieceProps> = ({
   isSelected,
 }) => {
   const config = pieceConfig[type] || pieceConfig.pawn;
-  const { scene } = useGLTF(config.file);
+  const { scene } = useGLTF(config.file) as GLTF;
   const meshRef = useRef<THREE.Mesh>(null);
   const [liftHeight, setLiftHeight] = useState(0);
 

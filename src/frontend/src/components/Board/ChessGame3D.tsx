@@ -27,7 +27,6 @@ export function ChessGame3D({
   capturedPieces,
   pendingPromotion,
   onSquareClick,
-  onResetGame,
   onPromotionChoice,
   isDemoMode = false,
 }: ChessGame3DProps) {

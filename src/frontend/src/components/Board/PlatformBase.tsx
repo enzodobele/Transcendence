@@ -1,5 +1,4 @@
 import React from "react";
-import * as THREE from "three";
 
 export const PlatformBase: React.FC = () => {
   return (
