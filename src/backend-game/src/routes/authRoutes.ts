@@ -1,5 +1,6 @@
+// src/backend/src/routes/authRoutes.ts
 import express from "express";
-import { register, login } from "../controllers/authController";
+import { register, login } from "../../../backend-auth/src/controllers/authController";
 
 const router = express.Router();
 

@@ -35,11 +35,15 @@ services:
     depends_on:
       frontend:
         condition: service_healthy
-      backend:
-        condition: service_healthy
       db:
         condition: service_healthy
       ai:
+        condition: service_healthy
+      backend-game:
+        condition: service_healthy
+      backend-auth: # 👈 Ajouté
+        condition: service_healthy
+      backend-matchmaking: # 👈 Ajouté
         condition: service_healthy
     networks:
       - chessguard_network
@@ -51,19 +55,16 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # =============================================
-  # 📦 BACKEND (Node + Express + Prisma)
-  # =============================================
-  backend:
-    build: ./src/backend
-    container_name: backend
-
+  # =========================================================================
+  # 🔐 MICROSERVICE AUTH (Gère l'inscription, connexion, profils)
+  # =========================================================================
+  backend-auth:
+    build: ./src/backend-auth
+    container_name: backend-auth
     user: "nodejs"
-
     volumes:
-      - ./src/backend:/app
+      - ./src/backend-auth:/app
       - /app/node_modules
-
     environment:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name
@@ -74,23 +75,88 @@ services:
       - db_user
       - db_name
       - jwt_secret
-
     depends_on:
       db:
         condition: service_healthy
-
     networks:
       - chessguard_network
-
     command: npm run dev
-
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 8
       start_period: 60s
+    restart: unless-stopped
 
+  # =========================================================================
+  # ♟️ GAME ENGINE (Ancien gros backend épuré - Sockets & Validations)
+  # =========================================================================
+  backend-game:
+    build: ./src/backend-game
+    container_name: backend-game
+    user: "nodejs"
+    volumes:
+      - ./src/backend-game:/app
+      - /app/node_modules
+    environment:
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      PORT: 3002
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+      - jwt_secret
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_network
+    command: npm run dev
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3002/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
+    restart: unless-stopped
+
+  # =============================================
+  # 🚀 MATCHMAKING MICROSERVICE (Node + Express + Prisma)
+  # =============================================
+  backend-matchmaking:
+    build: ./src/backend-matchmaking
+    container_name: backend-matchmaking
+    user: "nodejs"
+    volumes:
+      - ./src/backend-matchmaking:/app
+      - /app/node_modules
+    environment:
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      GAME_SERVICE_URL: http://backend-game:3002
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+    depends_on:
+      db:
+        condition: service_healthy
+      backend-game:
+        condition: service_healthy
+    networks:
+      - chessguard_network
+    command: npm run dev
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
     restart: unless-stopped
 
   # =============================================

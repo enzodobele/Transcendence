@@ -54,7 +54,9 @@ db-migrate:
 	backend npx prisma migrate dev
 
 format:
-	@$(COMPOSE) exec backend npm run format
+	@$(COMPOSE) exec backend-game npm run format
+	@$(COMPOSE) exec backend-auth npm run format
+	@$(COMPOSE) exec backend-matchmaking npm run format
 	@$(COMPOSE) exec frontend npm run format
 
 # =============================================

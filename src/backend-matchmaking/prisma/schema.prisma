@@ -1,0 +1,163 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================
+// MODEL: User (Joueurs)
+// =============================================
+model User {
+  id             Int      @id @default(autoincrement())
+  username       String  @unique
+  email          String  @unique
+  hashedPassword String
+  eloRating      Int     @default(500)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  lastLogin      DateTime?
+  isActive       Boolean @default(true)
+  avatarUrl      String?
+  bio            String?
+  currentGameId  Int?
+  currentGame    Game?    @relation("CurrentGame", fields: [currentGameId], references: [id], onDelete: SetNull)
+
+  // Relations
+  gamesAsPlayer1 Game[]          @relation("Player1")
+  gamesAsPlayer2 Game[]          @relation("Player2")
+  gamesWon        Game[]          @relation("Winner")
+  moves           Move[]
+  friendsAsUser1  Friend[]        @relation("User1Friends")
+  friendsAsUser2  Friend[]        @relation("User2Friends")
+  stats           UserStats?
+  waitlistEntry    waitlistEntry?
+
+  @@map("users")
+}
+
+// =============================================
+// MODEL: Game (Parties)
+// =============================================
+model Game {
+  id           Int        @id @default(autoincrement())
+  player1Id    Int        // Joueur blanc
+  player2Id    Int        // Joueur noir
+  startTime    DateTime   @default(now())
+  endTime      DateTime?
+  status       String     @default("en_cours") // "en_cours" | "terminee" | "abandonnee" | "nulle"
+  winnerId     Int?
+  timeControl  String     @default("5+0")
+  isRated      Boolean    @default(true)
+  fenString    String     // État actuel du plateau (FEN)
+
+  // Relations
+  player1 User   @relation("Player1", fields: [player1Id], references: [id])
+  player2 User   @relation("Player2", fields: [player2Id], references: [id])
+  winner  User?  @relation("Winner", fields: [winnerId], references: [id])
+  moves   Move[]
+  activeUser   User[]      @relation("CurrentGame")
+
+  @@map("games")
+}
+
+// =============================================
+// MODEL: Move (Coups)
+// =============================================
+model Move {
+  id             Int        @id @default(autoincrement())
+  gameId         Int
+  playerId       Int
+  moveNumber     Int
+  fromSquare     String    // Ex: "e2"
+  toSquare       String    // Ex: "e4"
+  piece          String    // Ex: "P" (pion), "K" (roi), "Q" (dame)
+  isCheck         Boolean   @default(false)
+  isCheckmate     Boolean   @default(false)
+  isCastle        Boolean   @default(false)
+  isEnPassant     Boolean   @default(false)
+  promotionPiece  String?   // Ex: "Q" (dame)
+  timestamp       DateTime @default(now())
+
+  // Relations
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  player User   @relation(fields: [playerId], references: [id])
+
+  // Index pour reconstruire la partie rapidement
+  @@index([gameId, moveNumber])
+  @@map("moves")
+}
+
+// =============================================
+// MODEL: Friend (Amis)
+// =============================================
+model Friend {
+  user1Id    Int
+  user2Id    Int
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user1 User @relation("User1Friends", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 User @relation("User2Friends", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  // Clé primaire composite
+  @@id([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@map("friends")
+}
+
+// =============================================
+// MODEL: waitlistEntry (File d'attente)
+// =============================================
+model waitlistEntry {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  timeControl  String   @default("5+0")
+  createdAt    DateTime @default(now())
+
+  // Relation avec User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("waitlistEntry")
+}
+
+// =============================================
+// MODEL: UserStats (Statistiques)
+// =============================================
+model UserStats {
+  userId        Int     @id @unique
+  totalGames    Int     @default(0)
+  wins          Int     @default(0)
+  losses        Int     @default(0)
+  draws         Int     @default(0)
+  eloHistory    Json?
+  favoriteOpening String?
+
+  // Relation 1:1 avec User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_stats")
+}
+
+
+// // =============================================
+// // MODEL: ChatMessage (Messages)
+// // =============================================
+// model ChatMessage {
+//   id          Int      @id @default(autoincrement())
+//   senderId    Int
+//   receiverId  Int
+//   content     String
+//   timestamp   DateTime @default(now())
+//   isRead      Boolean  @default(false)
+
+//   // Relations
+//   sender   User @relation("Sender", fields: [senderId], references: [id])
+//   receiver User @relation("Receiver", fields: [receiverId], references: [id])
+
+//   @@map("chat_messages")
+// }
+

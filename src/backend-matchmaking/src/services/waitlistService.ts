@@ -1,3 +1,4 @@
+// src/backend/src/services/waitlistService.ts
 import prisma from "../prisma";
 
 export const addToWaitlist = async (

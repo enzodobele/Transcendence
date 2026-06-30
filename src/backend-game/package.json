@@ -26,6 +26,18 @@
     "pg": "^8.22.0",
     "ws": "^8.21.0"
   },
+  "overrides": {
+    "prisma": {
+      "@prisma/dev": {
+        "@hono/node-server": "1.19.13"
+      }
+    },
+    "@prisma/client": {
+      "@prisma/dev": {
+        "@hono/node-server": "1.19.13"
+      }
+    }
+  },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
