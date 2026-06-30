@@ -1,3 +1,4 @@
+import { type LucideIcon } from "lucide-react";
 import '../../styles/FindGame/ModeCard.css';
 
 interface ModeCardProps {
@@ -6,6 +7,7 @@ interface ModeCardProps {
   direction: 'up' | 'down';
   onClick: () => void;
   disabled?: boolean;
+  icon?: LucideIcon;
 }
 
 export function ModeCard({
@@ -14,15 +16,17 @@ export function ModeCard({
   direction,
   onClick,
   disabled = false,
+  icon: Icon,
 }: ModeCardProps) {
   const directionClass = direction === 'up' ? 'open-up' : 'open-down';
 
   return (
-    <button 
-      className={`mode-card ${directionClass}`} 
+    <button
+      className={`mode-card ${directionClass}`}
       onClick={onClick}
       disabled={disabled}
     >
+      {Icon && <Icon size={28} className="mode-card-icon" />}
       <div className="mode-info">
         <h3>{title}</h3>
         <p>{description}</p>

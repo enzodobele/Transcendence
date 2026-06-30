@@ -7,11 +7,8 @@ from tqdm import tqdm
 from model import ChessNet
 from dataset import ChessDataset
 
-PGN_PATH   = "/kaggle/working/lichess_db_standard_rated_2019-03.pgn.zst"
+CHUNK_DIR  = "/kaggle/working/preprocessed"
 MODEL_PATH = "/kaggle/working/model.pt"
-
-MAX_GAMES  = 1_000_000
-POSITIONS_ESTIMATED = 70_000_000
 
 
 def train(epochs=3, batch_size=256, lr=0.001):
@@ -28,16 +25,14 @@ def train(epochs=3, batch_size=256, lr=0.001):
     policy_loss_fn = nn.CrossEntropyLoss()
     value_loss_fn  = nn.MSELoss()
 
-    total_batches_estimated = POSITIONS_ESTIMATED // batch_size
+    dataset = ChessDataset(CHUNK_DIR)
+    loader  = DataLoader(dataset, batch_size=batch_size, num_workers=2)
 
     for epoch in range(epochs):
-        dataset = ChessDataset(PGN_PATH, min_elo=1500, max_games=MAX_GAMES)
-        loader  = DataLoader(dataset, batch_size=batch_size, num_workers=0)
-
         total_loss    = 0
         total_batches = 0
 
-        for tensors, move_indices, outcomes in tqdm(loader, desc=f"Epoch {epoch+1}", total=total_batches_estimated):
+        for tensors, move_indices, outcomes in tqdm(loader, desc=f"Epoch {epoch+1}"):
             tensors      = tensors.to(device)
             move_indices = move_indices.to(device)
             outcomes     = outcomes.to(device)

@@ -1,3 +1,4 @@
+import { Flag, Handshake, LogOut, RotateCcw, Home, Check, X } from "lucide-react";
 import { ChessGame3D } from "./ChessGame3D";
 import { ChessGame2D } from "./ChessGame2D";
 import "../../styles/Board/GameOver.css";
@@ -105,18 +106,18 @@ export function GameView({
         {!gameOverMessage && !isLocalGame && (
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button onClick={onResign} className="button-leave-game">
-              Abandonner
+              <Flag size={15} /> Abandonner
             </button>
             {!isAIGame && (
               <button onClick={onOfferDraw} className="button-leave-game">
-                Proposer la nulle
+                <Handshake size={15} /> Proposer la nulle
               </button>
             )}
           </div>
         )}
         {isLocalGame && (
           <button onClick={onLeaveLocalGame} className="button-leave-game">
-            Quitter la partie locale
+            <LogOut size={15} /> Quitter la partie locale
           </button>
         )}
       </div>
@@ -127,10 +128,10 @@ export function GameView({
             <p className="gameover-message">Nulle proposée</p>
             <div className="gameover-draw-actions">
               <button className="gameover-replay-btn" onClick={onDrawAccept}>
-                Accepter
+                <Check size={15} /> Accepter
               </button>
               <button className="gameover-refuse-btn" onClick={onDrawRefuse}>
-                Refuser
+                <X size={15} /> Refuser
               </button>
             </div>
           </div>
@@ -144,11 +145,11 @@ export function GameView({
             <div className="gameover-draw-actions">
               {isAIGame && (
                 <button className="gameover-replay-btn" onClick={onResetGame}>
-                  Rejouer
+                  <RotateCcw size={15} /> Rejouer
                 </button>
               )}
               <button className="gameover-refuse-btn" onClick={onReturnToMenu}>
-                Menu principal
+                <Home size={15} /> Menu principal
               </button>
             </div>
           </div>

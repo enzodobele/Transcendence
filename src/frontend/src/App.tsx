@@ -22,6 +22,7 @@ export default function App() {
   const [isLocalGame, setIsLocalGame] = useState(false);
   const [isAIGame, setIsAIGame] = useState(false);
   const [isCustomAI, setIsCustomAI] = useState(false);
+  const [isAIvsAI, setIsAIvsAI] = useState(false);
   const [aiDifficulty, setAiDifficulty] = useState(3);
   const [customGameOver, setCustomGameOver] = useState<string | null>(null);
   const [drawOfferPending, setDrawOfferPending] = useState(false);
@@ -54,11 +55,17 @@ export default function App() {
     pendingPromotion, handlePromotionChoice, makeMove, syncWithServerFen, customHistory,
   } = useChessGame(playerColor, (move) => {
     triggerServerMove(move);
-    if (isAIGame) {
+    if (isAIGame && !isAIvsAI) {
       if (isCustomAI) requestCustomAIMove(game.fen());
       else requestStockfishMove(game.fen(), aiDifficulty);
     }
   }, isLocalGame);
+
+  useEffect(() => {
+    if (!isAIvsAI || game.isGameOver() || customGameOver) return;
+    if (game.turn() === "w") requestCustomAIMove(game.fen());
+    else requestStockfishMove(game.fen(), aiDifficulty);
+  }, [board, isAIvsAI]);
 
   const { sendMoveToServer, sendResign, sendDrawOffer, sendDrawAccept, sendDrawRefuse } = useGameWebSocket({
     token,
@@ -99,6 +106,7 @@ export default function App() {
     setIsLocalGame(false);
     setIsAIGame(false);
     setIsCustomAI(false);
+    setIsAIvsAI(false);
     setCustomGameOver(null);
     setDrawOfferPending(false);
     resetGame();
@@ -114,6 +122,13 @@ export default function App() {
   const handleStartCustomAI = () => {
     handleReturnToMenu();
     setIsCustomAI(true);
+    setIsAIGame(true);
+  };
+
+  const handleStartAIvsAI = (difficulty: number) => {
+    handleReturnToMenu();
+    setAiDifficulty(difficulty);
+    setIsAIvsAI(true);
     setIsAIGame(true);
   };
 
@@ -168,6 +183,7 @@ export default function App() {
           onStartLocalGame={handleStartLocalGame}
           onStartAiGame={handleStartAiGame}
           onStartCustomAI={handleStartCustomAI}
+          onStartAIvsAI={handleStartAIvsAI}
         />
       )}
 
@@ -180,7 +196,7 @@ export default function App() {
           drawOfferPending={drawOfferPending}
           userUsername={user?.currentGame?.player1?.username}
           opponentUsername={user?.currentGame?.player2?.username}
-          onSquareClick={handleSquareClick}
+          onSquareClick={isAIvsAI ? () => {} : handleSquareClick}
           onPiecePointerDown={handlePiecePointerDown}
           onResetGame={handleResetGame}
           onPromotionChoice={handlePromotionChoice}
@@ -194,7 +210,7 @@ export default function App() {
       ) : (
         <div className="lobby-container">
           <h1 className="title-chess">CHESS <span className="title-guard">GUARD</span></h1>
-          <p className="subtitle-chess-guard">Jouer en local ou en ligne</p>
+          <p className="subtitle-chess-guard">Jouez en local ou en ligne</p>
 
           <div className="lobby-chessboard-preview" onClick={() => handleLobbyInteraction()}>
             <ChessGame3D

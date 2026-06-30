@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Swords } from "lucide-react";
 import { useFindGame } from "../../hooks/useFindGame";
 import { FindGameOverlay } from "./FindGameOverlay";
 import "../../styles/FindGame/FindGameButton.css";
@@ -7,9 +8,10 @@ interface FindGameButtonProps {
   onStartLocalGame: () => void;
   onStartAiGame: (difficulty: number) => void;
   onStartCustomAI: () => void;
+  onStartAIvsAI: (difficulty: number) => void;
 }
 
-export function FindGameButton({ onStartLocalGame, onStartAiGame, onStartCustomAI }: FindGameButtonProps) {
+export function FindGameButton({ onStartLocalGame, onStartAiGame, onStartCustomAI, onStartAIvsAI }: FindGameButtonProps) {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const { isSearching, error, startSearch, cancelSearch } = useFindGame();
 
@@ -18,7 +20,7 @@ export function FindGameButton({ onStartLocalGame, onStartAiGame, onStartCustomA
       <div className="find-game-wrapper">
         {error && <p className="lobby-error">{error}</p>}
         <button onClick={() => setIsOverlayOpen(true)} className="button-find-game">
-          Jouer
+          <Swords size={18} /> Jouer
         </button>
       </div>
 
@@ -31,6 +33,7 @@ export function FindGameButton({ onStartLocalGame, onStartAiGame, onStartCustomA
         onSelectLocalGame={onStartLocalGame}
         onStartAiGame={onStartAiGame}
         onStartCustomAI={() => { setIsOverlayOpen(false); onStartCustomAI(); }}
+        onStartAIvsAI={(difficulty) => { setIsOverlayOpen(false); onStartAIvsAI(difficulty); }}
       />
     </>
   );
