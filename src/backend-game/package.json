@@ -1,18 +1,13 @@
 {
-  "name": "chessguard-backend",
+  "name": "chessguard-game",
   "version": "1.0.0",
-  "main": "src/app.js",
+  "main": "dist/app.js",
   "scripts": {
     "dev": "prisma generate && tsx watch src/app.ts",
-    "start": "node src/app.js",
-    "db:push": "prisma db push",
-    "db:seed": "prisma db seed",
-    "db:studio": "prisma studio",
+    "build": "tsc",
+    "start": "node dist/app.js",
     "db:generate": "prisma generate",
-	"format": "npx prettier --write \"src/**/*.{ts,tsx}\""
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "format": "npx prettier --write \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
@@ -26,18 +21,6 @@
     "pg": "^8.22.0",
     "ws": "^8.21.0"
   },
-  "overrides": {
-    "prisma": {
-      "@prisma/dev": {
-        "@hono/node-server": "1.19.13"
-      }
-    },
-    "@prisma/client": {
-      "@prisma/dev": {
-        "@hono/node-server": "1.19.13"
-      }
-    }
-  },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
@@ -46,13 +29,17 @@
     "@types/pg": "^8.20.0",
     "@types/ws": "^8.5.12",
     "prisma": "^7.8.0",
-    "tsx": "^4.22.4"
+    "tsx": "^4.22.4",
+    "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "@hono/node-server": "^1.19.13"
   },
   "allowScripts": {
-	"prisma@7.8.0": true,
-	"@prisma/client@7.8.0": true,
-	"@prisma/engines@7.8.0": true,
-	"bcrypt@6.0.0": true,
-	"esbuild@0.28.1": true
-	}
+    "prisma@7.8.0": true,
+    "@prisma/client@7.8.0": true,
+    "@prisma/engines@7.8.0": true,
+    "bcrypt@6.0.0": true,
+    "esbuild@0.28.1": true
+  }
 }

@@ -37,12 +37,12 @@ export const Board: React.FC<BoardProps> = ({
         marginBottom: "20px",
       }}
     >
-      {board.map((row, rowIndex) => {
+      {board.map((_row, rowIndex) => {
         // Si Noir : on part du bas du tableau vers le haut
         const actualRowIndex = isBlack ? 7 - rowIndex : rowIndex;
         const currentRow = board[actualRowIndex];
 
-        return currentRow.map((piece, colIndex) => {
+        return currentRow.map((_piece, colIndex) => {
           // Si Noir : on inverse aussi les colonnes (de 'h' à 'a')
           const actualColIndex = isBlack ? 7 - colIndex : colIndex;
           const actualPiece = currentRow[actualColIndex];

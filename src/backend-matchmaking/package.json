@@ -1,9 +1,12 @@
 {
   "name": "chessguard-matchmaking",
   "version": "1.0.0",
-  "main": "src/app.ts",
+  "main": "dist/app.js",
   "scripts": {
-    "dev": "prisma generate && tsx watch src/app.ts"
+    "dev": "prisma generate && tsx watch src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
@@ -12,24 +15,16 @@
     "express": "^4.19.2",
     "pg": "^8.22.0"
   },
-  "overrides": {
-    "prisma": {
-      "@prisma/dev": {
-        "@hono/node-server": "1.19.13"
-      }
-    },
-    "@prisma/client": {
-      "@prisma/dev": {
-        "@hono/node-server": "1.19.13"
-      }
-    }
-  },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.1",
     "@types/pg": "^8.20.0",
     "prisma": "^7.8.0",
-    "tsx": "^4.22.4"
+    "tsx": "^4.22.4",
+    "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "@hono/node-server": "^1.19.13"
   },
   "allowScripts": {
     "prisma@7.8.0": true,

@@ -1,6 +1,4 @@
 import React from "react";
-import { ChessPiece } from "./ChessPiece";
-import { PIECE_TYPE_MAP } from "../../constants/boardConstants";
 import wQ from "../../assets/pieces/wQ.svg";
 import wR from "../../assets/pieces/wR.svg";
 import wB from "../../assets/pieces/wB.svg";

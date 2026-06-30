@@ -1,0 +1,28 @@
+# =========================================================================
+# 🌐 NGINX GATEWAY (Production)
+# =========================================================================
+FROM nginx:1.27-alpine
+
+# 1. Installe openssl pour générer le certificat auto-signé temporaire
+# (En vraie prod, ce dossier recevra tes vrais certificats Certbot/Let's Encrypt)
+RUN apk add --no-cache openssl && \
+    rm -f /etc/nginx/conf.d/default.conf
+
+# 2. Crée le dossier SSL et génère un certificat auto-signé pour sécuriser le transport
+RUN mkdir -p /etc/nginx/ssl && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /etc/nginx/ssl/nginx-selfsigned.key \
+        -out /etc/nginx/ssl/nginx-selfsigned.crt \
+        -subj "/C=FR/ST=Paris/L=Paris/O=ChessGuard/CN=localhost"
+
+# 3. Copie la configuration Nginx épurée de production
+COPY nginx.prod.conf /etc/nginx/conf.d/default.conf
+
+# 4. Suppression des dossiers HTML par défaut (Nginx Gateway ne sert pas de fichiers directs)
+RUN rm -rf /usr/share/nginx/html/*
+
+# Ports ouverts sur le Web (la Gateway gère l'entrée HTTP et HTTPS)
+EXPOSE 80
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,218 @@
+name: chessguard_prod
+
+services:
+  # =========================================================================
+  # 🌐 NGINX GATEWAY (Le seul point d'entrée public)
+  # =========================================================================
+  nginx:
+    build:
+      context: ./src/nginx
+      dockerfile: Dockerfile.prod
+    ports:
+      - "443:443"
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend-auth:
+        condition: service_healthy
+      backend-matchmaking:
+        condition: service_healthy
+      backend-game:
+        condition: service_healthy
+      ai:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-check-certificate", "-qO-", "https://127.0.0.1:443"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: always
+
+  # =========================================================================
+  # 🖥️ FRONTEND (Serveur d'assets statiques React)
+  # =========================================================================
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile.prod
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5173/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  # =========================================================================
+  # 🔐 MICROSERVICE : Auth (Port 3000)
+  # =========================================================================
+  backend-auth:
+    build:
+      context: ./src/backend-auth
+      dockerfile: Dockerfile.prod
+    user: "nodejs"
+    environment:
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      NODE_ENV: production
+      PORT: 3000
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+      - jwt_secret
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  # =========================================================================
+  # 🚀 MICROSERVICE : Matchmaking (Port 3001)
+  # =========================================================================
+  backend-matchmaking:
+    build:
+      context: ./src/backend-matchmaking
+      dockerfile: Dockerfile.prod
+    user: "nodejs"
+    environment:
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      NODE_ENV: production
+      PORT: 3001
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+      - jwt_secret
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  # =========================================================================
+  # ♟️ MICROSERVICE : Game (Port 3002)
+  # =========================================================================
+  backend-game:
+    build:
+      context: ./src/backend-game
+      dockerfile: Dockerfile.prod
+    user: "nodejs"
+    environment:
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      NODE_ENV: production
+      PORT: 3002
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+      - jwt_secret
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+# =========================================================================
+  # 🤖 MICROSERVICE : IA Maison (FastAPI + PyTorch)
+  # =========================================================================
+  ai:
+    build:
+      context: ./src/ai
+      dockerfile: Dockerfile.prod
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      # Utilise curl (installé via le Dockerfile) pour taper le endpoint de santé
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: always
+
+  # =========================================================================
+  # 🗃️ DATABASE (PostgreSQL)
+  # =========================================================================
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_DB_FILE: /run/secrets/db_name
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      chessguard_prod_network:
+        aliases:
+          - chessguard-db  # 🛡️ Permet à Prisma de trouver la DB avec son ancien nom
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/db_user) -d $$(cat /run/secrets/db_name)"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+# =========================================================================
+# 💾 VOLUMES PERSISTANTS
+# =========================================================================
+volumes:
+  postgres_prod_data:
+    name: chessguard_prod_db_data
+
+# =========================================================================
+# 🔌 RÉSEAUX ISOLÉS
+# =========================================================================
+networks:
+  chessguard_prod_network:
+    name: chessguard_prod_network
+    driver: bridge
+
+# =========================================================================
+# 🔒 SECRETS DOCKER
+# =========================================================================
+secrets:
+  db_user:
+    file: ./src/secrets/prod_db_user.txt
+  db_name:
+    file: ./src/secrets/prod_db_name.txt
+  db_password:
+    file: ./src/secrets/prod_db_password.txt
+  jwt_secret:
+    file: ./src/secrets/prod_jwt_secret.txt
