@@ -57,6 +57,8 @@ services:
       context: ./src/backend-auth
       dockerfile: Dockerfile.prod
     user: "nodejs"
+    volumes:
+      - avatar_uploads:/app/uploads
     environment:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name
@@ -195,6 +197,8 @@ services:
 volumes:
   postgres_prod_data:
     name: chessguard_prod_db_data
+  avatar_uploads:
+    name: chessguard_prod_avatar_uploads
 
 # =========================================================================
 # 🔌 RÉSEAUX ISOLÉS

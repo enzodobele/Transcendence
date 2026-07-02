@@ -28,3 +28,17 @@ export const generateToken = (
   });
   return token;
 };
+
+export const verifyToken = (
+  token: string,
+): (jwt.JwtPayload & { userId: number; username: string; email: string }) | null => {
+  try {
+    return jwt.verify(token, JWT_SECRET) as jwt.JwtPayload & {
+      userId: number;
+      username: string;
+      email: string;
+    };
+  } catch {
+    return null;
+  }
+};
