@@ -67,6 +67,7 @@ services:
     volumes:
       - ./src/backend-auth:/app
       - /app/node_modules
+      - avatar_uploads:/app/uploads
     environment:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name
@@ -266,6 +267,7 @@ services:
 volumes:
   postgres_data:
   portainer_data:
+  avatar_uploads:
 
 # =============================================
 # 🌐 NETWORK

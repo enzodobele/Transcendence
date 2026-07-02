@@ -1,5 +1,22 @@
 // frontend/src/services/auth.ts
 
+// Extrait un message d'erreur lisible depuis une réponse HTTP, même si le corps
+// n'est pas du JSON (ex: page d'erreur HTML renvoyée par nginx sur un 413/502).
+async function extractErrorMessage(
+  response: Response,
+  fallback: string,
+): Promise<string> {
+  try {
+    const error = await response.json();
+    return error.error || fallback;
+  } catch {
+    if (response.status === 413) {
+      return "Fichier trop volumineux.";
+    }
+    return `${fallback} (${response.status})`;
+  }
+}
+
 // Fonction utilitaire pour récupérer les headers avec le token JWT automatiquement
 function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("token");
@@ -26,8 +43,7 @@ export async function register(
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Erreur lors de l'inscription");
+    throw new Error(await extractErrorMessage(response, "Erreur lors de l'inscription"));
   }
 
   return response.json();
@@ -41,8 +57,7 @@ export async function login(email: string, password: string) {
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Erreur lors de la connexion");
+    throw new Error(await extractErrorMessage(response, "Erreur lors de la connexion"));
   }
 
   return response.json(); // Doit renvoyer { token: "..." }
@@ -50,8 +65,7 @@ export async function login(email: string, password: string) {
 
 // 💡 Nouvelle fonction pour récupérer le profil au démarrage de l'app ou refresh
 export async function fetchMe() {
-  const response = await fetch("/api/lobby/me", {
-    // Ajuste le préfixe si ta route est /api/me
+  const response = await fetch("/api/auth/me", {
     method: "GET",
     headers: getAuthHeaders(), // Injecte le Bearer token
   });
@@ -62,4 +76,43 @@ export async function fetchMe() {
   }
 
   return response.json(); // Renvoie { userId: X, username: "Y", currentGameId: Z }
+}
+
+export async function updateProfile(fields: {
+  username?: string;
+  email?: string;
+}) {
+  const response = await fetch("/api/auth/profile", {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(fields),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(response, "Erreur lors de la mise à jour du profil"),
+    );
+  }
+
+  return response.json();
+}
+
+export async function uploadAvatar(file: File) {
+  const token = localStorage.getItem("token");
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  const response = await fetch("/api/auth/avatar", {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(response, "Erreur lors de l'envoi de l'avatar"),
+    );
+  }
+
+  return response.json();
 }

@@ -1,5 +1,9 @@
+import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import LogoutIcon from "../../assets/Logo/logout.svg?react";
+import ProfileIcon from "../../assets/Logo/profile.svg?react";
+import defaultAvatarUrl from "../../assets/Logo/default-avatar.svg";
+import { ProfileEditOverlay } from "./ProfileEditOverlay";
 import "../../styles/Profile/ProfileOverlay.css";
 
 interface ProfileOverlayProps {
@@ -9,6 +13,7 @@ interface ProfileOverlayProps {
 
 export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
   const { user, logout } = useAuth();
+  const [showEdit, setShowEdit] = useState(false);
 
   if (!isOpen || !user) return null;
 
@@ -32,6 +37,12 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
           </svg>
         </button>
 
+        <img
+          src={user.avatarUrl || defaultAvatarUrl}
+          alt="Avatar"
+          className="profile-avatar"
+        />
+
         <h2 className="profile-title">Mon profil</h2>
         <p className="profile-subtitle">Informations de votre compte</p>
 
@@ -45,6 +56,14 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
         </div>
 
         <button
+          className="profile-edit-button"
+          onClick={() => setShowEdit(true)}
+        >
+          <ProfileIcon className="profile-icon" />
+          <span>Modifier le profil</span>
+        </button>
+
+        <button
           className="profile-logout-button"
           onClick={() => {
             logout();
@@ -55,6 +74,8 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
           <span>Logout</span>
         </button>
       </div>
+
+      <ProfileEditOverlay isOpen={showEdit} onClose={() => setShowEdit(false)} />
     </div>
   );
 }

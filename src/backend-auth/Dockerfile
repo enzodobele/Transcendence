@@ -51,6 +51,9 @@ COPY --chown=nodejs:nodejs --from=builder /app/src ./src
 COPY --chown=nodejs:nodejs entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
+# Dossier persistant pour les avatars uploadés (monté en volume au runtime)
+RUN mkdir -p /app/uploads/avatars && chown -R nodejs:nodejs /app/uploads
+
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 
 USER nodejs

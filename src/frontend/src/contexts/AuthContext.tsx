@@ -7,6 +7,7 @@ interface User {
   id: number;
   username: string;
   email: string;
+  avatarUrl?: string | null;
   currentGame?: {
     id: number;
     status: string;
