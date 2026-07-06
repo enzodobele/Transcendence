@@ -9,7 +9,7 @@ services:
       context: ./src/nginx
       dockerfile: Dockerfile.prod
     environment:
-        MODSEC_RULE_ENGINE: DetectionOnly
+        MODSEC_RULE_ENGINE: On
         BLOCKING_PARANOIA: "1"
         ANOMALY_INBOUND: "5"
         ANOMALY_OUTBOUND: "4"
