@@ -55,3 +55,31 @@ vault kv put secret/chessguard/jwt \
   secret="$(cat /secrets/prod_jwt_secret.txt)"
 
 echo "[bootstrap] Secrets charg\u00e9s dans Vault \u2705"
+
+# =========================================================================
+# Permissions : policy + AppRole pour les backends
+# =========================================================================
+
+# Policy en LECTURE SEULE sur les secrets ChessGuard
+vault policy write chessguard-backend - <<'EOF'
+path "secret/data/chessguard/*" {
+  capabilities = ["read"]
+}
+EOF
+
+# Activer la méthode d'auth AppRole (idempotent)
+vault auth enable approle 2>/dev/null || true
+
+# Créer/mettre à jour le rôle, lié à notre policy
+vault write auth/approle/role/chessguard-backend \
+  token_policies="chessguard-backend" \
+  token_ttl=1h \
+  token_max_ttl=4h \
+  secret_id_ttl=0 \
+  secret_id_num_uses=0
+
+# Écrire role_id (stable) + un secret_id (généré) pour que les backends s'authentifient
+vault read  -field=role_id   auth/approle/role/chessguard-backend/role-id   > /vault/secrets/role_id
+vault write -f -field=secret_id auth/approle/role/chessguard-backend/secret-id > /vault/secrets/secret_id
+
+echo "[bootstrap] Policy + AppRole configur\u00e9s \u2705"

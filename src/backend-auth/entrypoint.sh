@@ -2,28 +2,38 @@
 set -e
 
 # =============================================
-# Fonction utilitaire pour lire un secret
+# Récupération des secrets depuis Vault (AppRole)
 # =============================================
-read_secret_strict() {
-  local secret_name="$1"
-  local secret_path="/run/secrets/$secret_name"
+echo "[+] [Auth] Authentification à Vault..."
+export VAULT_ADDR="http://vault:8200"
 
-  if [ ! -s "$secret_path" ]; then
-    echo "[-] CRITICAL ERROR: Secret '$secret_name' is missing or empty at $secret_path" >&2
-    exit 1
-  fi
+ROLE_ID=$(cat /vault/role_id | tr -d '\n')
+SECRET_ID=$(cat /vault/secret_id | tr -d '\n')
 
-  cat "$secret_path" | tr -d '\n'  # ✅ Supprime les sauts de ligne
+# 1. Login AppRole → jeton limité (on extrait client_token du JSON)
+VAULT_TOKEN=$(curl -s --request POST \
+  --data "{\"role_id\":\"$ROLE_ID\",\"secret_id\":\"$SECRET_ID\"}" \
+  "$VAULT_ADDR/v1/auth/approle/login" \
+  | grep -o '"client_token":"[^"]*"' | cut -d'"' -f4)
+
+if [ -z "$VAULT_TOKEN" ]; then
+  echo "[-] [Auth] ERREUR: login Vault échoué (jeton vide)" >&2
+  exit 1
+fi
+
+# 2. Petit helper : lit un champ d'un secret KV v2
+vault_get() {   # $1 = sous-chemin (db|jwt), $2 = champ
+  curl -s --header "X-Vault-Token: $VAULT_TOKEN" \
+    "$VAULT_ADDR/v1/secret/data/chessguard/$1" \
+    | grep -o "\"$2\":\"[^\"]*\"" | cut -d'"' -f4
 }
 
-# =============================================
-# Lecture des secrets
-# =============================================
-echo "[+] [Auth] Loading secrets..."
-export DB_USER=$(read_secret_strict "db_user")
-export DB_NAME=$(read_secret_strict "db_name")
-export DB_PASSWORD=$(read_secret_strict "db_password")
-export JWT_SECRET=$(read_secret_strict "jwt_secret")
+export DB_USER=$(vault_get db user)
+export DB_NAME=$(vault_get db name)
+export DB_PASSWORD=$(vault_get db password)
+export JWT_SECRET=$(vault_get jwt secret)
+
+echo "[+] [Auth] Secrets récupérés depuis Vault ✅"
 
 # =============================================
 # Construction de DATABASE_URL

@@ -65,21 +65,17 @@ services:
     user: "nodejs"
     volumes:
       - avatar_uploads:/app/uploads
+      - ./src/vault/secrets/role_id:/vault/role_id:ro       # identité AppRole
+      - ./src/vault/secrets/secret_id:/vault/secret_id:ro
     environment:
-      DB_USER_FILE: /run/secrets/db_user
-      DB_NAME_FILE: /run/secrets/db_name
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      VAULT_ADDR: http://vault:8200
       NODE_ENV: production
       PORT: 3000
-    secrets:
-      - db_password
-      - db_user
-      - db_name
-      - jwt_secret
     depends_on:
       db:
         condition: service_healthy
+      vault-bootstrap:
+        condition: service_completed_successfully    # secrets prêts dans Vault
     networks:
       - chessguard_prod_network
     healthcheck:
@@ -97,21 +93,18 @@ services:
       context: ./src/backend-matchmaking
       dockerfile: Dockerfile.prod
     user: "nodejs"
+    volumes:
+      - ./src/vault/secrets/role_id:/vault/role_id:ro
+      - ./src/vault/secrets/secret_id:/vault/secret_id:ro
     environment:
-      DB_USER_FILE: /run/secrets/db_user
-      DB_NAME_FILE: /run/secrets/db_name
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      VAULT_ADDR: http://vault:8200
       NODE_ENV: production
       PORT: 3001
-    secrets:
-      - db_password
-      - db_user
-      - db_name
-      - jwt_secret
     depends_on:
       db:
         condition: service_healthy
+      vault-bootstrap:
+        condition: service_completed_successfully
     networks:
       - chessguard_prod_network
     healthcheck:
@@ -129,21 +122,18 @@ services:
       context: ./src/backend-game
       dockerfile: Dockerfile.prod
     user: "nodejs"
+    volumes:
+      - ./src/vault/secrets/role_id:/vault/role_id:ro
+      - ./src/vault/secrets/secret_id:/vault/secret_id:ro
     environment:
-      DB_USER_FILE: /run/secrets/db_user
-      DB_NAME_FILE: /run/secrets/db_name
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      VAULT_ADDR: http://vault:8200
       NODE_ENV: production
       PORT: 3002
-    secrets:
-      - db_password
-      - db_user
-      - db_name
-      - jwt_secret
     depends_on:
       db:
         condition: service_healthy
+      vault-bootstrap:
+        condition: service_completed_successfully
     networks:
       - chessguard_prod_network
     healthcheck:

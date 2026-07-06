@@ -4,31 +4,42 @@ set -e
 # =============================================
 # Fonction utilitaire pour lire un secret
 # =============================================
-read_secret_strict() {
-  local secret_name="$1"
-  local secret_path="/run/secrets/$secret_name"
+# =============================================
+# Récupération des secrets depuis Vault (AppRole)
+# =============================================
+echo "[+] [Matchmaking] Authentification à Vault..."
+export VAULT_ADDR="http://vault:8200"
 
-  if [ ! -s "$secret_path" ]; then
-    echo "[-] CRITICAL ERROR: Secret '$secret_name' is missing or empty at $secret_path" >&2
-    exit 1
-  fi
+ROLE_ID=$(cat /vault/role_id | tr -d '\n')
+SECRET_ID=$(cat /vault/secret_id | tr -d '\n')
 
-  cat "$secret_path" | tr -d '\n'
+VAULT_TOKEN=$(curl -s --request POST \
+  --data "{\"role_id\":\"$ROLE_ID\",\"secret_id\":\"$SECRET_ID\"}" \
+  "$VAULT_ADDR/v1/auth/approle/login" \
+  | grep -o '"client_token":"[^"]*"' | cut -d'"' -f4)
+
+if [ -z "$VAULT_TOKEN" ]; then
+  echo "[-] [Matchmaking] ERREUR: login Vault échoué (jeton vide)" >&2
+  exit 1
+fi
+
+vault_get() {
+  curl -s --header "X-Vault-Token: $VAULT_TOKEN" \
+    "$VAULT_ADDR/v1/secret/data/chessguard/$1" \
+    | grep -o "\"$2\":\"[^\"]*\"" | cut -d'"' -f4
 }
 
-# =============================================
-# Lecture des secrets (Pas besoin de JWT_SECRET ici)
-# =============================================
-echo "[+] [Matchmaking] Loading secrets..."
-export DB_USER=$(read_secret_strict "db_user")
-export DB_NAME=$(read_secret_strict "db_name")
-export DB_PASSWORD=$(read_secret_strict "db_password")
+export DB_USER=$(vault_get db user)
+export DB_NAME=$(vault_get db name)
+export DB_PASSWORD=$(vault_get db password)
+
+echo "[+] [Matchmaking] Secrets récupérés depuis Vault ✅"
 
 # =============================================
 # Construction de DATABASE_URL
 # =============================================
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
-echo "[+] [Matchmaking] DATABASE_URL: $DATABASE_URL"
+ echo "[+] [Matchmaking] DATABASE_URL configurée."
 
 # =============================================
 # Attente de la base de données
