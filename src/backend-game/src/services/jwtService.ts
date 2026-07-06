@@ -2,7 +2,10 @@
 import jwt from "jsonwebtoken";
 
 // Clé secrète
-const JWT_SECRET = process.env.JWT_SECRET || "ta_cle_secrete_temporaire";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET manquant : il doit être fourni par Vault.");
+}
 
 export const generateToken = (userId: number, username: string): string => {
   return jwt.sign(
