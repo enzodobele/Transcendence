@@ -172,6 +172,42 @@ services:
     restart: always
 
   # =========================================================================
+  # 🔐 VAULT (Coffre-fort à secrets)
+  # =========================================================================
+  vault:
+    image: hashicorp/vault:1.18
+    cap_add:
+      - IPC_LOCK              # autorise Vault à verrouiller sa mémoire (évite que les secrets partent sur le disque/swap)
+    environment:
+      VAULT_ADDR: http://127.0.0.1:8200   # pour que la commande `vault` fonctionne dans le conteneur
+    volumes:
+      - ./src/vault/config.hcl:/vault/config/config.hcl:ro
+      - vault_data:/vault/file
+    command: vault server -config=/vault/config/config.hcl
+    networks:
+      - chessguard_prod_network
+    restart: always
+
+    # =========================================================================
+  # 🔐 VAULT BOOTSTRAP (init + descellement automatique, puis s'arrête)
+  # =========================================================================
+  vault-bootstrap:
+    image: hashicorp/vault:1.18
+    depends_on:
+      vault:
+        condition: service_started
+    environment:
+      VAULT_ADDR: http://vault:8200
+    volumes:
+      - ./src/vault/bootstrap.sh:/bootstrap.sh:ro
+      - ./src/vault/secrets:/vault/secrets      # accès à init.txt (clés)
+      - ./src/secrets:/secrets:ro
+    entrypoint: ["/bin/sh", "/bootstrap.sh"]
+    networks:
+      - chessguard_prod_network
+    restart: "no"                                # conteneur "one-shot"
+
+  # =========================================================================
   # 🗃️ DATABASE (PostgreSQL)
   # =========================================================================
   db:
@@ -205,6 +241,9 @@ volumes:
     name: chessguard_prod_db_data
   avatar_uploads:
     name: chessguard_prod_avatar_uploads
+  vault_data:
+    name: chessguard_prod_vault_data
+     
 
 # =========================================================================
 # 🔌 RÉSEAUX ISOLÉS
