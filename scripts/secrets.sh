@@ -47,4 +47,7 @@ sudo chgrp 1001 "$SECRETS_DIR"/*.txt 2>/dev/null || chgrp 1001 "$SECRETS_DIR"/*.
 chmod 640 "$SECRETS_DIR"/*.txt
 chmod 750 "$SECRETS_DIR"
 
+sudo chgrp 0 "$SECRETS_DIR/pgadmin_password.txt"
+chmod 640 "$SECRETS_DIR/pgadmin_password.txt"
+
 echo -e "${GREEN}✅ Done! All Dev & Prod secrets generated cleanly in: $SECRETS_DIR${NC}"
