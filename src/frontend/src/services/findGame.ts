@@ -1,4 +1,4 @@
-// frontend/src/services/lobby.ts
+// frontend/src/services/findGame.ts
 
 // Fonction utilitaire interne pour injecter le token JWT
 function getAuthHeaders(): HeadersInit {
@@ -12,10 +12,11 @@ function getAuthHeaders(): HeadersInit {
 /**
  * Envoie la demande pour rejoindre la file d'attente
  */
-export async function joinWaitlistApi() {
+export async function joinWaitlistApi(userId: string | number) {
   const response = await fetch("/api/lobby/join", {
     method: "POST",
     headers: getAuthHeaders(),
+	body: JSON.stringify({ userId }),
   });
 
   if (!response.ok) {
@@ -29,10 +30,11 @@ export async function joinWaitlistApi() {
 /**
  * Envoie la demande pour quitter la file d'attente
  */
-export async function leaveWaitlistApi() {
+export async function leaveWaitlistApi(userId: string | number) {
   const response = await fetch("/api/lobby/leave", {
     method: "POST",
     headers: getAuthHeaders(),
+	body: JSON.stringify({ userId }),
   });
 
   if (!response.ok) {

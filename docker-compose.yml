@@ -141,11 +141,13 @@ services:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name
       DB_PASSWORD_FILE: /run/secrets/db_password
-      GAME_SERVICE_URL: http://backend-game:3002
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      GAME_SERVICE_URL: https://backend-game:3002
     secrets:
       - db_password
       - db_user
       - db_name
+      - jwt_secret
     depends_on:
       db:
         condition: service_healthy
