@@ -1,8 +1,32 @@
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
+import * as fs from "fs"; // 👈 Obligatoire pour lire le secret Docker
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || "your-secret-key-change-in-production";
+// =========================================================================
+// 🚨 VÉRIFICATION STRICTE DU SECRET (FAIL-FAST)
+// =========================================================================
+if (!process.env.JWT_SECRET_FILE) {
+  console.error("❌ CRITICAL ERROR [Auth Service]: La variable JWT_SECRET_FILE n'est pas définie.");
+  process.exit(1);
+}
+
+if (!fs.existsSync(process.env.JWT_SECRET_FILE)) {
+  console.error(`❌ CRITICAL ERROR [Auth Service]: Le fichier secret n'existe pas à l'emplacement : ${process.env.JWT_SECRET_FILE}`);
+  process.exit(1);
+}
+
+let JWT_SECRET: string;
+try {
+  JWT_SECRET = fs.readFileSync(process.env.JWT_SECRET_FILE, "utf8").trim();
+  if (!JWT_SECRET) {
+    throw new Error("Le fichier secret est vide.");
+  }
+  console.log("✅ [Auth Service] JWT_SECRET chargé avec succès depuis le secret Docker.");
+} catch (err: any) {
+  console.error(`❌ CRITICAL ERROR [Auth Service]: Impossible de lire le secret JWT : ${err.message}`);
+  process.exit(1);
+}
+// =========================================================================
 
 export const hashPassword = async (password: string): Promise<string> => {
   const saltRounds = 10;

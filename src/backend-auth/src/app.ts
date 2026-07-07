@@ -32,7 +32,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: "Erreur serveur" });
 });
 
-const PORT = process.env.PORT || 3000; // Il écoutera sur le port 3000 dans son conteneur
+const PORT = process.env.PORT; // Il écoutera sur le port 3000 dans son conteneur
 app.listen(PORT, () => {
   console.log(`🔐 Microservice Auth connecté sur le port ${PORT}`);
 });

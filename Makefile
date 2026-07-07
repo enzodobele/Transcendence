@@ -29,7 +29,7 @@ REQUIRED_DEV_SECRETS := \
 
 .PHONY: up down rebuild restart logs ps exec db-seed db-migrate format \
         prod prod-down prod-rebuild prod-logs prod-ps prod-exec prod-db-seed \
-        clean fclean prod-clean prod-fclean
+        clean fclean prod-clean prod-fclean check-types
 
 # =========================================================================
 # 🛠️ ENVIRONNEMENT DE DÉVELOPPEMENT (Local)
@@ -152,3 +152,16 @@ prod-fclean:
 	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
 	@sleep 5
 	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
+
+
+
+check-types:
+	@echo "🔍 [Vérification] Analyse du dossier Matchmaking..."
+	@cd src/backend-matchmaking && npx tsc --noEmit || echo "❌ Erreurs trouvées dans backend-matchmaking"
+	@echo "\n🔍 [Vérification] Analyse du dossier Auth..."
+	@cd src/backend-auth && npx tsc --noEmit || echo "❌ Erreurs trouvées dans backend-auth"
+	@echo "\n🔍 [Vérification] Analyse du dossier Game Engine..."
+	@cd src/backend-game && npx tsc --noEmit || echo "❌ Erreurs trouvées dans backend (Game Engine)"
+	@echo "\n🔍 [Vérification] Analyse du dossier Frontend..."
+	@cd src/frontend && npx tsc --noEmit || echo "❌ Erreurs trouvées dans le Frontend"
+	@echo "\n✨ [Vérification] Scan terminé !"
