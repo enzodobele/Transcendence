@@ -97,6 +97,8 @@ services:
       DB_PASSWORD_FILE: /run/secrets/db_password
       JWT_SECRET_FILE: /run/secrets/jwt_secret
       NODE_ENV: production
+      GAME_SERVICE_URL: https://backend-game:3002
+
       PORT: 3001
     secrets:
       - db_password
