@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "lastSeen" TIMESTAMP(3);

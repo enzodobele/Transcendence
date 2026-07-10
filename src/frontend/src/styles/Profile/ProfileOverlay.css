@@ -95,3 +95,157 @@
   height: 1rem;
   fill: currentColor;
 }
+
+/* ==========================================================================
+   4. SECTION AMIS
+   ========================================================================== */
+.profile-friends-section {
+  margin-bottom: 1rem;
+  border-top: 0.0625rem solid rgba(30, 25, 18, 0.1);
+  padding-top: 0.8rem;
+}
+
+.profile-friends-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0.6rem;
+}
+
+.profile-friends-toggle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  opacity: 0.6;
+  line-height: 1;
+}
+
+.profile-add-friend {
+  margin-bottom: 0.7rem;
+}
+
+.profile-add-friend-row {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.profile-add-friend-input {
+  flex: 1;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid rgba(30, 25, 18, 0.2);
+  background: rgba(30, 25, 18, 0.04);
+  font-size: 0.9rem;
+  color: inherit;
+  outline: none;
+}
+
+.profile-add-friend-input:focus {
+  border-color: rgba(30, 25, 18, 0.4);
+}
+
+.profile-add-friend-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: #1f1c17;
+  color: #fbf8f1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.profile-add-friend-btn:hover {
+  opacity: 0.85;
+}
+
+.profile-friend-feedback {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+}
+
+.profile-friend-feedback.ok { color: #2a7a2a; }
+.profile-friend-feedback.err { color: #c0392b; }
+
+.profile-friends-empty {
+  font-size: 0.82rem;
+  opacity: 0.5;
+  margin: 0;
+}
+
+.profile-friends-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 8rem;
+  overflow-y: auto;
+}
+
+.profile-friend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-friend-avatar {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 0.0625rem solid rgba(30, 25, 18, 0.1);
+}
+
+.profile-friend-name {
+  font-size: 0.92rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.profile-request-actions {
+  display: flex;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.profile-request-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.profile-request-btn.accept {
+  background: #2a7a2a;
+  color: #fff;
+}
+
+.profile-request-btn.reject {
+  background: #c0392b;
+  color: #fff;
+}
+
+.profile-request-btn:hover {
+  opacity: 0.8;
+}
+
+.profile-presence-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.profile-presence-dot.online  { background: #2ecc71; }
+.profile-presence-dot.offline { background: #aaa; }

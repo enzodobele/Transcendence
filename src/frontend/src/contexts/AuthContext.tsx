@@ -1,7 +1,7 @@
 // frontend/src/contexts/AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { fetchMe } from "../services/auth";
+import { fetchMe, heartbeat } from "../services/auth";
 
 interface User {
   id: number;
@@ -63,6 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     refreshUserStatus();
   }, []);
+
+  // Heartbeat toutes les 60s pour signaler la présence
+  useEffect(() => {
+    if (!user) return;
+    heartbeat();
+    const interval = setInterval(heartbeat, 60_000);
+    return () => clearInterval(interval);
+  }, [user?.id]);
 
   const login = (userData: User, authToken: string) => {
     setToken(authToken);

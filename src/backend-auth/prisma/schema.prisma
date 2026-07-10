@@ -19,6 +19,7 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   lastLogin      DateTime?
+  lastSeen       DateTime?
   isActive       Boolean @default(true)
   avatarUrl      String?
   bio            String?
@@ -32,6 +33,8 @@ model User {
   moves           Move[]
   friendsAsUser1  Friend[]        @relation("User1Friends")
   friendsAsUser2  Friend[]        @relation("User2Friends")
+  sentRequests    FriendRequest[] @relation("SentRequests")
+  receivedRequests FriendRequest[] @relation("ReceivedRequests")
   stats           UserStats?
   waitlistEntry    waitlistEntry?
 
@@ -107,6 +110,23 @@ model Friend {
   @@index([user1Id])
   @@index([user2Id])
   @@map("friends")
+}
+
+// =============================================
+// MODEL: FriendRequest (Demandes d'amis)
+// =============================================
+model FriendRequest {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentRequests",      fields: [senderId],   references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedRequests",  fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId])
+  @@map("friend_requests")
 }
 
 // =============================================

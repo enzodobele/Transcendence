@@ -3,7 +3,7 @@
 # =========================================================================
 
 NAME = chessguard
-DOCKER_COMPOSE := $(shell command -v docker-compose 2>/dev/null || echo "docker compose")
+DOCKER_COMPOSE := docker compose
 
 # 📂 Fichiers de configuration Docker Compose
 COMPOSE_DEV  = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)_dev

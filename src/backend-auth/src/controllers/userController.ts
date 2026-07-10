@@ -112,3 +112,11 @@ export const uploadAvatar = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Erreur serveur" });
   }
 };
+
+export const heartbeat = async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+  if (!userId) return res.status(401).json({ error: "Non autorisé" });
+
+  await prisma.user.update({ where: { id: userId }, data: { lastSeen: new Date() } });
+  return res.status(204).send();
+};

@@ -47,6 +47,8 @@ services:
         condition: service_healthy
       backend-matchmaking:
         condition: service_healthy
+      backend-friends:
+        condition: service_healthy
     networks:
       - chessguard_network
     healthcheck:
@@ -73,6 +75,7 @@ services:
       DB_NAME_FILE: /run/secrets/db_name
       DB_PASSWORD_FILE: /run/secrets/db_password
       JWT_SECRET_FILE: /run/secrets/jwt_secret
+      PORT: 3000
     secrets:
       - db_password
       - db_user
@@ -86,6 +89,41 @@ services:
     command: npm run dev
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
+    restart: unless-stopped
+
+  # =========================================================================
+  # 👥 MICROSERVICE FRIENDS (Gestion des amis)
+  # =========================================================================
+  backend-friends:
+    build: ./src/backend-friends
+    container_name: backend-friends
+    user: "nodejs"
+    volumes:
+      - ./src/backend-friends:/app
+      - /app/node_modules
+    environment:
+      PORT: 3003
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+      - db_user
+      - db_name
+      - jwt_secret
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_network
+    command: npm run dev
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3003/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 8
