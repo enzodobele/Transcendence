@@ -1,0 +1,74 @@
+je te liste ci dessous tout les modules fait :
+• Minor: Use a frontend framework (React, Vue, Angular, Svelte, etc.). //////////////////////////////////////////////////////////////////////////////////////////////////////// 
+• Minor: Use a backend framework (Express, Fastify, NestJS, Django, etc.). 
+//////////////////////////////////////////////////////////////////////////////////////////////////////// 
+• Major: Implement real-time features using WebSockets or similar technology.
+◦ Real-time updates across clients.
+◦ Handle connection/disconnection gracefully.
+◦ Efficient message broadcasting.
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+• Minor: Custom-made design system with reusable components, including a proper
+color palette, typography, and icons (minimum: 10 reusable components).
+On remplit les critère j'ai ajouté quelques asset pour le bouton jouer/les modes de jeux et les boutons abandonner/quitter la partie etc
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+• Major: Introduce an AI Opponent for games.
+◦ The AI must be challenging and able to win occasionally.
+◦ The AI should simulate human-like behavior (not perfect play).
+◦ If you implement game customization options, the AI must be able to use
+them.
+◦ You must be able to explain your AI implementation during evaluation.
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+Ryatsuo — 30/06/2026 01:53
+• Major: Implement advanced 3D graphics using a library like Three.js or Babylon.js.
+◦ Create an immersive 3D environment.
+◦ Implement advanced rendering techniques.
+◦ Ensure smooth performance and user interaction.
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+Ryatsuo — 30/06/2026 02:02
+• Minor: Use an ORM for the database.
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+• Major: Implement a complete web-based game where users can play against each
+other.
+◦ The game can be real-time multiplayer (e.g., Pong, Chess, Tic-Tac-Toe, Card
+games, etc.).
+◦ Players must be able to play live matches.
+◦ The game must have clear rules and win/loss conditions.
+◦ The game can be 2D or 3D.
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+Ryatsuo — 30/06/2026 02:16
+• Major: Implement a custom module that is not listed above.
+◦ The module must be substantial and demonstrate technical complexity.
+◦ You must provide proper justification in your README.md explaining:
+∗ Why you chose this module.
+∗ What technical challenges it addresses.
+∗ How it adds value to your project.
+∗ Why it deserves Major module status (2 points).
+◦ Taking shortcuts or implementing trivial features will result in rejection.
+◦ Be creative and think outside the box.
+◦ The module should be relevant to your project context.
+Pour l'ia on pourra dire qu'on a intégré Stockfish et pour le custom module on pourra dire que c'est notre ia faite maison
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+ça fait 14 point en tout, il nous reste à faire ou à finir :
+• Major: Backend as microservices.
+◦ Design loosely-coupled services with clear interfaces.
+◦ Use REST APIs or message queues for communication.
+◦ Each service should have a single responsibility
+c'est bien écris BACKEND donc oui il faut que le backend soit en micro service
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ 
+• Major: Implement WAF/ModSecurity (hardened) + HashiCorp Vault for secrets:
+◦ Configure strict ModSecurity/WAF.
+◦ Manage secrets in Vault (API keys, credentials, environment variables), encrypted and isolated.
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ 
+Ryatsuo — 30/06/2026 02:24
+• Major: Remote players — Enable two players on separate computers to play the
+same game in real-time.
+◦ Handle network latency and disconnections gracefully.
+◦ Provide a smooth user experience for remote gameplay.
+◦ Implement reconnection logic.
+celui ci est fini à 80% il faut qu'on gère les déconnexions
+et avec tout ça on a 20 points
+on peut abandonner le système d'elo et matchmaking par elo
+
+User Management Minor
+RGPD
+Chat

@@ -1,4 +1,4 @@
-// src/backend/src/services/waitlistService.ts
+// src/backend-matchmaking/services/waitlistService.ts
 import prisma from "../prisma";
 
 export const addToWaitlist = async (
@@ -7,7 +7,7 @@ export const addToWaitlist = async (
 ) => {
   const existing = await prisma.waitlistEntry.findUnique({ where: { userId } });
   if (existing) {
-    throw new Error("L'utilisateur est déjà dans la file d'attente.");
+    return existing;
   }
 
   return prisma.waitlistEntry.create({
@@ -21,8 +21,11 @@ export const removeFromWaitlist = async (userId: number) => {
   });
 };
 
+/**
+ * Trouve un adversaire disponible sans le supprimer immédiatement.
+ */
 export const findOpponent = async (userId: number, timeControl: string) => {
-  const opponent = await prisma.waitlistEntry.findFirst({
+  return await prisma.waitlistEntry.findFirst({
     where: {
       userId: { not: userId },
       timeControl,
@@ -30,15 +33,4 @@ export const findOpponent = async (userId: number, timeControl: string) => {
     orderBy: { createdAt: "asc" },
     include: { user: true },
   });
-
-  if (!opponent) {
-    return null;
-  }
-
-  // Retire les deux joueurs de la file
-  await prisma.waitlistEntry.deleteMany({
-    where: { userId: { in: [userId, opponent.userId] } },
-  });
-
-  return opponent;
 };

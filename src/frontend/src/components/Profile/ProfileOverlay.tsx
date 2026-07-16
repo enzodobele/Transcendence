@@ -187,7 +187,12 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
           )}
         </div>
 
-        <button className="profile-logout-button" onClick={() => { logout(); onClose(); }}>
+        <button className="profile-logout-button"
+		onClick={() => {
+			logout();
+			onClose();
+			window.location.replace("/");
+		}}>
           <LogoutIcon className="logout-icon" />
           <span>Logout</span>
         </button>

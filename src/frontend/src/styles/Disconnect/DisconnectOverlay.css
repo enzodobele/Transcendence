@@ -1,0 +1,78 @@
+/* Conteneur invisible sur tout l'écran (laisse passer les clics) */
+.disconnection-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* Le petit encart en haut à droite (intercepte les clics) */
+.disconnection-content {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 260px;
+  background: var(--color-overlay-background, #18181b);
+  color: #ffffff;
+  border: 1px solid #ef4444;
+  padding: 12px;
+  border-radius: 8px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* En-tête */
+.disconnection-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.disconnection-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Timer */
+.disconnection-timer-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.disconnection-timer-countdown {
+  font-family: monospace;
+  font-weight: bold;
+  color: #ef4444;
+}
+
+/* Bouton d'action */
+.disconnection-claim-button {
+  width: 100%;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.disconnection-claim-button:hover {
+  background: #b91c1c;
+}
+
+/* Texte d'attente */
+.disconnection-wait-text {
+  font-size: 10px;
+  color: #71717a;
+  text-align: center;
+  font-style: italic;
+}
