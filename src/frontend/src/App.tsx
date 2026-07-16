@@ -1,16 +1,13 @@
-import { useState, useEffect, useRef } from "react";
-import { useChessGame } from "./hooks/chess/useChessGame";
 import { useAuth } from "./contexts/AuthContext";
-import { useGameWebSocket } from "./hooks/chess/useGameWebSocket";
-import { useStockfish } from "./hooks/useStockfish";
-import { useChessAI } from "./hooks/useChessAI";
+import { useGameLogic } from "./hooks/chess/useGameLogic";
 
 import "./styles/main.css";
 
 import { GameView } from "./components/Board/GameView";
 import { FloatingPiece } from "./components/Board/FloatingPiece";
 import { AnimatedPiece } from "./components/Board/AnimatedPiece";
-import { ChessGame3D } from "./components/Board/ChessGame3D";
+import { LobbyView } from "./components/LobbyView";
+import { DisconnectionOverlay } from "./components/Disconnect/DisconnectOverlay";
 
 import { LoginButton } from "./components/Login/LoginButton";
 import { ProfileButton } from "./components/Profile/ProfileButton";
@@ -19,148 +16,19 @@ import { Switch3DButton } from "./components/Board/Switch3DButton";
 
 export default function App() {
   const { isAuthenticated, isLoading, user, token, refreshUserStatus } = useAuth();
-  const [isLocalGame, setIsLocalGame] = useState(false);
-  const [isAIGame, setIsAIGame] = useState(false);
-  const [isCustomAI, setIsCustomAI] = useState(false);
-  const [isAIvsAI, setIsAIvsAI] = useState(false);
-  const [aiDifficulty, setAiDifficulty] = useState(3);
-  const [customGameOver, setCustomGameOver] = useState<string | null>(null);
-  const [drawOfferPending, setDrawOfferPending] = useState(false);
-  const [is3D, setIs3D] = useState(false);
-
-  const [isGameViewActive, setIsGameViewActive] = useState(false);
-  const [activeGameId, setActiveGameId] = useState<number | undefined>(undefined);
-  const [onlinePlayerColor, setOnlinePlayerColor] = useState<"white" | "black">("white");
-
-  const [isDemoMode, setIsDemoMode] = useState(true);
-  const demoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const isOnlineGame = !isLocalGame && !isAIGame && isGameViewActive;
-  const isInActiveGame = isLocalGame || isAIGame || isGameViewActive;
-  const playerColor: "white" | "black" = isLocalGame || isAIGame ? "white" : onlinePlayerColor;
-
-  let triggerServerMove = (_moveData: any) => {};
-
-  const { requestMove: requestStockfishMove } = useStockfish((from, to, promotion) => {
-    makeMove(from, to, promotion, true, true);
-  });
-
-  const { requestMove: requestCustomAIMove } = useChessAI((from, to, promotion) => {
-    makeMove(from, to, promotion, true, true);
-  });
 
   const {
+    isLocalGame, isAIGame, isAIvsAI, is3D, setIs3D,
+    customGameOver, drawOfferPending, isInActiveGame, playerColor,
     game, board, selected, lastMove, dragPiece, animatingPiece, clearAnimation,
-    handleSquareClick, handlePiecePointerDown, resetGame, capturedPieces,
-    pendingPromotion, handlePromotionChoice, makeMove, syncWithServerFen, customHistory,
-  } = useChessGame(playerColor, (move) => {
-    triggerServerMove(move);
-    if (isAIGame && !isAIvsAI) {
-      if (isCustomAI) requestCustomAIMove(game.fen());
-      else requestStockfishMove(game.fen(), aiDifficulty);
-    }
-  }, isLocalGame);
-
-  useEffect(() => {
-    if (!isAIvsAI || game.isGameOver() || customGameOver) return;
-    if (game.turn() === "w") requestCustomAIMove(game.fen());
-    else requestStockfishMove(game.fen(), aiDifficulty);
-  }, [board, isAIvsAI]);
-
-  const { sendMoveToServer, sendResign, sendDrawOffer, sendDrawAccept, sendDrawRefuse } = useGameWebSocket({
-    token,
-    gameId: activeGameId,
-    isLocalGame,
-    syncWithServerFen,
-    makeMove,
-    onGameOver: (reason, winnerColor) => {
-      setCustomGameOver(
-        reason === "resign"
-          ? winnerColor === "white" ? "Les blancs gagnent !" : "Les noirs gagnent !"
-          : "Partie nulle !"
-      );
-      refreshUserStatus();
-    },
-    onDrawOffer: () => setDrawOfferPending(true),
-    onDrawRefused: () => alert("La nulle a été refusée."),
-  });
-
-  triggerServerMove = sendMoveToServer;
-
-  useEffect(() => {
-    if (user?.currentGame?.id) {
-      setActiveGameId(user.currentGame.id);
-      setOnlinePlayerColor(
-        user.username === user.currentGame.player1?.username ? "white" : "black"
-      );
-      setIsGameViewActive(true);
-      setCustomGameOver(null);
-      setDrawOfferPending(false);
-      resetGame();
-    }
-  }, [user?.currentGame?.id]);
-
-  const handleReturnToMenu = () => {
-    setIsGameViewActive(false);
-    setActiveGameId(undefined);
-    setIsLocalGame(false);
-    setIsAIGame(false);
-    setIsCustomAI(false);
-    setIsAIvsAI(false);
-    setCustomGameOver(null);
-    setDrawOfferPending(false);
-    resetGame();
-  };
-
-  const handleStartAiGame = (difficulty: number) => {
-    handleReturnToMenu();
-    setAiDifficulty(difficulty);
-    setIsCustomAI(false);
-    setIsAIGame(true);
-  };
-
-  const handleStartCustomAI = () => {
-    handleReturnToMenu();
-    setIsCustomAI(true);
-    setIsAIGame(true);
-  };
-
-  const handleStartAIvsAI = (difficulty: number) => {
-    handleReturnToMenu();
-    setAiDifficulty(difficulty);
-    setIsAIvsAI(true);
-    setIsAIGame(true);
-  };
-
-  const handleStartLocalGame = () => {
-    handleReturnToMenu();
-    setIsLocalGame(true);
-  };
-
-  const handleResign = () => {
-    if (isOnlineGame) sendResign();
-    else setCustomGameOver(playerColor === "white" ? "Les noirs gagnent !" : "Les blancs gagnent !");
-  };
-
-  const handleOfferDraw = () => {
-    if (isOnlineGame) sendDrawOffer();
-    else setCustomGameOver("Partie nulle !");
-  };
-
-  const handleDrawAccept = () => { setDrawOfferPending(false); sendDrawAccept(); };
-  const handleDrawRefuse = () => { setDrawOfferPending(false); sendDrawRefuse(); };
-  const handleResetGame = () => { resetGame(); setCustomGameOver(null); };
-
-  const handleLobbyInteraction = (square?: string) => {
-    if (isDemoMode) setIsDemoMode(false);
-    if (demoTimeoutRef.current) clearTimeout(demoTimeoutRef.current);
-    demoTimeoutRef.current = setTimeout(() => setIsDemoMode(true), 3000);
-    if (square) handleSquareClick(square, true);
-  };
-
-  useEffect(() => {
-    return () => { if (demoTimeoutRef.current) clearTimeout(demoTimeoutRef.current); };
-  }, []);
+    capturedPieces, pendingPromotion, customHistory,
+    isOpponentDisconnected, disconnectTimeout,
+    
+    handleSquareClick, handlePiecePointerDown, handlePromotionChoice,
+    handleReturnToMenu, handleStartAiGame, handleStartCustomAI, handleStartAIvsAI,
+    handleStartLocalGame, handleResign, handleOfferDraw, handleDrawAccept,
+    handleDrawRefuse, handleResetGame, sendClaimVictory
+  } = useGameLogic({ user, token, refreshUserStatus });
 
   if (isLoading) {
     return (
@@ -174,19 +42,24 @@ export default function App() {
 
   return (
     <div className={`app${is3D && isInActiveGame ? " app-3d" : ""}`}>
+      {/* Profil / Connexion */}
       {isAuthenticated ? <ProfileButton /> : <LoginButton />}
 
+      {/* Boutons d'actions principaux */}
       {isInActiveGame && !gameIsOver ? (
         <Switch3DButton is3D={is3D} setIs3D={setIs3D} />
       ) : (
-        isAuthenticated && <FindGameButton
-          onStartLocalGame={handleStartLocalGame}
-          onStartAiGame={handleStartAiGame}
-          onStartCustomAI={handleStartCustomAI}
-          onStartAIvsAI={handleStartAIvsAI}
-        />
+        isAuthenticated && (
+          <FindGameButton
+            onStartLocalGame={handleStartLocalGame}
+            onStartAiGame={handleStartAiGame}
+            onStartCustomAI={handleStartCustomAI}
+            onStartAIvsAI={handleStartAIvsAI}
+          />
+        )
       )}
 
+      {/* Rendu principal : Partie active OU Lobby d'accueil */}
       {isInActiveGame ? (
         <GameView
           game={game} board={board} selected={selected} lastMove={lastMove}
@@ -208,28 +81,25 @@ export default function App() {
           onDrawRefuse={handleDrawRefuse}
         />
       ) : (
-        <div className="lobby-container">
-          <h1 className="title-chess">CHESS <span className="title-guard">GUARD</span></h1>
-          <p className="subtitle-chess-guard">Jouez en local ou en ligne</p>
-
-          <div className="lobby-chessboard-preview" onClick={() => handleLobbyInteraction()}>
-            <ChessGame3D
-              game={game} board={board} selected={selected} capturedPieces={capturedPieces}
-              pendingPromotion={!!pendingPromotion} onSquareClick={(square) => handleLobbyInteraction(square)}
-              onResetGame={resetGame} onPromotionChoice={handlePromotionChoice} isDemoMode={isDemoMode}
-            />
-          </div>
-
-          <div className="lobby-actions">
-            {!isAuthenticated && (
-              <p className="login-prompt">Connectez-vous pour défier des joueurs en ligne.</p>
-            )}
-          </div>
-        </div>
+        <LobbyView
+          isAuthenticated={isAuthenticated}
+          game={game} board={board} selected={selected}
+          capturedPieces={capturedPieces} pendingPromotion={pendingPromotion}
+          resetGame={handleResetGame} handlePromotionChoice={handlePromotionChoice}
+          handleSquareClick={handleSquareClick}
+        />
       )}
 
+      {/* Éléments Flottants & Overlays */}
       <FloatingPiece dragPiece={dragPiece} game={game} />
       {animatingPiece && <AnimatedPiece data={animatingPiece} onDone={clearAnimation} />}
+
+      {/* ⏱️ Overlay de déconnexion réseau de l'adversaire */}
+      <DisconnectionOverlay
+        isOpen={isOpponentDisconnected}
+        initialSeconds={disconnectTimeout}
+        onClaimVictory={sendClaimVictory}
+      />
     </div>
   );
 }
