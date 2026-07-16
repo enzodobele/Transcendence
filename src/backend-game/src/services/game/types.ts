@@ -6,4 +6,5 @@ export interface Room {
   players: { [userId: number]: WebSocket };
   game: Chess;
   pendingDrawOfferId?: number;
+  isGameOver?: boolean;
 }
