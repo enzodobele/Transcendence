@@ -13,6 +13,7 @@ model User {
   hashedPassword   String
   avatarUrl        String?
   lastSeen         DateTime?
+  currentGameId    Int?
   friendsAsUser1   Friend[]        @relation("User1Friends")
   friendsAsUser2   Friend[]        @relation("User2Friends")
   sentRequests     FriendRequest[] @relation("SentRequests")

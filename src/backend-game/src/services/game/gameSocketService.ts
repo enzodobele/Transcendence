@@ -1,7 +1,13 @@
 // src/backend/src/services/game/gameSocketService.ts
 import { WebSocketServer } from "ws";
 import http from "http";
-import { handleGameConnection, removePlayerFromRoom } from "./gameRoomManager";
+import {
+  handleGameConnection,
+  handleSpectatorConnection,
+  removePlayerFromRoom,
+  removeSpectatorFromRoom,
+  broadcastToSpectators,
+} from "./gameRoomManager";
 import { startDisconnectionTimer, cancelDisconnectionTimer } from "./disconnectionManager";
 import { handleAuthAndValidation } from "./handlers/authHandler";
 import { handlePlayerMove } from "./handlers/moveHandler";
@@ -20,11 +26,45 @@ export const initGameWebSocket = (server: http.Server) => {
     const url = new URL(req.url!, `http://${req.headers.host}`);
     const token = url.searchParams.get("token");
     const gameIdParam = url.searchParams.get("gameId");
+    const spectatorParam = url.searchParams.get("spectator");
 
-    const validation = await handleAuthAndValidation(socket, token, gameIdParam);
+    const validation = await handleAuthAndValidation(socket, token, gameIdParam, spectatorParam);
     if (!validation) return;
 
-    const { userId, gameId, dbGame } = validation;
+    if (validation.spectator) {
+      const spectatorValidation = validation as any;
+      const spectatorGameId: number = spectatorValidation.gameId;
+      const room = handleSpectatorConnection(socket, spectatorGameId, spectatorValidation.dbGame);
+
+      const movesFromDb = spectatorValidation.dbGame.moves ? spectatorValidation.dbGame.moves.sort((a: any, b: any) => a.id - b.id) : [];
+      const customMoveHistory = movesFromDb.map((m: any) => ({
+        piece: m.piece,
+        from: m.fromSquare,
+        to: m.toSquare,
+        isCheck: m.isCheck,
+        isCheckmate: m.isCheckmate,
+      }));
+
+      socket.send(
+        JSON.stringify({
+          type: "sync",
+          color: "spectator",
+          fen: room.game.fen(),
+          history: customMoveHistory,
+        }),
+      );
+
+      socket.on("close", () => {
+        removeSpectatorFromRoom(spectatorGameId, socket);
+      });
+
+      return;
+    }
+
+    const playerValidation = validation as any;
+    const userId: number = playerValidation.userId;
+    const gameId: number = playerValidation.gameId;
+    const dbGame = playerValidation.dbGame;
     const room = handleGameConnection(socket, gameId, userId, dbGame);
 
     // 🔄 TENTATIVE D'ANNULATION DU TIMER AFK (Reconnexion d'un joueur)
@@ -55,6 +95,8 @@ export const initGameWebSocket = (server: http.Server) => {
     if (room.players[opponentId]) {
       room.players[opponentId].send(JSON.stringify({ type: "opponent_connected" }));
     }
+
+    broadcastToSpectators(room, { type: "opponent_connected" });
 
     // Aiguillage des messages
     socket.on("message", async (data) => {

@@ -32,6 +32,7 @@ interface GameViewProps {
   onOfferDraw: () => void;
   onDrawAccept: () => void;
   onDrawRefuse: () => void;
+  isSpectator?: boolean;
 }
 
 function getGameOverMessage(game: any, t: (key: string) => string): string | null {
@@ -67,6 +68,7 @@ export function GameView({
   onOfferDraw,
   onDrawAccept,
   onDrawRefuse,
+  isSpectator = false,
 }: GameViewProps) {
   const { t } = useTranslation();
   const gameOverMessage = customGameOver ?? getGameOverMessage(game, t);
@@ -105,7 +107,7 @@ export function GameView({
       </div>
 
       <div className="game-actions">
-        {!gameOverMessage && !isLocalGame && (
+        {!isSpectator && !gameOverMessage && !isLocalGame && (
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button onClick={onResign} className="button-leave-game">
               <Flag size={15} /> {t("game.resign")}
@@ -117,14 +119,14 @@ export function GameView({
             )}
           </div>
         )}
-        {isLocalGame && (
+        {!isSpectator && isLocalGame && (
           <button onClick={onLeaveLocalGame} className="button-leave-game">
             <LogOut size={15} /> {t("game.quitLocal")}
           </button>
         )}
       </div>
 
-      {drawOfferPending && !gameOverMessage && (
+      {!isSpectator && drawOfferPending && !gameOverMessage && (
         <div className="gameover-overlay">
           <div className="gameover-content">
             <p className="gameover-message">{t("game.drawOffered")}</p>
@@ -144,7 +146,8 @@ export function GameView({
         <div className="gameover-overlay">
           <div className="gameover-content">
             <p className="gameover-message">{gameOverMessage}</p>
-            <div className="gameover-draw-actions">
+            {!isSpectator && (
+              <div className="gameover-draw-actions">
               {isAIGame && (
                 <button className="gameover-replay-btn" onClick={onResetGame}>
                   <RotateCcw size={15} /> {t("game.replay")}
@@ -153,7 +156,8 @@ export function GameView({
               <button className="gameover-refuse-btn" onClick={onReturnToMenu}>
                 <Home size={15} /> {t("game.mainMenu")}
               </button>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}

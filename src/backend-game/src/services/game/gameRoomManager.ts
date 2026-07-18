@@ -7,12 +7,10 @@ import { Room } from "./types";
 const activeRooms = new Map<number, Room>();
 
 /**
- * Initialise ou récupère une Room en RAM, en reconstituant l'historique si nécessaire
+ * Initialise ou récupère une Room en RAM, en reconstituant l'historique si nécessaire.
  */
-export function handleGameConnection(
-  socket: WebSocket,
+function getOrCreateRoom(
   gameId: number,
-  userId: number,
   dbGame: any,
 ): Room {
   let room = activeRooms.get(gameId);
@@ -21,6 +19,7 @@ export function handleGameConnection(
     room = {
       gameId,
       players: {},
+      spectators: new Set<WebSocket>(),
       game: new Chess(),
     };
 
@@ -49,13 +48,40 @@ export function handleGameConnection(
     activeRooms.set(gameId, room);
   }
 
+  return room;
+}
+
+/**
+ * Enregistre la connexion d'un joueur dans la room active correspondante.
+ */
+export function handleGameConnection(
+  socket: WebSocket,
+  gameId: number,
+  userId: number,
+  dbGame: any,
+): Room {
+  const room = getOrCreateRoom(gameId, dbGame);
+
   // Ajout du joueur actif
   room.players[userId] = socket;
   return room;
 }
 
 /**
- * Supprime un joueur de la room à la déconnexion
+ * Enregistre un spectateur dans la room active correspondante.
+ */
+export function handleSpectatorConnection(
+  socket: WebSocket,
+  gameId: number,
+  dbGame: any,
+): Room {
+  const room = getOrCreateRoom(gameId, dbGame);
+  room.spectators.add(socket);
+  return room;
+}
+
+/**
+ * Supprime un joueur de la room à la déconnexion.
  */
 export function removePlayerFromRoom(gameId: number, userId: number): void {
   const room = activeRooms.get(gameId);
@@ -66,7 +92,29 @@ export function removePlayerFromRoom(gameId: number, userId: number): void {
 }
 
 /**
- * Calcule l'état de fin de partie via le moteur chess.js
+ * Retire un spectateur de la room quand sa socket se ferme.
+ */
+export function removeSpectatorFromRoom(gameId: number, socket: WebSocket): void {
+  const room = activeRooms.get(gameId);
+  if (room && room.spectators.has(socket)) {
+    room.spectators.delete(socket);
+  }
+}
+
+/**
+ * Diffuse un message à tous les spectateurs connectés à la room.
+ */
+export function broadcastToSpectators(room: Room, payload: object): void {
+  const message = JSON.stringify(payload);
+  room.spectators.forEach((socket) => {
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(message);
+    }
+  });
+}
+
+/**
+ * Calcule l'état de fin de partie via le moteur chess.js.
  */
 export function checkGameStatus(room: Room, dbGame: any) {
   const isGameOver = room.game.isGameOver();
