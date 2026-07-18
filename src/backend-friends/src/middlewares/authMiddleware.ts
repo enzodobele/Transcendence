@@ -17,7 +17,7 @@ if (!JWT_SECRET) {
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Token manquant." });
+    return res.status(401).json({ error: "TOKEN_INVALID" });
   }
 
   const token = authHeader.split(" ")[1];
@@ -30,6 +30,6 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     req.user = decoded;
     next();
   } catch {
-    return res.status(401).json({ error: "Token invalide ou expiré." });
+    return res.status(401).json({ error: "TOKEN_INVALID" });
   }
 };

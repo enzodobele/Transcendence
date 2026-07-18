@@ -41,7 +41,7 @@ app.get("/health", (req, res) => {
 app.post("/matchmaking/join", async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Authentification requise" });
+    return res.status(401).json({ error: "UNAUTHORIZED" });
   }
 
   const token = authHeader.split(" ")[1];
@@ -53,7 +53,7 @@ app.post("/matchmaking/join", async (req: Request, res: Response) => {
     userId = Number(decoded.userId);
   } catch (error) {
     console.error("[Matchmaking] Échec d'authentification JWT:", error);
-    return res.status(401).json({ error: "Session expirée ou jeton invalide" });
+    return res.status(401).json({ error: "TOKEN_INVALID" });
   }
 
   // 2. ♟️ ÉTAPE 2 : Logique de Matchmaking
@@ -85,17 +85,17 @@ app.post("/matchmaking/join", async (req: Request, res: Response) => {
         console.error("❌ [Matchmaking] Échec lors de la création de la partie par le Game Service :", axiosError.message);
         
         // On ne supprime personne de la waitlist pour qu'ils retentent leur chance lors du prochain cycle
-        return res.status(502).json({ 
-          error: "Le service de jeu n'a pas pu démarrer la partie. Veuillez patienter..." 
+        return res.status(502).json({
+          error: "SERVER_ERROR"
         });
       }
     }
 
     // Aucun adversaire trouvé pour le moment
-    return res.json({ waiting: true, message: "En attente d'un adversaire..." });
+    return res.json({ waiting: true, message: "WAITING_FOR_OPPONENT" });
   } catch (error) {
     console.error("[Matchmaking] Erreur critique lors de l'exécution du matchmaking:", error);
-    return res.status(500).json({ error: "Erreur interne du serveur de matchmaking" });
+    return res.status(500).json({ error: "SERVER_ERROR" });
   }
 });
 
@@ -103,7 +103,7 @@ app.post("/matchmaking/leave", async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Non autorisé" });
+    return res.status(401).json({ error: "UNAUTHORIZED" });
   }
 
   try {
@@ -113,9 +113,9 @@ app.post("/matchmaking/leave", async (req: Request, res: Response) => {
     
     await removeFromWaitlist(userId);
     console.log(`[Matchmaking] User #${userId} a quitté manuellement la file d'attente.`);
-    return res.json({ message: "Vous avez quitté la file d'attente." });
+    return res.json({ message: "LEFT_QUEUE" });
   } catch (e) {
-    return res.status(401).json({ error: "Jeton invalide" });
+    return res.status(401).json({ error: "TOKEN_INVALID" });
   }
 });
 
