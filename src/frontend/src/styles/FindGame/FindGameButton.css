@@ -1,13 +1,47 @@
-/* src/frontend/src/styles/FindGame/FindGameButton.css */
-.button-find-game {
+
+button.button-find-game {
   position: absolute;
   top: clamp(0.4rem, 0.8vw, 0.6rem);
   right: clamp(0.4rem, 0.8vw, 0.6rem);
   z-index: 6;
+
+  width: 2.3rem;
+  height: 2.3rem;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: linear-gradient(150deg, #4b8060 0%, #2d4d3a 55%, #1f2e23 100%);
+  color: var(--color-primary-light);
+  box-shadow:
+    0 0.2rem 0.5rem rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.25s ease;
 }
 
-.button-find-game {
-  cursor: pointer;
+button.button-find-game::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6) 50%, transparent);
+  transform: translateX(-260%) skewX(-20deg);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+button.button-find-game:hover {
+  box-shadow:
+    0 0 0.7rem rgba(45, 77, 58, 0.5),
+    0 0.25rem 0.6rem rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+button.button-find-game:hover::before {
+  transform: translateX(360%) skewX(-20deg);
 }
 
 .lobby-error {
@@ -15,3 +49,4 @@
   font-size: 0.8rem;
   margin: 0 0 0.2rem 0;
 }
+

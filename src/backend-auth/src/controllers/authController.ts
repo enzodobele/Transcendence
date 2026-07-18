@@ -89,3 +89,19 @@ export const login = async (req: Request, res: Response) => {
     res.status(400).json({ error: "Erreur lors de la connexion" });
   }
 };
+
+export const deleteAccount = async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+  if (!userId) return res.status(401).json({ error: "Non autorisé" });
+
+  try {
+    await prisma.user.delete({ where: { id: userId } });
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Erreur lors de la suppression du compte :", error);
+    return res.status(409).json({
+      error:
+        "Impossible de supprimer ce compte pour le moment : des parties y sont encore liées.",
+    });
+  }
+};

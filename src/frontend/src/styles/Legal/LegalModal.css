@@ -1,0 +1,92 @@
+.legal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(10, 12, 14, 0.38);
+  backdrop-filter: blur(10px);
+  z-index: 1100;
+}
+
+.legal-content {
+  position: relative;
+  width: min(100%, 34rem);
+  max-height: min(85svh, 42rem);
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--color-overlay-background);
+  color: #1f1c17;
+  border: 1px solid rgba(30, 25, 18, 0.1);
+  box-shadow: 0 24px 60px rgba(14, 16, 18, 0.25);
+}
+
+.legal-close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  background: transparent;
+  color: rgba(31, 28, 23, 0.7);
+  font-size: 1.1rem;
+}
+
+.legal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding-right: 2rem;
+}
+
+.legal-tab {
+  border: none;
+  background: rgba(31, 28, 23, 0.06);
+  color: rgba(31, 28, 23, 0.68);
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.legal-tab-active {
+  background: linear-gradient(135deg, #d8a86c 0%, #b87e45 100%);
+  color: #23160e;
+}
+
+.legal-body {
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  text-align: left;
+}
+
+.legal-title {
+  margin: 0 0 0.1rem;
+  font-size: 1.3rem;
+}
+
+.legal-updated {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  color: rgba(31, 28, 23, 0.55);
+}
+
+.legal-body h3 {
+  margin: 1rem 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.legal-body p,
+.legal-body li {
+  margin: 0.2rem 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(31, 28, 23, 0.85);
+}
+
+.legal-body ul {
+  margin: 0.2rem 0;
+  padding-left: 1.2rem;
+}

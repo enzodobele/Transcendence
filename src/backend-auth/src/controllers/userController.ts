@@ -120,3 +120,19 @@ export const heartbeat = async (req: Request, res: Response) => {
   await prisma.user.update({ where: { id: userId }, data: { lastSeen: new Date() } });
   return res.status(204).send();
 };
+
+export const deleteAccount = async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+  if (!userId) return res.status(401).json({ error: "Non autorisé" });
+
+  try {
+    await prisma.user.delete({ where: { id: userId } });
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Erreur lors de la suppression du compte :", error);
+    return res.status(409).json({
+      error:
+        "Impossible de supprimer ce compte pour le moment : des parties y sont encore liées.",
+    });
+  }
+};
