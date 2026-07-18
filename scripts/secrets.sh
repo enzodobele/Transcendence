@@ -43,7 +43,7 @@ generate_password              > "$SECRETS_DIR/prod_jwt_secret.txt"
 # =============================================
 # 🔒 Permissions strictes
 # =============================================
-sudo chgrp 1001 "$SECRETS_DIR"/*.txt 2>/dev/null || chgrp 1001 "$SECRETS_DIR"/*.txt
+chgrp 1001 "$SECRETS_DIR"/*.txt 2>/dev/null || chgrp 1001 "$SECRETS_DIR"/*.txt
 chmod 640 "$SECRETS_DIR"/*.txt
 chmod 750 "$SECRETS_DIR"
 
