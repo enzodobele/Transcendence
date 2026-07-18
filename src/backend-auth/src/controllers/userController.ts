@@ -117,6 +117,16 @@ export const heartbeat = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   if (!userId) return res.status(401).json({ error: "Non autorisé" });
 
-  await prisma.user.update({ where: { id: userId }, data: { lastSeen: new Date() } });
-  return res.status(204).send();
+  try {
+    await prisma.user.update({ where: { id: userId }, data: { lastSeen: new Date() } });
+    return res.status(204).send();
+  } catch (error) {
+    // Cas fréquent après reseed: token valide en localStorage mais user supprimé/recréé.
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code?: string }).code === "P2025") {
+      return res.status(401).json({ error: "Session expirée ou utilisateur introuvable" });
+    }
+
+    console.error("Erreur heartbeat:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
 };

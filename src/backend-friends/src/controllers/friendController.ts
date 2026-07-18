@@ -6,8 +6,8 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
   const senderId = req.user?.userId;
   if (!senderId) return res.status(401).json({ error: "Non autorisé" });
 
-  const { username } = req.body;
-  if (!username?.trim()) return res.status(400).json({ error: "Username requis." });
+  const username = typeof req.body?.username === "string" ? req.body.username.trim() : "";
+  if (!username) return res.status(400).json({ error: "Username requis." });
 
   try {
     const receiver = await prisma.user.findUnique({
@@ -59,7 +59,7 @@ export const getIncomingRequests = async (req: Request, res: Response) => {
       include: { sender: { select: { id: true, username: true, avatarUrl: true } } },
       orderBy: { createdAt: "desc" },
     });
-    return res.json(requests.map((r) => ({ id: r.id, sender: r.sender, createdAt: r.createdAt })));
+    return res.json(requests.map((r: typeof requests[number]) => ({ id: r.id, sender: r.sender, createdAt: r.createdAt })));
   } catch (error) {
     console.error("Erreur getIncomingRequests:", error);
     return res.status(500).json({ error: "Erreur serveur" });
@@ -71,7 +71,7 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   if (!userId) return res.status(401).json({ error: "Non autorisé" });
 
-  const requestId = parseInt(req.params.id);
+  const requestId = Number(req.params.id);
   if (isNaN(requestId)) return res.status(400).json({ error: "ID invalide." });
 
   try {
@@ -99,7 +99,7 @@ export const deleteFriendRequest = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   if (!userId) return res.status(401).json({ error: "Non autorisé" });
 
-  const requestId = parseInt(req.params.id);
+  const requestId = Number(req.params.id);
   if (isNaN(requestId)) return res.status(400).json({ error: "ID invalide." });
 
   try {
@@ -126,18 +126,19 @@ export const getFriends = async (req: Request, res: Response) => {
     const rows = await prisma.friend.findMany({
       where: { OR: [{ user1Id: userId }, { user2Id: userId }] },
       include: {
-        user1: { select: { id: true, username: true, avatarUrl: true, lastSeen: true } },
-        user2: { select: { id: true, username: true, avatarUrl: true, lastSeen: true } },
+        user1: { select: { id: true, username: true, avatarUrl: true, lastSeen: true, currentGameId: true } },
+        user2: { select: { id: true, username: true, avatarUrl: true, lastSeen: true, currentGameId: true } },
       },
     });
     const now = Date.now();
-    const friends = rows.map((f) => {
+    const friends = rows.map((f: typeof rows[number]) => {
       const u = f.user1Id === userId ? f.user2 : f.user1;
       return {
         id: u.id,
         username: u.username,
         avatarUrl: u.avatarUrl,
         isOnline: u.lastSeen ? now - u.lastSeen.getTime() < ONLINE_THRESHOLD_MS : false,
+        currentGameId: u.currentGameId,
       };
     });
     return res.json(friends);

@@ -3,13 +3,38 @@ import path from "path";
 import multer from "multer";
 import { register, login } from "./controllers/authController";
 import userRoutes from "./routes/userRoutes";
+import prisma from "./prisma";
 
 const app = express();
 app.use(express.json());
 
+function formatUptime(totalSeconds: number): string
+{
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}h${minutes.toString().padStart(2, "0")}m`;
+}
+
 // Point d'entrée Santé
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+app.get("/health", async (_req: Request, res: Response) => {
+  const uptime = formatUptime(process.uptime());
+
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return res.status(200).json({
+      status: "ok",
+      database: "connected",
+      uptime,
+    });
+  } catch (error) {
+    console.error("[health] Database check failed:", error);
+    return res.status(503).json({
+      status: "degraded",
+      database: "disconnected",
+      uptime,
+    });
+  }
 });
 
 // Routes d'authentification pures

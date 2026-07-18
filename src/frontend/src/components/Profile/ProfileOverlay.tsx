@@ -19,6 +19,7 @@ interface Friend {
   username: string;
   avatarUrl: string | null;
   isOnline: boolean;
+  currentGameId?: number | null;
 }
 
 interface ProfileOverlayProps {
@@ -35,6 +36,7 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(false);
+  const isCurrentUserInGame = !!user?.currentGame?.id;
 
   const reload = () => {
     getFriends().then(setFriends).catch(() => {});
@@ -164,6 +166,14 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
                   <img src={f.avatarUrl || defaultAvatarUrl} alt={f.username} className="profile-friend-avatar" />
                   <span className="profile-friend-name">{f.username}</span>
                   <span className={`profile-presence-dot ${f.isOnline ? "online" : "offline"}`} />
+                  {f.currentGameId && f.isOnline && !isCurrentUserInGame && (
+                    <button
+                      className="profile-request-btn accept"
+                      onClick={() => window.location.assign(`/spectate?gameId=${f.currentGameId}`)}
+                    >
+                      Spectate
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

@@ -31,6 +31,7 @@ interface GameViewProps {
   onOfferDraw: () => void;
   onDrawAccept: () => void;
   onDrawRefuse: () => void;
+  isSpectator?: boolean;
 }
 
 function getGameOverMessage(game: any): string | null {
@@ -66,6 +67,7 @@ export function GameView({
   onOfferDraw,
   onDrawAccept,
   onDrawRefuse,
+  isSpectator = false,
 }: GameViewProps) {
   const gameOverMessage = customGameOver ?? getGameOverMessage(game);
 
@@ -103,7 +105,7 @@ export function GameView({
       </div>
 
       <div className="game-actions">
-        {!gameOverMessage && !isLocalGame && (
+        {!isSpectator && !gameOverMessage && !isLocalGame && (
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button onClick={onResign} className="button-leave-game">
               <Flag size={15} /> Abandonner
@@ -115,14 +117,14 @@ export function GameView({
             )}
           </div>
         )}
-        {isLocalGame && (
+        {!isSpectator && isLocalGame && (
           <button onClick={onLeaveLocalGame} className="button-leave-game">
             <LogOut size={15} /> Quitter la partie locale
           </button>
         )}
       </div>
 
-      {drawOfferPending && !gameOverMessage && (
+      {!isSpectator && drawOfferPending && !gameOverMessage && (
         <div className="gameover-overlay">
           <div className="gameover-content">
             <p className="gameover-message">Nulle proposée</p>
@@ -142,7 +144,8 @@ export function GameView({
         <div className="gameover-overlay">
           <div className="gameover-content">
             <p className="gameover-message">{gameOverMessage}</p>
-            <div className="gameover-draw-actions">
+            {!isSpectator && (
+              <div className="gameover-draw-actions">
               {isAIGame && (
                 <button className="gameover-replay-btn" onClick={onResetGame}>
                   <RotateCcw size={15} /> Rejouer
@@ -151,7 +154,8 @@ export function GameView({
               <button className="gameover-refuse-btn" onClick={onReturnToMenu}>
                 <Home size={15} /> Menu principal
               </button>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}

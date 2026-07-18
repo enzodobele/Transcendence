@@ -1,7 +1,7 @@
 // src/backend/src/services/game/handlers/moveHandler.ts
 import { WebSocket } from "ws";
 import { Room } from "../types";
-import { checkGameStatus } from "../gameRoomManager";
+import { checkGameStatus, broadcastToSpectators } from "../gameRoomManager";
 import { saveMoveToDatabase } from "../gameDbService";
 
 export async function handlePlayerMove(
@@ -60,6 +60,8 @@ export async function handlePlayerMove(
         JSON.stringify({ type: "opponent_move", move: movePayload, fen: nextFen })
       );
     }
+
+    broadcastToSpectators(room, { type: "opponent_move", move: movePayload, fen: nextFen });
 
     saveMoveToDatabase(
       gameId,

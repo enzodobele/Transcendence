@@ -3,12 +3,15 @@ import { WebSocket } from "ws";
 import { Room } from "../types";
 import { saveGameOverNoMove } from "../gameDbService";
 import { isVictoryClaimable, clearTimer } from "../disconnectionManager";
+import { broadcastToSpectators } from "../gameRoomManager";
 
 function broadcast(room: Room, dbGame: any, payload: object) {
   const msg = JSON.stringify(payload);
   for (const id of [dbGame.player1Id, dbGame.player2Id]) {
     room.players[id]?.send(msg);
   }
+
+  broadcastToSpectators(room, payload);
 }
 
 export async function handleResign(userId: number, gameId: number, room: Room, dbGame: any) {

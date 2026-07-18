@@ -27,7 +27,7 @@ REQUIRED_DEV_SECRETS := \
     $(SECRETS_DIR)/portainer_password.txt
 
 
-.PHONY: up down rebuild restart logs ps exec db-seed db-migrate format \
+.PHONY: up down rebuild restart logs ps exec db-seed db-migrate format backup restore \
         prod prod-down prod-rebuild prod-logs prod-ps prod-exec prod-db-seed \
         clean fclean prod-clean prod-fclean check-types
 
@@ -88,6 +88,15 @@ format:
 	@$(COMPOSE_DEV) exec backend-auth npm run format || true
 	@$(COMPOSE_DEV) exec backend-matchmaking npm run format || true
 	@$(COMPOSE_DEV) exec frontend npm run format || true
+
+backup:
+	@echo "[+] Lancement d'un backup PostgreSQL..."
+	@./scripts/backup.sh
+
+restore:
+	@if [ -z "$(FILE)" ]; then echo "Usage: make restore FILE=backups/<dump.sql.gz>"; exit 1; fi
+	@echo "[+] Restauration de la sauvegarde $(FILE)..."
+	@./scripts/restore.sh "$(FILE)"
 
 # =========================================================================
 # 🚀 ENVIRONNEMENT DE PRODUCTION (VPS / Serveur)
