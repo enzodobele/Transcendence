@@ -1,5 +1,6 @@
 // src/frontend/src/components/Disconnect/DisconnectOverlay.tsx
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import "../../styles/Disconnect/DisconnectOverlay.css";
 
 interface DisconnectionOverlayProps {
@@ -13,6 +14,7 @@ export const DisconnectionOverlay: React.FC<DisconnectionOverlayProps> = ({
   initialSeconds,
   onClaimVictory,
 }) => {
+  const { t } = useTranslation();
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
   const [canClaim, setCanClaim] = useState(false);
 
@@ -53,23 +55,23 @@ export const DisconnectionOverlay: React.FC<DisconnectionOverlayProps> = ({
         
         <div className="disconnection-header">
           <span style={{ color: "#ef4444" }}>⚠️</span>
-          <h4 className="disconnection-title">Adversaire déconnecté</h4>
+          <h4 className="disconnection-title">{t("disconnect.title")}</h4>
         </div>
 
         <div className="disconnection-timer-row">
-          <span>Temps restant :</span>
+          <span>{t("disconnect.timeRemaining")}</span>
           <span className="disconnection-timer-countdown">
-            {secondsLeft > 0 ? formatTime(secondsLeft) : "Prêt"}
+            {secondsLeft > 0 ? formatTime(secondsLeft) : t("disconnect.ready")}
           </span>
         </div>
 
         {canClaim ? (
           <button onClick={onClaimVictory} className="disconnection-claim-button">
-            Gagner par forfait
+            {t("disconnect.claimVictory")}
           </button>
         ) : (
           <div className="disconnection-wait-text">
-            Attente requise avant victoire.
+            {t("disconnect.waitRequired")}
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import { updateProfile, uploadAvatar } from "../../services/auth";
 import defaultAvatarUrl from "../../assets/Logo/default-avatar.svg";
@@ -10,6 +11,7 @@ interface ProfileEditOverlayProps {
 }
 
 export function ProfileEditOverlay({ isOpen, onClose }: ProfileEditOverlayProps) {
+  const { t } = useTranslation();
   const { user, refreshUserStatus } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -34,8 +36,8 @@ export function ProfileEditOverlay({ isOpen, onClose }: ProfileEditOverlayProps)
       await updateProfile({ username, email });
       await refreshUserStatus();
       onClose();
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de la mise à jour du profil");
+    } catch (err) {
+      setError(t("errors." + (err instanceof Error ? err.message : "GENERIC"), { defaultValue: t("errors.GENERIC") }));
     }
   }
 
@@ -47,8 +49,8 @@ export function ProfileEditOverlay({ isOpen, onClose }: ProfileEditOverlayProps)
       setAvatarError("");
       await uploadAvatar(file);
       await refreshUserStatus();
-    } catch (err: any) {
-      setAvatarError(err.message || "Erreur lors de l'envoi de l'avatar");
+    } catch (err) {
+      setAvatarError(t("errors." + (err instanceof Error ? err.message : "GENERIC"), { defaultValue: t("errors.GENERIC") }));
     }
   }
 
@@ -81,18 +83,18 @@ export function ProfileEditOverlay({ isOpen, onClose }: ProfileEditOverlayProps)
           </svg>
         </button>
 
-        <h2 className="profile-edit-title">Modifier le profil</h2>
-        <p className="profile-edit-subtitle">Mettez à jour vos informations</p>
+        <h2 className="profile-edit-title">{t("profile.editProfile")}</h2>
+        <p className="profile-edit-subtitle">{t("profile.editSubtitle")}</p>
 
         {error && <p className="profile-edit-error">{error}</p>}
 
         <img
           src={user.avatarUrl || defaultAvatarUrl}
-          alt="Avatar actuel"
+          alt={t("profile.currentAvatarAlt")}
           className="profile-edit-avatar-preview"
         />
         <label className="profile-edit-label" htmlFor="avatar-input">
-          Avatar
+          {t("profile.avatarAlt")}
         </label>
         <input
           id="avatar-input"
@@ -103,7 +105,7 @@ export function ProfileEditOverlay({ isOpen, onClose }: ProfileEditOverlayProps)
         />
         {avatarError && <p className="profile-edit-error">{avatarError}</p>}
 
-        <strong className="profile-edit-label">Pseudo</strong>
+        <strong className="profile-edit-label">{t("profile.pseudo")}</strong>
         <input
           type="text"
           value={username}
@@ -111,7 +113,7 @@ export function ProfileEditOverlay({ isOpen, onClose }: ProfileEditOverlayProps)
           className="profile-edit-input"
         />
 
-        <strong className="profile-edit-label">Email</strong>
+        <strong className="profile-edit-label">{t("profile.email")}</strong>
         <input
           type="text"
           value={email}
@@ -120,7 +122,7 @@ export function ProfileEditOverlay({ isOpen, onClose }: ProfileEditOverlayProps)
         />
 
         <button type="submit" className="profile-edit-submit-button">
-          Enregistrer
+          {t("profile.save")}
         </button>
       </form>
     </div>

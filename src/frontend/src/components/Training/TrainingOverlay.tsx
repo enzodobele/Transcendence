@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import "../../styles/Training/TrainingOverlay.css";
 
 interface TrainingOverlayProps {
@@ -8,14 +9,15 @@ interface TrainingOverlayProps {
 }
 
 const DIFFICULTIES = [
-  { level: 1, label: "Débutant",      elo: "~800",   description: "Pour apprendre les bases" },
-  { level: 2, label: "Facile",        elo: "~1100",  description: "Un adversaire indulgent" },
-  { level: 3, label: "Intermédiaire", elo: "~1500",  description: "Un vrai défi équilibré" },
-  { level: 4, label: "Difficile",     elo: "~2000",  description: "Pour les joueurs confirmés" },
-  { level: 5, label: "Expert",        elo: "~2800",  description: "Bonne chance..." },
+  { level: 1, key: "beginner",     elo: "~800" },
+  { level: 2, key: "easy",         elo: "~1100" },
+  { level: 3, key: "intermediate", elo: "~1500" },
+  { level: 4, key: "hard",         elo: "~2000" },
+  { level: 5, key: "expert",       elo: "~2800" },
 ];
 
 export function TrainingOverlay({ isOpen, onClose, onStart }: TrainingOverlayProps) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState(3);
 
   if (!isOpen) return null;
@@ -32,8 +34,8 @@ export function TrainingOverlay({ isOpen, onClose, onStart }: TrainingOverlayPro
           </svg>
         </button>
 
-        <h2 className="training-title">Entraînement</h2>
-        <p className="training-subtitle">Choisissez votre niveau de difficulté</p>
+        <h2 className="training-title">{t("training.title")}</h2>
+        <p className="training-subtitle">{t("training.subtitle")}</p>
 
         <div className="training-difficulties">
           {DIFFICULTIES.map((d) => (
@@ -43,16 +45,16 @@ export function TrainingOverlay({ isOpen, onClose, onStart }: TrainingOverlayPro
               onClick={() => setSelected(d.level)}
             >
               <div className="training-difficulty-header">
-                <span className="training-difficulty-label">{d.label}</span>
+                <span className="training-difficulty-label">{t(`training.difficulty.${d.key}.label`)}</span>
                 <span className="training-difficulty-elo">{d.elo}</span>
               </div>
-              <span className="training-difficulty-desc">{d.description}</span>
+              <span className="training-difficulty-desc">{t(`training.difficulty.${d.key}.description`)}</span>
             </button>
           ))}
         </div>
 
         <button className="training-start-button" onClick={() => onStart(selected)}>
-          Jouer
+          {t("training.play")}
         </button>
 
       </div>

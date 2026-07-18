@@ -1,19 +1,19 @@
 // frontend/src/services/auth.ts
 
-// Extrait un message d'erreur lisible depuis une réponse HTTP, même si le corps
-// n'est pas du JSON (ex: page d'erreur HTML renvoyée par nginx sur un 413/502).
+// Extracts the error code from an HTTP response. The code is translated at the
+// display site via the `errors` namespace. Also handles a non-JSON body (e.g. 413 nginx).
 async function extractErrorMessage(
   response: Response,
-  fallback: string,
+  fallbackCode: string,
 ): Promise<string> {
   try {
     const error = await response.json();
-    return error.error || fallback;
+    return error.error || fallbackCode;
   } catch {
     if (response.status === 413) {
-      return "Fichier trop volumineux.";
+      return "FILE_TOO_LARGE";
     }
-    return `${fallback} (${response.status})`;
+    return fallbackCode;
   }
 }
 
@@ -43,7 +43,7 @@ export async function register(
   });
 
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, "Erreur lors de l'inscription"));
+    throw new Error(await extractErrorMessage(response, "REGISTRATION_FAILED"));
   }
 
   return response.json();
@@ -57,7 +57,7 @@ export async function login(email: string, password: string) {
   });
 
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, "Erreur lors de la connexion"));
+    throw new Error(await extractErrorMessage(response, "LOGIN_FAILED"));
   }
 
   return response.json(); // Doit renvoyer { token: "..." }
@@ -72,7 +72,7 @@ export async function fetchMe() {
 
   if (!response.ok) {
     // Si le token est invalide/expiré, on rejette pour nettoyer le stockage côté Context
-    throw new Error("Session expirée ou invalide");
+    throw new Error("TOKEN_INVALID");
   }
 
   return response.json(); // Renvoie { userId: X, username: "Y", currentGameId: Z }
@@ -90,7 +90,7 @@ export async function updateProfile(fields: {
 
   if (!response.ok) {
     throw new Error(
-      await extractErrorMessage(response, "Erreur lors de la mise à jour du profil"),
+      await extractErrorMessage(response, "SERVER_ERROR"),
     );
   }
 
@@ -105,7 +105,7 @@ export async function sendFriendRequest(username: string) {
   });
 
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, "Erreur lors de l'envoi de la demande"));
+    throw new Error(await extractErrorMessage(response, "SERVER_ERROR"));
   }
 
   return response.json();
@@ -122,7 +122,7 @@ export async function getFriends(): Promise<{ id: number; username: string; avat
   });
 
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, "Erreur lors de la récupération des amis"));
+    throw new Error(await extractErrorMessage(response, "SERVER_ERROR"));
   }
 
   return response.json();
@@ -141,7 +141,7 @@ export async function getIncomingRequests(): Promise<FriendRequest[]> {
   });
 
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, "Erreur lors de la récupération des demandes"));
+    throw new Error(await extractErrorMessage(response, "SERVER_ERROR"));
   }
 
   return response.json();
@@ -154,7 +154,7 @@ export async function acceptFriendRequest(id: number) {
   });
 
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, "Erreur lors de l'acceptation"));
+    throw new Error(await extractErrorMessage(response, "SERVER_ERROR"));
   }
 
   return response.json();
@@ -167,7 +167,7 @@ export async function rejectFriendRequest(id: number) {
   });
 
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, "Erreur lors du refus"));
+    throw new Error(await extractErrorMessage(response, "SERVER_ERROR"));
   }
 
   return response.json();
@@ -186,7 +186,7 @@ export async function uploadAvatar(file: File) {
 
   if (!response.ok) {
     throw new Error(
-      await extractErrorMessage(response, "Erreur lors de l'envoi de l'avatar"),
+      await extractErrorMessage(response, "SERVER_ERROR"),
     );
   }
 

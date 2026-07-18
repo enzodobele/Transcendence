@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Swords } from "lucide-react";
 import { useFindGame } from "../../hooks/useFindGame";
 import { FindGameOverlay } from "./FindGameOverlay";
@@ -12,15 +13,16 @@ interface FindGameButtonProps {
 }
 
 export function FindGameButton({ onStartLocalGame, onStartAiGame, onStartCustomAI, onStartAIvsAI }: FindGameButtonProps) {
+  const { t } = useTranslation();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const { isSearching, error, startSearch, cancelSearch } = useFindGame();
 
   return (
     <>
       <div className="find-game-wrapper">
-        {error && <p className="lobby-error">{error}</p>}
+        {error && <p className="lobby-error">{t("errors." + error, { defaultValue: t("errors.GENERIC") })}</p>}
         <button onClick={() => setIsOverlayOpen(true)} className="button-find-game">
-          <Swords size={18} /> Jouer
+          <Swords size={18} /> {t("findGame.play")}
         </button>
       </div>
 

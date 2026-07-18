@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Users, Bot, Brain, Cpu, Globe, UserPlus } from "lucide-react";
 import "../../styles/FindGame/FindGameOverlay.css";
 import { ModeCard } from "./ModeCard";
@@ -27,6 +28,7 @@ export function FindGameOverlay({
   onStartCustomAI,
   onStartAIvsAI,
 }: FindGameOverlayProps) {
+  const { t } = useTranslation();
   const [isTrainingOpen, setIsTrainingOpen] = useState(false);
   const [isAIvsAIOpen, setIsAIvsAIOpen] = useState(false);
 
@@ -47,54 +49,54 @@ export function FindGameOverlay({
   };
 
   const handleCreateFriendDuel = () => {
-    alert("Lien d'invitation bientôt dispo ! (En attente du backend)");
+    alert(t("findGame.inviteComingSoon"));
   };
 
   const GAME_MODES = [
     {
       id: "local",
-      title: "Partie Libre",
-      description: "Jouez tranquillement sur un échiquier local, sans pression.",
+      title: t("findGame.modes.local.title"),
+      description: t("findGame.modes.local.description"),
       direction: "down" as const,
       action: () => { onSelectLocalGame(); onClose(); },
       icon: Users,
     },
     {
       id: "ai",
-      title: "Entraînement",
-      description: "Affrontez Stockfish pour parfaire vos ouvertures.",
+      title: t("findGame.modes.ai.title"),
+      description: t("findGame.modes.ai.description"),
       direction: "down" as const,
       action: handleStartAiGame,
       icon: Bot,
     },
     {
       id: "custom-ai",
-      title: "IA Maison",
-      description: "Affrontez notre IA entraînée sur 1M de parties Lichess.",
+      title: t("findGame.modes.customAi.title"),
+      description: t("findGame.modes.customAi.description"),
       direction: "down" as const,
       action: onStartCustomAI,
       icon: Brain,
     },
     {
       id: "ai-vs-ai",
-      title: "IA vs IA",
-      description: "Regardez notre IA affronter Stockfish.",
+      title: t("findGame.modes.aiVsAi.title"),
+      description: t("findGame.modes.aiVsAi.description"),
       direction: "down" as const,
       action: () => setIsAIvsAIOpen(true),
       icon: Cpu,
     },
     {
       id: "matchmaking",
-      title: "Matchmaking Aléatoire",
-      description: "Trouvez un adversaire à votre taille en ligne (Classement Elo).",
+      title: t("findGame.modes.matchmaking.title"),
+      description: t("findGame.modes.matchmaking.description"),
       direction: "up" as const,
       action: onStartMatchmaking,
       icon: Globe,
     },
     {
       id: "duel",
-      title: "Duel d'amis",
-      description: "Créez une salle privée et envoyez un lien de défi.",
+      title: t("findGame.modes.duel.title"),
+      description: t("findGame.modes.duel.description"),
       direction: "up" as const,
       action: handleCreateFriendDuel,
       icon: UserPlus,
@@ -134,11 +136,11 @@ export function FindGameOverlay({
           /* ════════ SUB-ÉCRAN 2 : ATTENTE MATCHMAKING ════════ */
           <div className="matchmaking-searching-view">
             <div className="matchmaking-spinner"></div>
-            <h3 className="matchmaking-title">Recherche d'un adversaire</h3>
-            <p className="pulse-text">Veuillez patienter pendant que nous vous trouvons un rival...</p>
-            
+            <h3 className="matchmaking-title">{t("findGame.searching")}</h3>
+            <p className="pulse-text">{t("findGame.searchingSubtitle")}</p>
+
             <button onClick={onCancelMatchmaking} className="button-cancel-game">
-              Annuler la recherche
+              {t("findGame.cancelSearch")}
             </button>
           </div>
         )}

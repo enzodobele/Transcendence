@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import LogoutIcon from "../../assets/Logo/logout.svg?react";
 import ProfileIcon from "../../assets/Logo/profile.svg?react";
@@ -27,6 +28,7 @@ interface ProfileOverlayProps {
 }
 
 export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [showEdit, setShowEdit] = useState(false);
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -54,11 +56,11 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
     if (!friendUsername.trim()) return;
     try {
       const data = await sendFriendRequest(friendUsername.trim());
-      setFriendFeedback({ ok: true, msg: data.message });
+      setFriendFeedback({ ok: true, msg: t("errors." + (data.message ?? "GENERIC"), { defaultValue: t("errors.GENERIC") }) });
       setFriendUsername("");
       reload();
-    } catch (err: any) {
-      setFriendFeedback({ ok: false, msg: err.message });
+    } catch (err) {
+      setFriendFeedback({ ok: false, msg: t("errors." + (err instanceof Error ? err.message : "GENERIC"), { defaultValue: t("errors.GENERIC") }) });
     }
   };
 
@@ -85,27 +87,27 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
           </svg>
         </button>
 
-        <img src={user.avatarUrl || defaultAvatarUrl} alt="Avatar" className="profile-avatar" />
-        <h2 className="profile-title">Mon profil</h2>
-        <p className="profile-subtitle">Informations de votre compte</p>
+        <img src={user.avatarUrl || defaultAvatarUrl} alt={t("profile.avatarAlt")} className="profile-avatar" />
+        <h2 className="profile-title">{t("profile.title")}</h2>
+        <p className="profile-subtitle">{t("profile.subtitle")}</p>
 
         <div className="profile-info">
-          <strong className="profile-label">Pseudo</strong>
+          <strong className="profile-label">{t("profile.pseudo")}</strong>
           <p className="profile-value">{user.username}</p>
-          <strong className="profile-label">Email</strong>
-          <p className="profile-value">{user.email || (user as any).mail || "Non renseigné"}</p>
+          <strong className="profile-label">{t("profile.email")}</strong>
+          <p className="profile-value">{user.email || (user as any).mail || t("profile.notProvided")}</p>
         </div>
 
         <button className="profile-edit-button" onClick={() => setShowEdit(true)}>
           <ProfileIcon className="profile-icon" />
-          <span>Modifier le profil</span>
+          <span>{t("profile.editProfile")}</span>
         </button>
 
         {/* ── Demandes reçues ── */}
         {requests.length > 0 && (
           <div className="profile-friends-section">
             <span className="profile-label" style={{ display: "block", marginBottom: "0.5rem" }}>
-              Demandes reçues ({requests.length})
+              {t("profile.incomingRequests", { n: requests.length })}
             </span>
             <ul className="profile-friends-list">
               {requests.map((r) => (
@@ -125,7 +127,7 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
         {/* ── Amis ── */}
         <div className="profile-friends-section">
           <div className="profile-friends-header" onClick={() => { setShowAddFriend(!showAddFriend); setFriendFeedback(null); }}>
-            <span className="profile-label" style={{ marginTop: 0 }}>Amis ({friends.length})</span>
+            <span className="profile-label" style={{ marginTop: 0 }}>{t("profile.friends", { n: friends.length })}</span>
             <span className="profile-friends-toggle">{showAddFriend ? "−" : "+"}</span>
           </div>
 
@@ -135,14 +137,14 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
                 <input
                   className="profile-add-friend-input"
                   type="text"
-                  placeholder="Nom d'utilisateur..."
+                  placeholder={t("profile.addFriendPlaceholder")}
                   value={friendUsername}
                   onChange={(e) => { setFriendUsername(e.target.value); setFriendFeedback(null); }}
                   onKeyDown={(e) => e.key === "Enter" && handleSendRequest()}
                   autoFocus
                 />
                 <button className="profile-add-friend-btn" onClick={handleSendRequest}>
-                  Envoyer
+                  {t("profile.send")}
                 </button>
               </div>
               {friendFeedback && (
@@ -154,9 +156,9 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
           )}
 
           {loading ? (
-            <p className="profile-friends-empty">Chargement...</p>
+            <p className="profile-friends-empty">{t("profile.loadingFriends")}</p>
           ) : friends.length === 0 ? (
-            <p className="profile-friends-empty">Aucun ami pour l'instant.</p>
+            <p className="profile-friends-empty">{t("profile.noFriends")}</p>
           ) : (
             <ul className="profile-friends-list">
               {friends.map((f) => (
@@ -177,7 +179,7 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
 			window.location.replace("/");
 		}}>
           <LogoutIcon className="logout-icon" />
-          <span>Logout</span>
+          <span>{t("profile.logout")}</span>
         </button>
       </div>
 

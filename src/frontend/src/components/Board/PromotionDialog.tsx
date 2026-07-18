@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import wQ from "../../assets/pieces/wQ.svg";
 import wR from "../../assets/pieces/wR.svg";
 import wB from "../../assets/pieces/wB.svg";
@@ -20,17 +21,18 @@ const piecesMap: Record<string, Record<"w" | "b", string>> = {
   knight: { w: wN, b: bN },
 };
 
-const pieceLabelMap: Record<string, string> = {
-  queen: "Reine",
-  rook: "Tour",
-  bishop: "Fou",
-  knight: "Cavalier",
+const pieceLabelKeyMap: Record<string, string> = {
+  queen: "game.promotion.queen",
+  rook: "game.promotion.rook",
+  bishop: "game.promotion.bishop",
+  knight: "game.promotion.knight",
 };
 
 export const PromotionDialog: React.FC<PromotionDialogProps> = ({
   onChoose,
   playerColor,
 }) => {
+  const { t } = useTranslation();
   const promotionPieces = ["queen", "rook", "bishop", "knight"];
 
   return (
@@ -49,7 +51,7 @@ export const PromotionDialog: React.FC<PromotionDialogProps> = ({
       }}
     >
       <h2 style={{ color: "white", marginBottom: "20px" }}>
-        Choisissez une pièce pour la promotion
+        {t("game.promotion.title")}
       </h2>
 
       <div
@@ -61,6 +63,7 @@ export const PromotionDialog: React.FC<PromotionDialogProps> = ({
       >
         {promotionPieces.map((piece) => {
           const pieceSvg = piecesMap[piece][playerColor];
+          const pieceLabel = t(pieceLabelKeyMap[piece]);
 
           return (
             <button
@@ -90,14 +93,14 @@ export const PromotionDialog: React.FC<PromotionDialogProps> = ({
             >
               <img
                 src={pieceSvg}
-                alt={pieceLabelMap[piece]}
+                alt={pieceLabel}
                 style={{
                   width: "50px",
                   height: "50px",
                   marginBottom: "8px",
                 }}
               />
-              <span>{pieceLabelMap[piece]}</span>
+              <span>{pieceLabel}</span>
             </button>
           );
         })}
