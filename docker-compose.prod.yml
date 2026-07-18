@@ -56,7 +56,6 @@ services:
     build:
       context: ./src/backend-auth
       dockerfile: Dockerfile.prod
-    user: "nodejs"
     volumes:
       - avatar_uploads:/app/uploads
     environment:
@@ -90,7 +89,6 @@ services:
     build:
       context: ./src/backend-matchmaking
       dockerfile: Dockerfile.prod
-    user: "nodejs"
     environment:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name
@@ -124,7 +122,6 @@ services:
     build:
       context: ./src/backend-game
       dockerfile: Dockerfile.prod
-    user: "nodejs"
     environment:
       DB_USER_FILE: /run/secrets/db_user
       DB_NAME_FILE: /run/secrets/db_name

@@ -65,7 +65,6 @@ services:
   backend-auth:
     build: ./src/backend-auth
     container_name: backend-auth
-    user: "nodejs"
     volumes:
       - ./src/backend-auth:/app
       - /app/node_modules
@@ -101,7 +100,6 @@ services:
   backend-friends:
     build: ./src/backend-friends
     container_name: backend-friends
-    user: "nodejs"
     volumes:
       - ./src/backend-friends:/app
       - /app/node_modules
@@ -136,7 +134,6 @@ services:
   backend-game:
     build: ./src/backend-game
     container_name: backend-game
-    user: "nodejs"
     volumes:
       - ./src/backend-game:/app
       - /app/node_modules
@@ -171,7 +168,6 @@ services:
   backend-matchmaking:
     build: ./src/backend-matchmaking
     container_name: backend-matchmaking
-    user: "nodejs"
     volumes:
       - ./src/backend-matchmaking:/app
       - /app/node_modules
@@ -271,10 +267,8 @@ services:
     container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: "True"
-    secrets:
-      - pgadmin_password
     volumes:
       - ./src/pgadmin/servers.json:/pgadmin4/servers.json:ro
     networks:
@@ -329,7 +323,5 @@ secrets:
     file: src/secrets/db_password.txt
   portainer_password:
     file: src/secrets/portainer_password.txt
-  pgadmin_password:
-    file: src/secrets/pgadmin_password.txt
   jwt_secret:
     file: src/secrets/jwt_secret.txt
