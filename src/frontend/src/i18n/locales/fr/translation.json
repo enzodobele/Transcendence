@@ -1,0 +1,173 @@
+{
+  "common": {
+    "loading": "Chargement de ChessGuard...",
+    "playLocalOrOnline": "Jouez en local ou en ligne",
+    "loginToChallenge": "Connectez-vous pour défier des joueurs en ligne."
+  },
+  "findGame": {
+    "play": "Jouer",
+    "searching": "Recherche d'un adversaire",
+    "searchingSubtitle": "Veuillez patienter pendant que nous vous trouvons un rival...",
+    "cancelSearch": "Annuler la recherche",
+    "inviteComingSoon": "Lien d'invitation bientôt dispo ! (En attente du backend)",
+    "modes": {
+      "local": {
+        "title": "Partie Libre",
+        "description": "Jouez tranquillement sur un échiquier local, sans pression."
+      },
+      "ai": {
+        "title": "Entraînement",
+        "description": "Affrontez Stockfish pour parfaire vos ouvertures."
+      },
+      "customAi": {
+        "title": "IA Maison",
+        "description": "Affrontez notre IA entraînée sur 1M de parties Lichess."
+      },
+      "aiVsAi": {
+        "title": "IA vs IA",
+        "description": "Regardez notre IA affronter Stockfish."
+      },
+      "matchmaking": {
+        "title": "Matchmaking Aléatoire",
+        "description": "Trouvez un adversaire à votre taille en ligne (Classement Elo)."
+      },
+      "duel": {
+        "title": "Duel d'amis",
+        "description": "Créez une salle privée et envoyez un lien de défi."
+      }
+    }
+  },
+  "training": {
+    "title": "Entraînement",
+    "subtitle": "Choisissez votre niveau de difficulté",
+    "play": "Jouer",
+    "difficulty": {
+      "beginner": {
+        "label": "Débutant",
+        "description": "Pour apprendre les bases"
+      },
+      "easy": {
+        "label": "Facile",
+        "description": "Un adversaire indulgent"
+      },
+      "intermediate": {
+        "label": "Intermédiaire",
+        "description": "Un vrai défi équilibré"
+      },
+      "hard": {
+        "label": "Difficile",
+        "description": "Pour les joueurs confirmés"
+      },
+      "expert": {
+        "label": "Expert",
+        "description": "Bonne chance..."
+      }
+    }
+  },
+  "disconnect": {
+    "title": "Adversaire déconnecté",
+    "timeRemaining": "Temps restant :",
+    "ready": "Prêt",
+    "claimVictory": "Gagner par forfait",
+    "waitRequired": "Attente requise avant victoire."
+  },
+  "login": {
+    "createAccount": "Créer un compte",
+    "welcomeBack": "Bon retour",
+    "subtitleRegister": "Créez un compte pour jouer en ligne",
+    "subtitleLogin": "Connectez-vous pour jouer en ligne",
+    "pseudo": "Pseudo",
+    "usernamePlaceholder": "JonDoe",
+    "email": "Email",
+    "emailPlaceholder": "vous@exemple.com",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "switchToLogin": "Déjà un compte ? Se connecter",
+    "switchToRegister": "Pas encore de compte ? S'inscrire",
+    "connexion": "Connexion"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "subtitle": "Informations de votre compte",
+    "avatarAlt": "Avatar",
+    "pseudo": "Pseudo",
+    "email": "Email",
+    "notProvided": "Non renseigné",
+    "editProfile": "Modifier le profil",
+    "incomingRequests": "Demandes reçues ({{n}})",
+    "friends": "Amis ({{n}})",
+    "addFriendPlaceholder": "Nom d'utilisateur...",
+    "send": "Envoyer",
+    "loadingFriends": "Chargement...",
+    "noFriends": "Aucun ami pour l'instant.",
+    "logout": "Logout",
+    "editSubtitle": "Mettez à jour vos informations",
+    "currentAvatarAlt": "Avatar actuel",
+    "save": "Enregistrer"
+  },
+  "game": {
+    "quitLocal": "Quitter la partie locale",
+    "resign": "Abandonner",
+    "offerDraw": "Proposer la nulle",
+    "drawOffered": "Nulle proposée",
+    "accept": "Accepter",
+    "refuse": "Refuser",
+    "replay": "Rejouer",
+    "mainMenu": "Menu principal",
+    "moveHistory": "Historique des coups",
+    "noMoves": "Aucun coup joué",
+    "player1": "Joueur 1",
+    "player2": "Joueur 2",
+    "playVsHuman": "Jouer vs Humain",
+    "playVsAI": "Jouer vs IA",
+    "difficulty": {
+      "beginner": "Débutant (~500 ELO)",
+      "easy": "Facile (~1000 ELO)",
+      "medium": "Moyen (~1500 ELO)",
+      "hard": "Difficile (~2000 ELO)",
+      "expert": "Expert (~3500 ELO)"
+    },
+    "promotion": {
+      "title": "Choisissez une pièce pour la promotion",
+      "queen": "Reine",
+      "rook": "Tour",
+      "bishop": "Fou",
+      "knight": "Cavalier"
+    },
+    "result": {
+      "whiteWins": "Les blancs gagnent !",
+      "blackWins": "Les noirs gagnent !",
+      "whiteWinsForfeit": "Victoire par forfait des blancs !",
+      "blackWinsForfeit": "Victoire par forfait des noirs !",
+      "draw": "Partie nulle !",
+      "drawRefused": "La nulle a été refusée.",
+      "stalemate": "Pat — Égalité !",
+      "gameOver": "Partie terminée"
+    }
+  },
+  "errors": {
+    "GENERIC": "Une erreur est survenue",
+    "UNAUTHORIZED": "Non autorisé",
+    "SERVER_ERROR": "Erreur serveur",
+    "TOKEN_INVALID": "Token invalide ou expiré.",
+    "INVALID_EMAIL": "Email invalide.",
+    "PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 6 caractères.",
+    "EMAIL_OR_USERNAME_TAKEN": "Email ou username déjà utilisé.",
+    "REGISTRATION_FAILED": "Erreur lors de l'inscription.",
+    "USER_NOT_FOUND": "Utilisateur introuvable",
+    "WRONG_PASSWORD": "Mot de passe incorrect",
+    "LOGIN_FAILED": "Erreur lors de la connexion",
+    "NO_FIELDS_TO_UPDATE": "Aucun champ à mettre à jour.",
+    "USERNAME_EMPTY": "Le pseudo ne peut pas être vide.",
+    "INVALID_ID": "ID invalide.",
+    "REQUEST_NOT_FOUND": "Demande introuvable.",
+    "CANNOT_ADD_SELF": "Vous ne pouvez pas vous ajouter vous-même.",
+    "ALREADY_FRIENDS": "Vous êtes déjà amis.",
+    "REQUEST_ALREADY_SENT": "Demande déjà envoyée.",
+    "FILE_TOO_LARGE": "Fichier trop volumineux.",
+    "MUST_BE_LOGGED_IN": "Vous devez être connecté pour jouer.",
+    "FRIEND_REQUEST_SENT": "Demande envoyée.",
+    "FRIEND_REQUEST_ACCEPTED": "Demande acceptée !",
+    "FRIEND_REQUEST_DELETED": "Demande supprimée."
+  }
+}

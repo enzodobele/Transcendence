@@ -1,0 +1,173 @@
+{
+  "common": {
+    "loading": "Loading ChessGuard...",
+    "playLocalOrOnline": "Play locally or online",
+    "loginToChallenge": "Log in to challenge players online."
+  },
+  "findGame": {
+    "play": "Play",
+    "searching": "Searching for an opponent",
+    "searchingSubtitle": "Please wait while we find you a rival...",
+    "cancelSearch": "Cancel search",
+    "inviteComingSoon": "Invite link coming soon! (Waiting on the backend)",
+    "modes": {
+      "local": {
+        "title": "Free Play",
+        "description": "Play at your own pace on a local board, no pressure."
+      },
+      "ai": {
+        "title": "Training",
+        "description": "Take on Stockfish to sharpen your openings."
+      },
+      "customAi": {
+        "title": "Home AI",
+        "description": "Take on our AI trained on 1M Lichess games."
+      },
+      "aiVsAi": {
+        "title": "AI vs AI",
+        "description": "Watch our AI face off against Stockfish."
+      },
+      "matchmaking": {
+        "title": "Random Matchmaking",
+        "description": "Find an opponent at your level online (Elo rating)."
+      },
+      "duel": {
+        "title": "Friend Duel",
+        "description": "Create a private room and send a challenge link."
+      }
+    }
+  },
+  "training": {
+    "title": "Training",
+    "subtitle": "Choose your difficulty level",
+    "play": "Play",
+    "difficulty": {
+      "beginner": {
+        "label": "Beginner",
+        "description": "To learn the basics"
+      },
+      "easy": {
+        "label": "Easy",
+        "description": "A forgiving opponent"
+      },
+      "intermediate": {
+        "label": "Intermediate",
+        "description": "A well-balanced challenge"
+      },
+      "hard": {
+        "label": "Hard",
+        "description": "For experienced players"
+      },
+      "expert": {
+        "label": "Expert",
+        "description": "Good luck..."
+      }
+    }
+  },
+  "disconnect": {
+    "title": "Opponent disconnected",
+    "timeRemaining": "Time remaining:",
+    "ready": "Ready",
+    "claimVictory": "Win by forfeit",
+    "waitRequired": "Wait required before victory."
+  },
+  "login": {
+    "createAccount": "Create an account",
+    "welcomeBack": "Welcome back",
+    "subtitleRegister": "Create an account to play online",
+    "subtitleLogin": "Log in to play online",
+    "pseudo": "Username",
+    "usernamePlaceholder": "JonDoe",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "signIn": "Sign in",
+    "switchToLogin": "Already have an account? Sign in",
+    "switchToRegister": "No account yet? Sign up",
+    "connexion": "Login"
+  },
+  "profile": {
+    "title": "My profile",
+    "subtitle": "Your account information",
+    "avatarAlt": "Avatar",
+    "pseudo": "Username",
+    "email": "Email",
+    "notProvided": "Not provided",
+    "editProfile": "Edit profile",
+    "incomingRequests": "Incoming requests ({{n}})",
+    "friends": "Friends ({{n}})",
+    "addFriendPlaceholder": "Username...",
+    "send": "Send",
+    "loadingFriends": "Loading...",
+    "noFriends": "No friends yet.",
+    "logout": "Logout",
+    "editSubtitle": "Update your information",
+    "currentAvatarAlt": "Current avatar",
+    "save": "Save"
+  },
+  "game": {
+    "quitLocal": "Quit local game",
+    "resign": "Resign",
+    "offerDraw": "Offer a draw",
+    "drawOffered": "Draw offered",
+    "accept": "Accept",
+    "refuse": "Decline",
+    "replay": "Play again",
+    "mainMenu": "Main menu",
+    "moveHistory": "Move history",
+    "noMoves": "No moves played",
+    "player1": "Player 1",
+    "player2": "Player 2",
+    "playVsHuman": "Play vs Human",
+    "playVsAI": "Play vs AI",
+    "difficulty": {
+      "beginner": "Beginner (~500 ELO)",
+      "easy": "Easy (~1000 ELO)",
+      "medium": "Medium (~1500 ELO)",
+      "hard": "Hard (~2000 ELO)",
+      "expert": "Expert (~3500 ELO)"
+    },
+    "promotion": {
+      "title": "Choose a piece for promotion",
+      "queen": "Queen",
+      "rook": "Rook",
+      "bishop": "Bishop",
+      "knight": "Knight"
+    },
+    "result": {
+      "whiteWins": "White wins!",
+      "blackWins": "Black wins!",
+      "whiteWinsForfeit": "White wins by forfeit!",
+      "blackWinsForfeit": "Black wins by forfeit!",
+      "draw": "Draw!",
+      "drawRefused": "The draw was declined.",
+      "stalemate": "Stalemate — Draw!",
+      "gameOver": "Game over"
+    }
+  },
+  "errors": {
+    "GENERIC": "An error occurred",
+    "UNAUTHORIZED": "Unauthorized",
+    "SERVER_ERROR": "Server error",
+    "TOKEN_INVALID": "Invalid or expired token.",
+    "INVALID_EMAIL": "Invalid email.",
+    "PASSWORD_TOO_SHORT": "The password must be at least 6 characters long.",
+    "EMAIL_OR_USERNAME_TAKEN": "Email or username already in use.",
+    "REGISTRATION_FAILED": "Registration failed.",
+    "USER_NOT_FOUND": "User not found",
+    "WRONG_PASSWORD": "Incorrect password",
+    "LOGIN_FAILED": "Login failed",
+    "NO_FIELDS_TO_UPDATE": "No fields to update.",
+    "USERNAME_EMPTY": "The username cannot be empty.",
+    "INVALID_ID": "Invalid ID.",
+    "REQUEST_NOT_FOUND": "Request not found.",
+    "CANNOT_ADD_SELF": "You cannot add yourself.",
+    "ALREADY_FRIENDS": "You are already friends.",
+    "REQUEST_ALREADY_SENT": "Request already sent.",
+    "FILE_TOO_LARGE": "File too large.",
+    "MUST_BE_LOGGED_IN": "You must be logged in to play.",
+    "FRIEND_REQUEST_SENT": "Request sent.",
+    "FRIEND_REQUEST_ACCEPTED": "Request accepted!",
+    "FRIEND_REQUEST_DELETED": "Request deleted."
+  }
+}

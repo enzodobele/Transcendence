@@ -1,0 +1,173 @@
+{
+  "common": {
+    "loading": "ChessGuard yükleniyor...",
+    "playLocalOrOnline": "Yerel veya çevrimiçi oynayın",
+    "loginToChallenge": "Çevrimiçi oyunculara meydan okumak için giriş yapın."
+  },
+  "findGame": {
+    "play": "Oyna",
+    "searching": "Rakip aranıyor",
+    "searchingSubtitle": "Size bir rakip bulurken lütfen bekleyin...",
+    "cancelSearch": "Aramayı iptal et",
+    "inviteComingSoon": "Davet bağlantısı çok yakında! (Sunucu bekleniyor)",
+    "modes": {
+      "local": {
+        "title": "Serbest Oyun",
+        "description": "Baskı olmadan yerel bir tahtada rahatça oynayın."
+      },
+      "ai": {
+        "title": "Antrenman",
+        "description": "Açılışlarınızı geliştirmek için Stockfish'e karşı oynayın."
+      },
+      "customAi": {
+        "title": "Kendi Yapay Zekamız",
+        "description": "1M Lichess oyunuyla eğitilmiş yapay zekamıza karşı oynayın."
+      },
+      "aiVsAi": {
+        "title": "Yapay Zeka vs Yapay Zeka",
+        "description": "Yapay zekamızın Stockfish'e karşı mücadelesini izleyin."
+      },
+      "matchmaking": {
+        "title": "Rastgele Eşleştirme",
+        "description": "Çevrimiçi seviyenize uygun bir rakip bulun (Elo sıralaması)."
+      },
+      "duel": {
+        "title": "Arkadaş Düellosu",
+        "description": "Özel bir oda oluşturun ve bir meydan okuma bağlantısı gönderin."
+      }
+    }
+  },
+  "training": {
+    "title": "Antrenman",
+    "subtitle": "Zorluk seviyenizi seçin",
+    "play": "Oyna",
+    "difficulty": {
+      "beginner": {
+        "label": "Başlangıç",
+        "description": "Temelleri öğrenmek için"
+      },
+      "easy": {
+        "label": "Kolay",
+        "description": "Hoşgörülü bir rakip"
+      },
+      "intermediate": {
+        "label": "Orta",
+        "description": "Dengeli gerçek bir meydan okuma"
+      },
+      "hard": {
+        "label": "Zor",
+        "description": "Deneyimli oyuncular için"
+      },
+      "expert": {
+        "label": "Uzman",
+        "description": "İyi şanslar..."
+      }
+    }
+  },
+  "disconnect": {
+    "title": "Rakip bağlantısı kesildi",
+    "timeRemaining": "Kalan süre:",
+    "ready": "Hazır",
+    "claimVictory": "Hükmen kazan",
+    "waitRequired": "Zaferden önce beklemek gerekiyor."
+  },
+  "login": {
+    "createAccount": "Hesap oluştur",
+    "welcomeBack": "Tekrar hoş geldiniz",
+    "subtitleRegister": "Çevrimiçi oynamak için bir hesap oluşturun",
+    "subtitleLogin": "Çevrimiçi oynamak için giriş yapın",
+    "pseudo": "Kullanıcı adı",
+    "usernamePlaceholder": "JonDoe",
+    "email": "E-posta",
+    "emailPlaceholder": "siz@ornek.com",
+    "password": "Şifre",
+    "signIn": "Giriş yap",
+    "switchToLogin": "Zaten hesabınız var mı? Giriş yapın",
+    "switchToRegister": "Henüz hesabınız yok mu? Kaydolun",
+    "connexion": "Giriş"
+  },
+  "profile": {
+    "title": "Profilim",
+    "subtitle": "Hesap bilgileriniz",
+    "avatarAlt": "Avatar",
+    "pseudo": "Kullanıcı adı",
+    "email": "E-posta",
+    "notProvided": "Belirtilmemiş",
+    "editProfile": "Profili düzenle",
+    "incomingRequests": "Gelen istekler ({{n}})",
+    "friends": "Arkadaşlar ({{n}})",
+    "addFriendPlaceholder": "Kullanıcı adı...",
+    "send": "Gönder",
+    "loadingFriends": "Yükleniyor...",
+    "noFriends": "Henüz arkadaş yok.",
+    "logout": "Çıkış yap",
+    "editSubtitle": "Bilgilerinizi güncelleyin",
+    "currentAvatarAlt": "Mevcut avatar",
+    "save": "Kaydet"
+  },
+  "game": {
+    "quitLocal": "Yerel oyundan çık",
+    "resign": "Pes et",
+    "offerDraw": "Beraberlik teklif et",
+    "drawOffered": "Beraberlik teklif edildi",
+    "accept": "Kabul et",
+    "refuse": "Reddet",
+    "replay": "Tekrar oyna",
+    "mainMenu": "Ana menü",
+    "moveHistory": "Hamle geçmişi",
+    "noMoves": "Hamle yapılmadı",
+    "player1": "Oyuncu 1",
+    "player2": "Oyuncu 2",
+    "playVsHuman": "İnsana Karşı Oyna",
+    "playVsAI": "Yapay Zekaya Karşı Oyna",
+    "difficulty": {
+      "beginner": "Başlangıç (~500 ELO)",
+      "easy": "Kolay (~1000 ELO)",
+      "medium": "Orta (~1500 ELO)",
+      "hard": "Zor (~2000 ELO)",
+      "expert": "Uzman (~3500 ELO)"
+    },
+    "promotion": {
+      "title": "Terfi için bir taş seçin",
+      "queen": "Vezir",
+      "rook": "Kale",
+      "bishop": "Fil",
+      "knight": "At"
+    },
+    "result": {
+      "whiteWins": "Beyaz kazandı!",
+      "blackWins": "Siyah kazandı!",
+      "whiteWinsForfeit": "Beyaz hükmen kazandı!",
+      "blackWinsForfeit": "Siyah hükmen kazandı!",
+      "draw": "Berabere!",
+      "drawRefused": "Beraberlik reddedildi.",
+      "stalemate": "Pat — Berabere!",
+      "gameOver": "Oyun bitti"
+    }
+  },
+  "errors": {
+    "GENERIC": "Bir hata oluştu",
+    "UNAUTHORIZED": "Yetkisiz",
+    "SERVER_ERROR": "Sunucu hatası",
+    "TOKEN_INVALID": "Geçersiz veya süresi dolmuş token.",
+    "INVALID_EMAIL": "Geçersiz e-posta.",
+    "PASSWORD_TOO_SHORT": "Şifre en az 6 karakter olmalıdır.",
+    "EMAIL_OR_USERNAME_TAKEN": "E-posta veya kullanıcı adı zaten kullanımda.",
+    "REGISTRATION_FAILED": "Kayıt sırasında hata oluştu.",
+    "USER_NOT_FOUND": "Kullanıcı bulunamadı",
+    "WRONG_PASSWORD": "Yanlış şifre",
+    "LOGIN_FAILED": "Giriş sırasında hata oluştu",
+    "NO_FIELDS_TO_UPDATE": "Güncellenecek alan yok.",
+    "USERNAME_EMPTY": "Kullanıcı adı boş olamaz.",
+    "INVALID_ID": "Geçersiz kimlik.",
+    "REQUEST_NOT_FOUND": "İstek bulunamadı.",
+    "CANNOT_ADD_SELF": "Kendinizi ekleyemezsiniz.",
+    "ALREADY_FRIENDS": "Zaten arkadaşsınız.",
+    "REQUEST_ALREADY_SENT": "İstek zaten gönderildi.",
+    "FILE_TOO_LARGE": "Dosya çok büyük.",
+    "MUST_BE_LOGGED_IN": "Oynamak için giriş yapmalısınız.",
+    "FRIEND_REQUEST_SENT": "İstek gönderildi.",
+    "FRIEND_REQUEST_ACCEPTED": "İstek kabul edildi!",
+    "FRIEND_REQUEST_DELETED": "İstek silindi."
+  }
+}

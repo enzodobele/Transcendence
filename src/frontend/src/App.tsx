@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { useAuth } from "./contexts/AuthContext";
 import { useGameLogic } from "./hooks/chess/useGameLogic";
 
@@ -13,8 +15,10 @@ import { LoginButton } from "./components/Login/LoginButton";
 import { ProfileButton } from "./components/Profile/ProfileButton";
 import { FindGameButton } from "./components/FindGame/FindGameButton";
 import { Switch3DButton } from "./components/Board/Switch3DButton";
+import { LanguageSwitcher } from "./components/LanguageSwitcher/LanguageSwitcher";
 
 export default function App() {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading, user, token, refreshUserStatus } = useAuth();
 
   const {
@@ -33,7 +37,7 @@ export default function App() {
   if (isLoading) {
     return (
       <div className="app-loading">
-        <div className="spinner">Chargement de ChessGuard...</div>
+        <div className="spinner">{t("common.loading")}</div>
       </div>
     );
   }
@@ -42,6 +46,8 @@ export default function App() {
 
   return (
     <div className={`app${is3D && isInActiveGame ? " app-3d" : ""}`}>
+      <LanguageSwitcher />
+
       {/* Profil / Connexion */}
       {isAuthenticated ? <ProfileButton /> : <LoginButton />}
 
