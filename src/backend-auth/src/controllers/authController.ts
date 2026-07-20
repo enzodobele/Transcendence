@@ -34,7 +34,7 @@ export const register = async (req: Request, res: Response) => {
       data: { email, username, hashedPassword },
     });
 
-    const token = generateToken(user.id, user.email, user.username);
+    const token = generateToken(user.id, user.email, user.username, user.isAdmin);
 
     res.status(201).json({
       token,
@@ -74,7 +74,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Mot de passe incorrect" });
     }
 
-    const token = generateToken(user.id, user.email, user.username);
+    const token = generateToken(user.id, user.email, user.username, user.isAdmin);
 
     res.status(200).json({
       token,

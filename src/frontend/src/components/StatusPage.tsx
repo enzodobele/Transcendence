@@ -1,108 +1,154 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchSystemStatus, type SystemStatus } from "../services/status";
+import {
+  getToken,
+  isAdminToken,
+  fetchSystemStatus,
+  triggerBackup,
+  type SystemStatus,
+  type ServiceStatus,
+} from "../services/status";
 import "../styles/status.css";
 
-type BackendState = "online" | "degraded" | "offline";
+const SERVICE_LABELS: Record<string, string> = {
+  auth: "Auth",
+  game: "Game Engine",
+  matchmaking: "Matchmaking",
+  friends: "Friends",
+  ai: "IA",
+};
 
-function statusLabel(isOnline: boolean): string {
-  return isOnline ? "Online" : "Offline";
-}
-
-function statusClass(isOnline: boolean): string {
-  return isOnline ? "ok" : "ko";
-}
-
-function backendLabel(state: BackendState): string {
-  if (state === "online") {
-    return "Online";
-  }
-
-  if (state === "degraded") {
-    return "Degraded";
-  }
-
-  return "Offline";
-}
-
-function backendClass(state: BackendState): string {
-  if (state === "online") {
-    return "ok";
-  }
-
-  if (state === "degraded") {
-    return "warn";
-  }
-
+function serviceClass(status: ServiceStatus["status"]): string
+{
+  if (status === "online") return "ok";
+  if (status === "degraded") return "warn";
   return "ko";
 }
 
-export function StatusPage() {
+function serviceLabel(status: ServiceStatus["status"]): string
+{
+  if (status === "online") return "Online";
+  if (status === "degraded") return "Degraded";
+  return "Offline";
+}
+
+export function StatusPage()
+{
+  const token = useMemo(() => getToken(), []);
+  const isAdmin = useMemo(() => isAdminToken(token), [token]);
+
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [backupMsg, setBackupMsg] = useState<string | null>(null);
+  const [isBacking, setIsBacking] = useState(false);
 
-  const load = async (showLoader = false) => {
-    if (showLoader) {
-      setIsLoading(true);
-    }
-
-    const next = await fetchSystemStatus();
+  const load = async (showLoader = false) =>
+  {
+    if (!token) return;
+    if (showLoader) setIsLoading(true);
+    const next = await fetchSystemStatus(token);
     setStatus(next);
-
-    if (showLoader) {
-      setIsLoading(false);
-    }
+    if (showLoader) setIsLoading(false);
   };
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     void load(true);
-    const interval = window.setInterval(() => {
-      void load();
-    }, 30000);
-
+    const interval = window.setInterval(() => void load(), 30000);
     return () => window.clearInterval(interval);
   }, []);
 
-  const checkedAt = useMemo(() => {
-    if (!status?.checkedAt) {
-      return "-";
+  const handleBackup = async () =>
+  {
+    if (!token) return;
+    setIsBacking(true);
+    setBackupMsg(null);
+    try
+    {
+      await triggerBackup(token);
+      setBackupMsg("Backup effectué avec succès !");
+      void load();
     }
+    catch
+    {
+      setBackupMsg("Erreur lors du backup.");
+    }
+    finally
+    {
+      setIsBacking(false);
+    }
+  };
+
+  const checkedAt = useMemo(() =>
+  {
+    if (!status?.checkedAt) return "-";
     return new Date(status.checkedAt).toLocaleString();
   }, [status?.checkedAt]);
+
+  if (!isAdmin)
+  {
+    return (
+      <main className="status-page">
+        <section className="status-panel">
+          <h1>ChessGuard Status</h1>
+          <p className="subtitle">Accès réservé aux administrateurs.</p>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="status-page">
       <section className="status-panel">
         <h1>ChessGuard Status</h1>
-        <p className="subtitle">Etat en temps reel des services critiques</p>
+        <p className="subtitle">État en temps réel des microservices</p>
 
         {isLoading && !status ? (
           <p>Chargement du statut...</p>
         ) : (
           <>
             <ul className="status-list">
-              <li className={backendClass(status?.backendState ?? "offline")}>
-                <span>Backend</span>
-                <strong>{backendLabel(status?.backendState ?? "offline")}</strong>
-              </li>
-              <li className={statusClass(!!status?.databaseOnline)}>
-                <span>Database</span>
-                <strong>{statusLabel(!!status?.databaseOnline)}</strong>
-              </li>
-              <li className={statusClass(!!status?.webSocketOnline)}>
-                <span>WebSocket</span>
-                <strong>{statusLabel(!!status?.webSocketOnline)}</strong>
-              </li>
+              {status?.services.map((svc) => (
+                <li key={svc.name} className={serviceClass(svc.status)}>
+                  <span>{SERVICE_LABELS[svc.name] ?? svc.name}</span>
+                  <strong>{serviceLabel(svc.status)}</strong>
+                </li>
+              ))}
             </ul>
 
             <div className="meta">
-              <p>Uptime backend: <strong>{status?.uptime ?? "unknown"}</strong></p>
-              <p>Last backup: <strong>{status?.lastBackup ?? "never"}</strong></p>
+              <p>
+                Last backup:{" "}
+                <strong>
+                  {status?.backup.lastBackup
+                    ? new Date(status.backup.lastBackup).toLocaleString()
+                    : "Jamais"}
+                </strong>
+              </p>
+              {status?.backup.file && (
+                <p>Fichier: <strong>{status.backup.file}</strong></p>
+              )}
               <p>Last check: <strong>{checkedAt}</strong></p>
             </div>
 
-            <button type="button" onClick={() => void load()} className="refresh-btn">
-              Refresh
-            </button>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button type="button" onClick={() => void load()} className="refresh-btn">
+                Refresh
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleBackup()}
+                className="refresh-btn"
+                disabled={isBacking}
+              >
+                {isBacking ? "Backup en cours..." : "Lancer un backup"}
+              </button>
+            </div>
+
+            {backupMsg && (
+              <p style={{ marginTop: 8, color: backupMsg.includes("Erreur") ? "#e55" : "#5e5" }}>
+                {backupMsg}
+              </p>
+            )}
           </>
         )}
       </section>

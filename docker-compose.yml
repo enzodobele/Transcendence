@@ -49,6 +49,8 @@ services:
         condition: service_healthy
       backend-friends:
         condition: service_healthy
+      backend-status:
+        condition: service_healthy
     networks:
       - chessguard_network
     healthcheck:
@@ -196,6 +198,42 @@ services:
     command: npm run dev
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
+    restart: unless-stopped
+
+  # =========================================================================
+  # 📊 MICROSERVICE STATUS (Health aggregator + Backup cron)
+  # =========================================================================
+  backend-status:
+    build: ./src/backend-status
+    container_name: backend-status
+    user: "nodejs"
+    volumes:
+      - ./src/backend-status:/app
+      - /app/node_modules
+      - ./backups:/backups
+    environment:
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      DB_USER_FILE: /run/secrets/db_user
+      DB_NAME_FILE: /run/secrets/db_name
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      PORT: 3004
+    secrets:
+      - jwt_secret
+      - db_user
+      - db_name
+      - db_password
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chessguard_network
+    command: npm run dev
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3004/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 8
