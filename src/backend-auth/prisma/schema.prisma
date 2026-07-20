@@ -133,7 +133,6 @@ model FriendRequest {
 model waitlistEntry {
   id           Int      @id @default(autoincrement())
   userId       Int      @unique
-  timeControl  String   @default("5+0")
   createdAt    DateTime @default(now())
 
   // Relation avec User

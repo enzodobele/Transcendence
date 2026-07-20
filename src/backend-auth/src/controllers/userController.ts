@@ -20,7 +20,6 @@ export const getMe = async (req: Request, res: Response) => {
           select: {
             id: true,
             status: true,
-            timeControl: true,
             player1: {
               select: { username: true },
             },

@@ -33,7 +33,7 @@ app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
 // --- Route Internes (Microservices) ---
 // Cet endpoint sera appelé uniquement par ton conteneur Matchmaking
 app.post("/internal/games", async (req: Request, res: Response) => {
-  const { player1Id, player2Id, timeControl } = req.body;
+  const { player1Id, player2Id } = req.body;
   const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
   if (!player1Id || !player2Id) {
@@ -48,7 +48,6 @@ app.post("/internal/games", async (req: Request, res: Response) => {
           player1Id,
           player2Id,
           fenString: INITIAL_FEN,
-          timeControl: timeControl || "5+0",
           status: "en_cours",
         },
       });
@@ -71,7 +70,6 @@ app.post("/internal/games", async (req: Request, res: Response) => {
       currentGame: {
         id: game.id,
         status: game.status,
-        timeControl: game.timeControl,
         player1: { username: p1?.username || "" },
         player2: { username: p2?.username || "" },
       },

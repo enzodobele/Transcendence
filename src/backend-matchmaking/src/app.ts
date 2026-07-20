@@ -72,7 +72,6 @@ app.post("/matchmaking/join", async (req: Request, res: Response) => {
         const gameRes = await axios.post(`${GAME_SERVICE_URL}/internal/games`, {
           player1Id: userId,
           player2Id: opponent.userId,
-          timeControl: "5+0"
         });
 
         // 🧹 Nettoyage : On supprime les deux joueurs de la file SEULEMENT si la partie a été créée avec succès
