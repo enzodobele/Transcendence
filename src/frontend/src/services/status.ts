@@ -1,88 +1,84 @@
-export interface HealthPayload {
-  status: "ok" | "degraded" | "down";
-  database: "connected" | "disconnected";
-  uptime: string;
+export interface ServiceStatus
+{
+  name: string;
+  status: "online" | "degraded" | "offline";
+  database?: string;
+  uptime?: string;
 }
 
-type BackendState = "online" | "degraded" | "offline";
-
-export interface BackupStatusPayload {
+export interface BackupStatus
+{
   lastBackup: string | null;
   file?: string;
 }
 
-export interface SystemStatus {
-  backendState: BackendState;
-  databaseOnline: boolean;
-  webSocketOnline: boolean;
-  uptime: string;
-  lastBackup: string;
+export interface SystemStatus
+{
+  services: ServiceStatus[];
+  backup: BackupStatus;
   checkedAt: string;
 }
 
-async function getHealth(): Promise<{ payload: HealthPayload | null; reachable: boolean } | null> {
-  try {
-    const response = await fetch("/api/status/health", { cache: "no-store" });
-    let payload: HealthPayload | null = null;
-
-    try {
-      payload = (await response.json()) as HealthPayload;
-    } catch {
-      payload = null;
-    }
-
-    return {
-      payload,
-      reachable: true,
-    };
-  } catch {
-    return null;
-  }
+export function getToken(): string | null
+{
+  return localStorage.getItem("token");
 }
 
-async function getBackupStatus(): Promise<BackupStatusPayload | null> {
-  try {
-    const response = await fetch("/backup-status.json", { cache: "no-store" });
-    if (!response.ok) {
-      return null;
-    }
-
-    return (await response.json()) as BackupStatusPayload;
-  } catch {
-    return null;
+export function isAdminToken(token: string | null): boolean
+{
+  if (!token) return false;
+  try
+  {
+    const payload = JSON.parse(
+      atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")),
+    );
+    return !!payload.isAdmin;
   }
-}
-
-export async function checkWebSocketOnline(): Promise<boolean> {
-  try {
-    const response = await fetch("/api/status/ws", { cache: "no-store" });
-    return response.ok;
-  } catch {
+  catch
+  {
     return false;
   }
 }
 
-export async function fetchSystemStatus(): Promise<SystemStatus> {
-  const [health, backup, webSocketOnline] = await Promise.all([
-    getHealth(),
-    getBackupStatus(),
-    checkWebSocketOnline(),
+export async function fetchServices(token: string): Promise<ServiceStatus[]>
+{
+  const r = await fetch("/api/status/services", {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+export async function fetchBackupStatus(token: string): Promise<BackupStatus>
+{
+  const r = await fetch("/api/status/backup", {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!r.ok) return { lastBackup: null };
+  return r.json();
+}
+
+export async function triggerBackup(token: string): Promise<void>
+{
+  const r = await fetch("/api/status/backup", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!r.ok) throw new Error(`Backup failed: HTTP ${r.status}`);
+}
+
+export async function fetchSystemStatus(token: string): Promise<SystemStatus>
+{
+  const [services, backup] = await Promise.all([
+    fetchServices(token).catch(() => [] as ServiceStatus[]),
+    fetchBackupStatus(token).catch(() => ({ lastBackup: null })),
   ]);
 
-  const healthPayload = health?.payload ?? null;
-  const backendState: BackendState =
-    !health || !health.reachable
-      ? "offline"
-      : healthPayload?.status === "degraded"
-      ? "degraded"
-      : "online";
-
   return {
-    backendState,
-    databaseOnline: healthPayload?.database === "connected",
-    webSocketOnline,
-    uptime: healthPayload?.uptime ?? "unknown",
-    lastBackup: backup?.lastBackup ?? "never",
+    services,
+    backup,
     checkedAt: new Date().toISOString(),
   };
 }

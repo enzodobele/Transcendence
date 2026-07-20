@@ -4,11 +4,29 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { AuthProvider } from "./contexts/AuthContext";
 import "./i18n";
+import { StatusPage } from "./components/StatusPage";
+import { SpectatorPage } from "./components/SpectatorPage";
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </StrictMode>,
-);
+const root = createRoot(document.getElementById("root")!);
+
+if (window.location.pathname === "/status") {
+  root.render(
+    <StrictMode>
+      <StatusPage />
+    </StrictMode>,
+  );
+} else if (window.location.pathname === "/spectate") {
+  root.render(
+    <StrictMode>
+      <SpectatorPage />
+    </StrictMode>,
+  );
+} else {
+  root.render(
+    <StrictMode>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </StrictMode>,
+  );
+}

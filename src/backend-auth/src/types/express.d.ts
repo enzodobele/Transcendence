@@ -8,6 +8,7 @@ interface CustomJwtPayload extends JwtPayload {
   userId: number;
   username: string;
   email: string;
+  isAdmin: boolean;
 }
 
 // Étend l'interface Request d'Express

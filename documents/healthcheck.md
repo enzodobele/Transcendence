@@ -1,142 +1,120 @@
 # Health Check + Status Page + Backup
 
-Ce document récapitule exactement ce qui a été modifié pour la feature:
 - endpoint santé
-- page de statut
+- page de statut (admin only)
 - backup automatique + restauration
 
-## 1) Fichiers modifiés pour cette feature
+## 1 Fichiers modifiés pour cette feature
 
-### Backend (Health API)
-- `src/backend-auth/src/app.ts`
-  - Ajout/extension de `GET /health`
-  - Vérification DB (`SELECT 1`)
-  - Retour JSON avec:
-    - `status`
-    - `database`
-    - `uptime`
+### Backend Status (nouveau microservice)
+- `src/backend-status/src/app.ts`
+  - `GET /health` — public (Docker healthcheck)
+  - `GET /services` — admin only, agrège le `/health` de chaque service
+  - `GET /backup` — admin only, retourne le statut du dernier backup
+  - `POST /backup` — admin only, déclenche un backup manuel
+  - Cron interne : backup automatique à 03h00
+- `src/backend-status/Dockerfile`
+- `src/backend-status/package.json`
+
+### Backend Auth (rôle admin)
+- `src/backend-auth/prisma/schema.prisma`
+  - Ajout `isAdmin Boolean @default(false)` sur le model `User`
+- `src/backend-auth/prisma/migrations/20260720000000_add_is_admin/migration.sql`
+- `src/backend-auth/src/services/authService.ts`
+  - `generateToken` inclut `isAdmin` dans le payload JWT
+- `src/backend-auth/src/controllers/authController.ts`
+  - Passe `user.isAdmin` à `generateToken` (register + login)
 
 ### Frontend (Status page)
-- `src/frontend/src/main.tsx`
-  - Routage simple vers `/status`
 - `src/frontend/src/components/StatusPage.tsx`
-  - Page visuelle de statut
-  - Affiche Backend / Database / WebSocket / Last backup / Last check
+  - Protégée : redirige si le token JWT ne contient pas `isAdmin: true`
+  - Affiche le statut de chaque microservice individuellement
+  - Bouton "Lancer un backup" (POST `/api/status/backup`)
 - `src/frontend/src/services/status.ts`
-  - Appels API:
-    - `/api/status/health`
-    - `/api/status/ws`
-    - `/backup-status.json`
-  - Agrégation du statut global pour l'UI
-- `src/frontend/src/styles/status.css`
-  - Styles visuels de la page status
+  - `fetchServices(token)` → `GET /api/status/services`
+  - `fetchBackupStatus(token)` → `GET /api/status/backup`
+  - `triggerBackup(token)` → `POST /api/status/backup`
+  - `isAdminToken(token)` — décode le JWT côté client
 
-### Nginx (Exposition des endpoints)
+### Nginx
 - `src/nginx/nginx.conf` (dev)
-  - `location = /api/status/health` -> `backend-auth:3000/health`
-  - `location = /api/status/ws` -> `backend-game:3002/health`
-  - `location = /backup-status.json` -> fichier statique
-- `src/nginx/nginx.prod.conf` (prod)
-  - mêmes routes status que dev
+  - `location /api/status/` → `backend-status:3004/`
+  - (remplace les anciennes routes exactes `/api/status/health` et `/api/status/ws`)
+- `src/nginx/nginx.prod.conf` (prod) — à mettre à jour de la même façon
 
-### Backup / Restore (DevOps)
-- `scripts/backup.sh`
-  - dump PostgreSQL (`pg_dump` via conteneur DB)
-  - compression en `.sql.gz`
-  - MAJ de `backup-status.json`
-  - politique de rétention (7 backups)
+### Docker Compose
+- `docker-compose.yml`
+  - Nouveau service `backend-status` (port 3004, volume `./backups:/backups`)
+  - `nginx` dépend de `backend-status: service_healthy`
+
+### Restore script
 - `scripts/restore.sh`
-  - restauration depuis `.sql` ou `.sql.gz`
-- `src/nginx/html/backup-status.json`
-  - statut du dernier backup lu par la page `/status`
-- `Makefile`
-  - cible `backup`
-  - cible `restore FILE=...`
+  - Reset automatique du schéma (`DROP SCHEMA public CASCADE`) avant restauration
 
 
-## 2) Ce que la feature affiche concrètement
+## 2 Ce que la feature affiche concrètement
 
-Endpoint backend:
-- `GET /health` renvoie par exemple:
+Page `/status` (admin uniquement) :
+- Auth / Game Engine / Matchmaking / Friends / IA : `Online` / `Degraded` / `Offline`
+- Last backup : date du dernier dump
+- Bouton : Lancer un backup
+- Bouton : Refresh
 
-```json
-{
-  "status": "ok",
-  "database": "connected",
-  "uptime": "12h32m"
-}
-```
-
-Page `/status`:
-- Backend: `Online` / `Degraded` / `Offline`
-- Database: `Online` / `Offline`
-- WebSocket: `Online` / `Offline`
-- Last backup: date ISO du dernier backup
-- Last check: date/heure du dernier refresh
+Si l'utilisateur n'est pas admin :
+> "Accès réservé aux administrateurs."
 
 
-## 3) Backup and Restore
+## 3 Backup and Restore
 
-### Backup script
+### Backup automatique (cron interne)
 
-The project now includes [scripts/backup.sh](../scripts/backup.sh).
+Le container `backend-status` exécute un backup chaque nuit à 03h00 via `node-cron`.
+Plus besoin d'installer un cron sur la machine hôte.
 
-What it does:
-- creates a PostgreSQL dump from the running DB container
-- compresses it as `.sql.gz` in `backups/`
-- updates `src/nginx/html/backup-status.json` (read by the `/status` page)
-- keeps only the latest 7 backups
-
-Run manually:
+### Backup manuel
 
 ```bash
+# Via l'interface web /status (bouton)
+# ou via l'API :
+curl -sk -X POST https://localhost/api/status/backup \
+  -H "Authorization: Bearer <token_admin>"
+
+# Via le Makefile (script shell hôte) :
 make backup
-```
-
-### Automatic backup (cron)
-
-Example daily backup at 03:00:
-
-```cron
-0 3 * * * /home/arthu/tronc_commun/Cercle_6/Transcendence/scripts/backup.sh >> /var/log/chessguard-backup.log 2>&1
 ```
 
 ### Restore script
 
-The project includes [scripts/restore.sh](../scripts/restore.sh).
-
-Run restore:
-
 ```bash
-make restore FILE=backups/<your_dump.sql.gz>
+make restore FILE=backups/<nom_du_dump.sql.gz>
 ```
 
-### Disaster recovery procedure (simple)
+### Donner le rôle admin à un utilisateur
 
-1. Stop write-heavy traffic to the app.
-2. Ensure the DB container is running.
-3. Run restore command with the selected backup.
-4. Restart application services.
-5. Validate:
-   - `/api/status/health` returns `status: ok` and `database: connected`
-   - `/status` shows Backend/Database/WebSocket online
-
-
-
-
-## 4) Commandes utiles
+```sql
+UPDATE "users" SET "isAdmin" = true WHERE username = 'ton_username';
+```
 
 ```bash
-# Lancer un backup manuel
-make backup
+docker exec -it chessguard-db psql -U $(cat src/secrets/db_user.txt) -d $(cat src/secrets/db_name.txt) \
+  -c "UPDATE \"users\" SET \"isAdmin\" = true WHERE username = 'bob';"
+
+
+## 4 Commandes utiles
+
+```bash
+# Vérifier que backend-status répond
+curl -sk https://localhost/api/status/health
+
+# Voir le statut de tous les services (token admin requis)
+curl -sk https://localhost/api/status/services \
+  -H "Authorization: Bearer <token>"
+
+# Voir le dernier backup
+curl -sk https://localhost/api/status/backup \
+  -H "Authorization: Bearer <token>"
 
 # Restaurer un backup
 make restore FILE=backups/<nom_du_dump.sql.gz>
-
-# Vérifier la santé backend auth
-curl -sk https://localhost/api/status/health
-
-# Vérifier le statut game/ws
-curl -sk https://localhost/api/status/ws
 ```
 
