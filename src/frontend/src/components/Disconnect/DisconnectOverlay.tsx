@@ -49,31 +49,33 @@ export const DisconnectionOverlay: React.FC<DisconnectionOverlayProps> = ({
 
   return (
     <div className="disconnection-overlay">
-      <div className="disconnection-content">
-        
-        <div className="disconnection-header">
-          <span style={{ color: "#ef4444" }}>⚠️</span>
-          <h4 className="disconnection-title">Adversaire déconnecté</h4>
-        </div>
+		<div className="disconnection-content">
+			
+			<div className="disconnection-header">
+			<span style={{ color: "#ef4444" }}>⚠️</span>
+			<h4 className="disconnection-title">Adversaire déconnecté</h4>
+			</div>
 
-        <div className="disconnection-timer-row">
-          <span>Temps restant :</span>
-          <span className="disconnection-timer-countdown">
-            {secondsLeft > 0 ? formatTime(secondsLeft) : "Prêt"}
-          </span>
-        </div>
+			{canClaim ? (
+			<button onClick={onClaimVictory} className="disconnection-claim-button">
+				Gagner par forfait
+			</button>
+			) : (
+			<>
+				<div className="disconnection-timer-row">
+				<span>Temps restant :</span>
+				<span className="disconnection-timer-countdown">
+					{formatTime(secondsLeft)}
+				</span>
+				</div>
+				
+				<div className="disconnection-wait-text">
+				Attente requise avant victoire.
+				</div>
+			</>
+			)}
 
-        {canClaim ? (
-          <button onClick={onClaimVictory} className="disconnection-claim-button">
-            Gagner par forfait
-          </button>
-        ) : (
-          <div className="disconnection-wait-text">
-            Attente requise avant victoire.
-          </div>
-        )}
-
-      </div>
-    </div>
+		</div>
+		</div>
   );
 };
