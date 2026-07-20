@@ -11,9 +11,12 @@ import {
   getIncomingRequests,
   acceptFriendRequest,
   rejectFriendRequest,
+  deleteAccount,
   type FriendRequest,
 } from "../../services/auth";
 import "../../styles/Profile/ProfileOverlay.css";
+import { LegalLinks } from "../Legal/LegalLinks";
+
 
 interface Friend {
   id: number;
@@ -37,6 +40,9 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const reload = () => {
     getFriends().then(setFriends).catch(() => {});
@@ -72,6 +78,20 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
   const handleReject = async (id: number) => {
     await rejectFriendRequest(id).catch(() => {});
     reload();
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteAccount();
+      logout();
+      onClose();
+    } catch (err) {
+      const code = err instanceof Error ? err.message : "GENERIC";
+      setDeleteError(t("errors." + code, { defaultValue: t("errors.GENERIC") }));
+      setIsDeleting(false);
+    }
   };
 
   if (!isOpen || !user) return null;
@@ -181,6 +201,40 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
           <LogoutIcon className="logout-icon" />
           <span>{t("profile.logout")}</span>
         </button>
+
+        {!showDeleteConfirm ? (
+          <button
+            className="profile-delete-account-button"
+            onClick={() => { setShowDeleteConfirm(true); setDeleteError(null); }}
+          >
+            {t("profile.deleteAccount")}
+          </button>
+        ) : (
+          <div className="profile-delete-confirm">
+            <p className="profile-delete-confirm-text">
+              {t("profile.deleteConfirmText")}
+            </p>
+            {deleteError && <p className="profile-delete-error">{deleteError}</p>}
+            <div className="profile-delete-confirm-actions">
+              <button
+                className="profile-delete-confirm-no"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+              >
+                {t("common.no")}
+              </button>
+              <button
+                className="profile-delete-confirm-yes"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? t("profile.deleting") : t("common.yes")}
+              </button>
+            </div>
+          </div>
+        )}
+      <LegalLinks />
+
       </div>
 
       <ProfileEditOverlay isOpen={showEdit} onClose={() => setShowEdit(false)} />

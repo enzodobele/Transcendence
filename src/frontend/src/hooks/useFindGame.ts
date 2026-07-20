@@ -47,8 +47,9 @@ const startSearch = async () => {
     setError("");
     await joinWaitlistApi(user.id); // 🔥 Ici, user.id est garanti 100% safe pour TS
     setIsSearching(true);
-  } catch (err: any) {
-    setError(err.message || t("errors.GENERIC"));
+  } catch (err) {
+    const code = err instanceof Error ? err.message : "GENERIC";
+    setError(t("errors." + code, { defaultValue: t("errors.GENERIC") }));
   }
 };
 

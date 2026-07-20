@@ -2,7 +2,9 @@
   "common": {
     "loading": "ChessGuard yükleniyor...",
     "playLocalOrOnline": "Yerel veya çevrimiçi oynayın",
-    "loginToChallenge": "Çevrimiçi oyunculara meydan okumak için giriş yapın."
+    "loginToChallenge": "Çevrimiçi oyunculara meydan okumak için giriş yapın.",
+    "no": "Hayır",
+    "yes": "Evet"
   },
   "findGame": {
     "play": "Oyna",
@@ -35,7 +37,9 @@
         "title": "Arkadaş Düellosu",
         "description": "Özel bir oda oluşturun ve bir meydan okuma bağlantısı gönderin."
       }
-    }
+    },
+    "findOpponent": "Rakip bul",
+    "otherModes": "Diğer oyun modları"
   },
   "training": {
     "title": "Antrenman",
@@ -62,7 +66,8 @@
         "label": "Uzman",
         "description": "İyi şanslar..."
       }
-    }
+    },
+    "selectLevel": "Bu seviyeyi seç"
   },
   "disconnect": {
     "title": "Rakip bağlantısı kesildi",
@@ -84,7 +89,9 @@
     "signIn": "Giriş yap",
     "switchToLogin": "Zaten hesabınız var mı? Giriş yapın",
     "switchToRegister": "Henüz hesabınız yok mu? Kaydolun",
-    "connexion": "Giriş"
+    "connexion": "Giriş",
+    "mustAcceptTerms": "Kullanım Koşulları'nı ve Gizlilik Politikası'nı kabul etmelisiniz.",
+    "acceptTerms": "<1>Kullanım Koşulları</1>'nı ve <3>Gizlilik Politikası</3>'nı kabul ediyorum"
   },
   "profile": {
     "title": "Profilim",
@@ -103,7 +110,10 @@
     "logout": "Çıkış yap",
     "editSubtitle": "Bilgilerinizi güncelleyin",
     "currentAvatarAlt": "Mevcut avatar",
-    "save": "Kaydet"
+    "save": "Kaydet",
+    "deleteAccount": "Hesabımı sil",
+    "deleteConfirmText": "Hesabınızı gerçekten silmek istiyor musunuz? Bu işlem geri alınamaz.",
+    "deleting": "Siliniyor..."
   },
   "game": {
     "quitLocal": "Yerel oyundan çık",
@@ -169,5 +179,107 @@
     "FRIEND_REQUEST_SENT": "İstek gönderildi.",
     "FRIEND_REQUEST_ACCEPTED": "İstek kabul edildi!",
     "FRIEND_REQUEST_DELETED": "İstek silindi."
+  },
+  "legal": {
+    "privacy": "Gizlilik",
+    "terms": "Koşullar",
+    "privacyTab": "Gizlilik Politikası",
+    "termsTab": "Kullanım Koşulları",
+    "close": "Kapat",
+    "privacyDoc": {
+      "title": "Gizlilik Politikası",
+      "updated": "Son güncelleme: Temmuz 2026",
+      "sections": [
+        {
+          "heading": "1. Biz kimiz",
+          "paragraphs": [
+            "ChessGuard, 42 müfredatı kapsamında geliştirilen çevrimiçi bir satranç oyunudur. Bu sayfa, uygulamayı kullandığınızda hangi verilerin hangi nedenlerle toplandığını açıklar."
+          ]
+        },
+        {
+          "heading": "2. Toplanan veriler",
+          "list": [
+            "Kayıt sırasında sağladığınız e-posta adresiniz ve kullanıcı adınız.",
+            "Parolanız, karma ve tuzlanmış biçimde saklanır (asla düz metin olarak değil).",
+            "Oyunun çalışması ve profil istatistikleriniz için gerekli olan oyun geçmişiniz (yapılan hamleler, sonuçlar, rakipler).",
+            "Oturumunuzu açık tutmak için tarayıcınızda yerel olarak saklanan bir oturum jetonu (token)."
+          ]
+        },
+        {
+          "heading": "3. Verilerin kullanımı",
+          "paragraphs": [
+            "Bu veriler yalnızca hizmeti çalıştırmak için kullanılır: kimlik doğrulama, oyuncuları eşleştirme, oyunlarınızı kaydetme ve profilinizi görüntüleme. Üçüncü taraflara satılmaz, paylaşılmaz veya reklam amacıyla kullanılmaz."
+          ]
+        },
+        {
+          "heading": "4. Saklama",
+          "paragraphs": [
+            "Verileriniz hesabınız var olduğu sürece saklanır. Hesabınızı silerek veya proje ekibiyle iletişime geçerek istediğiniz zaman silinmesini talep edebilirsiniz."
+          ]
+        },
+        {
+          "heading": "5. Haklarınız",
+          "paragraphs": [
+            "GDPR uyarınca, kişisel verilerinize erişme, bunları düzeltme ve silme hakkına sahipsiniz. Bu hakkı kullanmak için ekibe projenin GitHub deposu üzerinden ulaşın."
+          ]
+        },
+        {
+          "heading": "6. Çerezler ve yerel depolama",
+          "paragraphs": [
+            "Uygulama, oturum jetonunuzu saklamak için tarayıcının yerel depolamasını (localStorage) kullanır. Hiçbir izleme veya reklam çerezi kullanılmaz."
+          ]
+        }
+      ]
+    },
+    "termsDoc": {
+      "title": "Kullanım Koşulları",
+      "updated": "Son güncelleme: Temmuz 2026",
+      "sections": [
+        {
+          "heading": "1. Amaç",
+          "paragraphs": [
+            "Bu koşullar, çevrimiçi bir satranç platformu olan ChessGuard'ın kullanımını düzenler. Bir hesap oluşturarak bu koşulları tümüyle kabul etmiş olursunuz."
+          ]
+        },
+        {
+          "heading": "2. Hesap oluşturma",
+          "paragraphs": [
+            "Geçerli bir e-posta ve bir kullanıcı adı sağlamalısınız. Parolanızın gizliliğinden ve hesabınızdan gerçekleştirilen tüm etkinliklerden siz sorumlusunuz."
+          ]
+        },
+        {
+          "heading": "3. İyi davranış",
+          "list": [
+            "Adil oyun gereklidir: çevrimiçi bir oyun sırasında harici yardım araçları kullanmak yasaktır.",
+            "Hakaret içeren, ayrımcı veya yasa dışı kullanıcı adları ve mesajlar hoş görülmez.",
+            "Platformun güvenliğini aşmaya yönelik her türlü girişim, hesabın askıya alınmasıyla sonuçlanır."
+          ]
+        },
+        {
+          "heading": "4. Oyun özellikleri",
+          "paragraphs": [
+            "Platform; yerel, çevrimiçi ve yapay zekâya karşı oyunlar sunar. Görüntülenen sonuçlar ve istatistikler, platformda gerçekten oynanan oyunları yansıtır."
+          ]
+        },
+        {
+          "heading": "5. Hizmetin kullanılabilirliği",
+          "paragraphs": [
+            "ChessGuard, sürekli kullanılabilirlik garantisi olmadan \"olduğu gibi\" sunulan bir öğrenci projesidir. Hizmet, özellikle bakım için istediği zaman kesintiye uğratılabilir veya değiştirilebilir."
+          ]
+        },
+        {
+          "heading": "6. Hesap silme",
+          "paragraphs": [
+            "Hesabınızın silinmesini istediğiniz zaman talep edebilirsiniz. Bu, gizlilik politikamıza uygun olarak kişisel verilerinizin silinmesini sağlar."
+          ]
+        },
+        {
+          "heading": "7. İletişim",
+          "paragraphs": [
+            "Bu koşullarla ilgili her türlü soru için ekibe projenin GitHub deposu üzerinden ulaşın."
+          ]
+        }
+      ]
+    }
   }
 }

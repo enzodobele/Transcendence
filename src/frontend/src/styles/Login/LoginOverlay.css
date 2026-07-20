@@ -84,6 +84,33 @@
   margin-bottom: 0.4rem;
 }
 
+.login-terms-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(31, 28, 23, 0.78);
+  cursor: pointer;
+}
+
+.login-terms-checkbox input[type="checkbox"] {
+  margin-top: 0.15rem;
+  accent-color: #b87e45;
+  flex-shrink: 0;
+}
+
+.login-terms-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: inline;
+  font: inherit;
+  color: var(--color-secondary);
+  text-decoration: underline;
+}
+
 .login-submit-button {
   margin-top: 0.75rem;
   background: linear-gradient(135deg, #d8a86c 0%, #b87e45 100%);
@@ -91,6 +118,11 @@
   font-weight: 700;
   border-radius: 999px;
   padding: 0.85rem 1.1rem;
+}
+
+.login-submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .login-switch-button {

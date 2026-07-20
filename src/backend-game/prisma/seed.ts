@@ -138,7 +138,6 @@ async function main() {
     await prisma.waitlistEntry.create({
       data: {
         userId: carla.id,
-        timeControl: '10+0',
       },
     });
 
@@ -147,7 +146,6 @@ async function main() {
         player1Id: alice.id,
         player2Id: bob.id,
         status: 'terminee',
-        timeControl: '5+0',
         isRated: true,
         fenString: 'r1bqkbnr/pppp1ppp/2n5/4p3/1b1P4/2P2N2/PP2PPPP/RNBQKB1R w KQkq - 2 4',
         winnerId: alice.id,

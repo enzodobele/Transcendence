@@ -2,7 +2,9 @@
   "common": {
     "loading": "Loading ChessGuard...",
     "playLocalOrOnline": "Play locally or online",
-    "loginToChallenge": "Log in to challenge players online."
+    "loginToChallenge": "Log in to challenge players online.",
+    "no": "No",
+    "yes": "Yes"
   },
   "findGame": {
     "play": "Play",
@@ -35,7 +37,9 @@
         "title": "Friend Duel",
         "description": "Create a private room and send a challenge link."
       }
-    }
+    },
+    "findOpponent": "Find an opponent",
+    "otherModes": "Other game modes"
   },
   "training": {
     "title": "Training",
@@ -62,7 +66,8 @@
         "label": "Expert",
         "description": "Good luck..."
       }
-    }
+    },
+    "selectLevel": "Select this level"
   },
   "disconnect": {
     "title": "Opponent disconnected",
@@ -84,7 +89,9 @@
     "signIn": "Sign in",
     "switchToLogin": "Already have an account? Sign in",
     "switchToRegister": "No account yet? Sign up",
-    "connexion": "Login"
+    "connexion": "Login",
+    "mustAcceptTerms": "You must accept the Terms of Service and the Privacy Policy.",
+    "acceptTerms": "I accept the <1>Terms</1> and the <3>Privacy Policy</3>"
   },
   "profile": {
     "title": "My profile",
@@ -103,7 +110,10 @@
     "logout": "Logout",
     "editSubtitle": "Update your information",
     "currentAvatarAlt": "Current avatar",
-    "save": "Save"
+    "save": "Save",
+    "deleteAccount": "Delete my account",
+    "deleteConfirmText": "Do you really want to delete your account? This action is irreversible.",
+    "deleting": "Deleting..."
   },
   "game": {
     "quitLocal": "Quit local game",
@@ -169,5 +179,107 @@
     "FRIEND_REQUEST_SENT": "Request sent.",
     "FRIEND_REQUEST_ACCEPTED": "Request accepted!",
     "FRIEND_REQUEST_DELETED": "Request deleted."
+  },
+  "legal": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "privacyTab": "Privacy Policy",
+    "termsTab": "Terms of Service",
+    "close": "Close",
+    "privacyDoc": {
+      "title": "Privacy Policy",
+      "updated": "Last updated: July 2026",
+      "sections": [
+        {
+          "heading": "1. Who we are",
+          "paragraphs": [
+            "ChessGuard is an online chess game developed as part of the 42 curriculum. This page describes what data is collected when you use the application and for what reasons."
+          ]
+        },
+        {
+          "heading": "2. Data collected",
+          "list": [
+            "Your email address and username, provided at registration.",
+            "Your password, stored hashed and salted (never in plain text).",
+            "Your game history (moves played, results, opponents) required for the game to work and for your profile statistics.",
+            "A session token kept locally in your browser to keep you logged in."
+          ]
+        },
+        {
+          "heading": "3. Use of data",
+          "paragraphs": [
+            "This data is used only to run the service: authentication, matching players, saving your games and displaying your profile. It is neither sold, shared with third parties, nor used for advertising purposes."
+          ]
+        },
+        {
+          "heading": "4. Retention",
+          "paragraphs": [
+            "Your data is kept as long as your account exists. You can request its deletion at any time by deleting your account or contacting the project team."
+          ]
+        },
+        {
+          "heading": "5. Your rights",
+          "paragraphs": [
+            "In accordance with the GDPR, you have the right to access, rectify and delete your personal data. To exercise this right, contact the team via the project's GitHub repository."
+          ]
+        },
+        {
+          "heading": "6. Cookies and local storage",
+          "paragraphs": [
+            "The application uses the browser's local storage (localStorage) to keep your login token. No tracking or advertising cookies are used."
+          ]
+        }
+      ]
+    },
+    "termsDoc": {
+      "title": "Terms of Service",
+      "updated": "Last updated: July 2026",
+      "sections": [
+        {
+          "heading": "1. Purpose",
+          "paragraphs": [
+            "These terms govern the use of ChessGuard, an online chess platform. By creating an account, you accept these terms in their entirety."
+          ]
+        },
+        {
+          "heading": "2. Account creation",
+          "paragraphs": [
+            "You must provide a valid email and a username. You are responsible for the confidentiality of your password and for all activity carried out from your account."
+          ]
+        },
+        {
+          "heading": "3. Good conduct",
+          "list": [
+            "Fair play is required: using external assistance tools during an online game is prohibited.",
+            "Insulting, discriminatory or illegal usernames and messages are not tolerated.",
+            "Any attempt to bypass the platform's security results in account suspension."
+          ]
+        },
+        {
+          "heading": "4. Game features",
+          "paragraphs": [
+            "The platform offers local games, online games and games against an artificial intelligence. The displayed results and statistics reflect the games actually played on the platform."
+          ]
+        },
+        {
+          "heading": "5. Service availability",
+          "paragraphs": [
+            "ChessGuard is a student project provided \"as is\", without any guarantee of continuous availability. The service may be interrupted or modified at any time, particularly for maintenance."
+          ]
+        },
+        {
+          "heading": "6. Account deletion",
+          "paragraphs": [
+            "You can request the deletion of your account at any time. This entails the deletion of your personal data in accordance with our privacy policy."
+          ]
+        },
+        {
+          "heading": "7. Contact",
+          "paragraphs": [
+            "For any question regarding these terms, contact the team via the project's GitHub repository."
+          ]
+        }
+      ]
+    }
   }
 }

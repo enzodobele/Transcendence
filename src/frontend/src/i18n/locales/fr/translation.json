@@ -2,7 +2,9 @@
   "common": {
     "loading": "Chargement de ChessGuard...",
     "playLocalOrOnline": "Jouez en local ou en ligne",
-    "loginToChallenge": "Connectez-vous pour défier des joueurs en ligne."
+    "loginToChallenge": "Connectez-vous pour défier des joueurs en ligne.",
+    "no": "Non",
+    "yes": "Oui"
   },
   "findGame": {
     "play": "Jouer",
@@ -35,7 +37,9 @@
         "title": "Duel d'amis",
         "description": "Créez une salle privée et envoyez un lien de défi."
       }
-    }
+    },
+    "findOpponent": "Trouver un adversaire",
+    "otherModes": "Autres modes de jeu"
   },
   "training": {
     "title": "Entraînement",
@@ -62,7 +66,8 @@
         "label": "Expert",
         "description": "Bonne chance..."
       }
-    }
+    },
+    "selectLevel": "Sélectionner ce niveau"
   },
   "disconnect": {
     "title": "Adversaire déconnecté",
@@ -84,7 +89,9 @@
     "signIn": "Se connecter",
     "switchToLogin": "Déjà un compte ? Se connecter",
     "switchToRegister": "Pas encore de compte ? S'inscrire",
-    "connexion": "Connexion"
+    "connexion": "Connexion",
+    "mustAcceptTerms": "Vous devez accepter les CGU et la politique de confidentialité.",
+    "acceptTerms": "J'accepte les <1>CGU</1> et la <3>politique de confidentialité</3>"
   },
   "profile": {
     "title": "Mon profil",
@@ -103,7 +110,10 @@
     "logout": "Logout",
     "editSubtitle": "Mettez à jour vos informations",
     "currentAvatarAlt": "Avatar actuel",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "deleteAccount": "Supprimer mon compte",
+    "deleteConfirmText": "Voulez-vous vraiment supprimer votre compte ? Cette action est irréversible.",
+    "deleting": "Suppression..."
   },
   "game": {
     "quitLocal": "Quitter la partie locale",
@@ -169,5 +179,107 @@
     "FRIEND_REQUEST_SENT": "Demande envoyée.",
     "FRIEND_REQUEST_ACCEPTED": "Demande acceptée !",
     "FRIEND_REQUEST_DELETED": "Demande supprimée."
+  },
+  "legal": {
+    "privacy": "Confidentialité",
+    "terms": "CGU",
+    "privacyTab": "Politique de confidentialité",
+    "termsTab": "Conditions d'utilisation",
+    "close": "Fermer",
+    "privacyDoc": {
+      "title": "Politique de confidentialité",
+      "updated": "Dernière mise à jour : Juillet 2026",
+      "sections": [
+        {
+          "heading": "1. Qui sommes-nous",
+          "paragraphs": [
+            "ChessGuard est un jeu d'échecs en ligne développé dans le cadre du cursus 42. Cette page décrit quelles données sont collectées lorsque vous utilisez l'application et pour quelles raisons."
+          ]
+        },
+        {
+          "heading": "2. Données collectées",
+          "list": [
+            "Votre adresse email et votre pseudo, fournis lors de l'inscription.",
+            "Votre mot de passe, stocké sous forme hachée et salée (jamais en clair).",
+            "L'historique de vos parties (coups joués, résultats, adversaires) nécessaire au fonctionnement du jeu et aux statistiques de votre profil.",
+            "Un jeton de session (token) conservé localement dans votre navigateur pour rester connecté."
+          ]
+        },
+        {
+          "heading": "3. Utilisation des données",
+          "paragraphs": [
+            "Ces données servent uniquement à faire fonctionner le service : authentification, mise en relation entre joueurs, sauvegarde de vos parties et affichage de votre profil. Elles ne sont ni vendues, ni partagées avec des tiers, ni utilisées à des fins publicitaires."
+          ]
+        },
+        {
+          "heading": "4. Conservation",
+          "paragraphs": [
+            "Vos données sont conservées tant que votre compte existe. Vous pouvez demander leur suppression à tout moment en supprimant votre compte ou en contactant l'équipe du projet."
+          ]
+        },
+        {
+          "heading": "5. Vos droits",
+          "paragraphs": [
+            "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles. Pour exercer ce droit, contactez l'équipe via le dépôt GitHub du projet."
+          ]
+        },
+        {
+          "heading": "6. Cookies et stockage local",
+          "paragraphs": [
+            "L'application utilise le stockage local du navigateur (localStorage) pour conserver votre jeton de connexion. Aucun cookie de tracking ou publicitaire n'est utilisé."
+          ]
+        }
+      ]
+    },
+    "termsDoc": {
+      "title": "Conditions d'utilisation",
+      "updated": "Dernière mise à jour : Juillet 2026",
+      "sections": [
+        {
+          "heading": "1. Objet",
+          "paragraphs": [
+            "Les présentes conditions régissent l'utilisation de ChessGuard, une plateforme de jeu d'échecs en ligne. En créant un compte, vous acceptez ces conditions dans leur intégralité."
+          ]
+        },
+        {
+          "heading": "2. Création de compte",
+          "paragraphs": [
+            "Vous devez fournir un email valide et un pseudo. Vous êtes responsable de la confidentialité de votre mot de passe et de toute activité effectuée depuis votre compte."
+          ]
+        },
+        {
+          "heading": "3. Bonne conduite",
+          "list": [
+            "Le fair-play est requis : l'utilisation d'outils d'aide externes pendant une partie en ligne est interdite.",
+            "Les pseudos et messages injurieux, discriminatoires ou illégaux ne sont pas tolérés.",
+            "Toute tentative de contournement de la sécurité de la plateforme entraîne la suspension du compte."
+          ]
+        },
+        {
+          "heading": "4. Fonctionnalités du jeu",
+          "paragraphs": [
+            "La plateforme propose des parties en local, en ligne et contre une intelligence artificielle. Les résultats et statistiques affichés reflètent les parties réellement jouées sur la plateforme."
+          ]
+        },
+        {
+          "heading": "5. Disponibilité du service",
+          "paragraphs": [
+            "ChessGuard est un projet étudiant fourni \"tel quel\", sans garantie de disponibilité continue. Le service peut être interrompu ou modifié à tout moment, notamment pour maintenance."
+          ]
+        },
+        {
+          "heading": "6. Suppression de compte",
+          "paragraphs": [
+            "Vous pouvez demander la suppression de votre compte à tout moment. Cela entraîne la suppression de vos données personnelles conformément à notre politique de confidentialité."
+          ]
+        },
+        {
+          "heading": "7. Contact",
+          "paragraphs": [
+            "Pour toute question relative à ces conditions, contactez l'équipe via le dépôt GitHub du projet."
+          ]
+        }
+      ]
+    }
   }
 }

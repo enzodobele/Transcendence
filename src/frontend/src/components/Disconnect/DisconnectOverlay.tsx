@@ -52,17 +52,10 @@ export const DisconnectionOverlay: React.FC<DisconnectionOverlayProps> = ({
   return (
     <div className="disconnection-overlay">
       <div className="disconnection-content">
-        
+
         <div className="disconnection-header">
           <span style={{ color: "#ef4444" }}>⚠️</span>
           <h4 className="disconnection-title">{t("disconnect.title")}</h4>
-        </div>
-
-        <div className="disconnection-timer-row">
-          <span>{t("disconnect.timeRemaining")}</span>
-          <span className="disconnection-timer-countdown">
-            {secondsLeft > 0 ? formatTime(secondsLeft) : t("disconnect.ready")}
-          </span>
         </div>
 
         {canClaim ? (
@@ -70,9 +63,18 @@ export const DisconnectionOverlay: React.FC<DisconnectionOverlayProps> = ({
             {t("disconnect.claimVictory")}
           </button>
         ) : (
-          <div className="disconnection-wait-text">
-            {t("disconnect.waitRequired")}
-          </div>
+          <>
+            <div className="disconnection-timer-row">
+              <span>{t("disconnect.timeRemaining")}</span>
+              <span className="disconnection-timer-countdown">
+                {formatTime(secondsLeft)}
+              </span>
+            </div>
+
+            <div className="disconnection-wait-text">
+              {t("disconnect.waitRequired")}
+            </div>
+          </>
         )}
 
       </div>

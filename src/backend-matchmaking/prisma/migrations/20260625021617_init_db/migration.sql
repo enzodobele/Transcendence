@@ -8,7 +8,6 @@ CREATE TABLE "users" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "lastLogin" TIMESTAMP(3),
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "avatarUrl" TEXT,
     "bio" TEXT,
     "currentGameId" INTEGER,
@@ -25,7 +24,6 @@ CREATE TABLE "games" (
     "endTime" TIMESTAMP(3),
     "status" TEXT NOT NULL DEFAULT 'en_cours',
     "winnerId" INTEGER,
-    "timeControl" TEXT NOT NULL DEFAULT '5+0',
     "isRated" BOOLEAN NOT NULL DEFAULT true,
     "fenString" TEXT NOT NULL,
 
@@ -64,7 +62,6 @@ CREATE TABLE "friends" (
 CREATE TABLE "waitlistEntry" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "timeControl" TEXT NOT NULL DEFAULT '5+0',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "waitlistEntry_pkey" PRIMARY KEY ("id")

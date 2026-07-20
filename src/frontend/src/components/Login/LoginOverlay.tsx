@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { login, register } from "../../services/auth";
 import { useAuth } from "../../contexts/AuthContext";
+import { LegalModal, type LegalTab } from "../Legal/LegalModal";
 import "../../styles/Login/LoginOverlay.css";
 
 interface LoginProps {
@@ -15,6 +16,9 @@ export function Login({ isOpen, onClose }: LoginProps) {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [legalOpen, setLegalOpen] = useState(false);
+  const [legalTab, setLegalTab] = useState<LegalTab>("privacy");
   const { login: loginUser } = useAuth();
   const { t } = useTranslation();
 
@@ -23,6 +27,12 @@ export function Login({ isOpen, onClose }: LoginProps) {
     setPassword("");
     setUsername("");
     setError("");
+    setAcceptedTerms(false);
+  }
+
+  function openLegal(tab: LegalTab) {
+    setLegalTab(tab);
+    setLegalOpen(true);
   }
 
   function handleCloseAll() {
@@ -36,6 +46,11 @@ export function Login({ isOpen, onClose }: LoginProps) {
     
     try {
       setError("");
+
+      if (isRegister && !acceptedTerms) {
+        setError(t("login.mustAcceptTerms"));
+        return;
+      }
 
       if (isRegister) {
         const data = await register(email, username, password);
@@ -130,7 +145,26 @@ export function Login({ isOpen, onClose }: LoginProps) {
           className="login-input"
         />
 
-        <button type="submit" className="login-submit-button">
+        {isRegister && (
+          <label className="login-terms-checkbox">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+            />
+            <span>
+              <Trans i18nKey="login.acceptTerms">
+                J'accepte les <button type="button" className="login-terms-link" onClick={() => openLegal("terms")}>CGU</button> et la <button type="button" className="login-terms-link" onClick={() => openLegal("privacy")}>politique de confidentialité</button>
+              </Trans>
+            </span>
+          </label>
+        )}
+
+        <button
+          type="submit"
+          className="login-submit-button"
+          disabled={isRegister && !acceptedTerms}
+        >
           {isRegister ? t("login.createAccount") : t("login.signIn")}
         </button>
 
@@ -147,6 +181,8 @@ export function Login({ isOpen, onClose }: LoginProps) {
             : t("login.switchToRegister")}
         </button>
       </form>
+
+      <LegalModal isOpen={legalOpen} initialTab={legalTab} onClose={() => setLegalOpen(false)} />
     </div>
   );
 }

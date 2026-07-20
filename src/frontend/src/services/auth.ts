@@ -97,6 +97,19 @@ export async function updateProfile(fields: {
   return response.json();
 }
 
+export async function deleteAccount() {
+  const response = await fetch("/api/auth/me", {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(response, "SERVER_ERROR"),
+    );
+  }
+}
+
 export async function sendFriendRequest(username: string) {
   const response = await fetch("/api/friends/request", {
     method: "POST",
