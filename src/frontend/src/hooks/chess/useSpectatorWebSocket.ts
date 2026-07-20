@@ -11,6 +11,7 @@ interface UseSpectatorWebSocketProps {
   syncWithServerFen: (fen: string, history?: CustomMove[]) => void;
   onGameOver: (message: string) => void;
   onGameInfo: (info: SpectatorGameInfo) => void;
+  onGameNotAvailable: () => void;
 }
 
 export function useSpectatorWebSocket({
@@ -18,12 +19,15 @@ export function useSpectatorWebSocket({
   syncWithServerFen,
   onGameOver,
   onGameInfo,
+  onGameNotAvailable,
 }: UseSpectatorWebSocketProps) {
   const wsRef = useRef<WebSocket | null>(null);
   const syncRef = useRef(syncWithServerFen);
   const gameOverRef = useRef(onGameOver);
   const gameInfoRef = useRef(onGameInfo);
+  const gameNotAvailableRef = useRef(onGameNotAvailable);
   const lastGameInfo = useRef<SpectatorGameInfo | null>(null);
+  const syncReceived = useRef(false);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
@@ -39,6 +43,10 @@ export function useSpectatorWebSocket({
   }, [onGameInfo]);
 
   useEffect(() => {
+    gameNotAvailableRef.current = onGameNotAvailable;
+  }, [onGameNotAvailable]);
+
+  useEffect(() => {
     if (!gameId) return;
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -47,6 +55,14 @@ export function useSpectatorWebSocket({
     const wsUrl = `${protocol}//${window.location.host}/ws?spectator=1&gameId=${gameId}${tokenParam}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
+    syncReceived.current = false;
+
+    const connectionTimeout = setTimeout(() => {
+      if (!syncReceived.current) {
+        ws.close();
+        gameNotAvailableRef.current();
+      }
+    }, 5000);
 
     ws.onopen = () => setIsConnected(true);
 
@@ -55,6 +71,8 @@ export function useSpectatorWebSocket({
         const message = JSON.parse(event.data);
         switch (message.type) {
           case "sync": {
+            syncReceived.current = true;
+            clearTimeout(connectionTimeout);
             const info: SpectatorGameInfo = {
               player1Username: message.player1Username ?? "",
               player2Username: message.player2Username ?? "",
@@ -78,11 +96,11 @@ export function useSpectatorWebSocket({
             gameOverRef.current(
               message.reason === "resign"
                 ? winner
-                  ? `${winner} gagne — adversaire abandonné`
+                  ? `${winner} gagne — l'adversaire a abandonné`
                   : "Partie terminée par abandon"
                 : message.reason === "abandon"
                 ? winner
-                  ? `${winner} gagne — adversaire forfait`
+                  ? `${winner} gagne — adversaire a déclaré forfait`
                   : "Partie terminée par forfait"
                 : "Partie nulle !",
             );
@@ -95,9 +113,19 @@ export function useSpectatorWebSocket({
     };
 
     ws.onerror = () => setIsConnected(false);
-    ws.onclose = () => setIsConnected(false);
+    ws.onclose = (event) =>
+    {
+      setIsConnected(false);
+      clearTimeout(connectionTimeout);
+      if (event.code === 4004)
+      {
+        gameNotAvailableRef.current();
+      }
+    };
 
-    return () => {
+    return () =>
+    {
+      clearTimeout(connectionTimeout);
       ws.close();
       wsRef.current = null;
     };
