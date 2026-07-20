@@ -28,7 +28,7 @@ COPY --chown=nodejs:nodejs . .
 FROM node:22-alpine
 
 # Installe les dépendances nécessaires
-RUN apk add --no-cache wget postgresql-client
+RUN apk add --no-cache wget postgresql-client su-exec
 
 # Crée le groupe et l'utilisateur nodejs (UID 1001)
 RUN addgroup -g 1001 -S nodejs && \
@@ -56,7 +56,8 @@ RUN mkdir -p /app/uploads/avatars && chown -R nodejs:nodejs /app/uploads
 
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 
-USER nodejs
+# No USER here: the entrypoint starts as root to read the secrets mounted
+# with 0600 host perms, then drops to 'nodejs' via su-exec.
 
 # Port d'écoute pour l'Auth
 EXPOSE 3000

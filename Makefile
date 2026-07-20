@@ -23,7 +23,6 @@ REQUIRED_DEV_SECRETS := \
     $(SECRETS_DIR)/db_name.txt \
     $(SECRETS_DIR)/db_password.txt \
     $(SECRETS_DIR)/jwt_secret.txt \
-    $(SECRETS_DIR)/pgadmin_password.txt \
     $(SECRETS_DIR)/portainer_password.txt
 
 

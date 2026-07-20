@@ -26,6 +26,19 @@ export DB_PASSWORD=$(read_secret_strict "db_password")
 export JWT_SECRET=$(read_secret_strict "jwt_secret")
 
 # =============================================
+# Secrets copy for the 'nodejs' user
+# =============================================
+# /run/secrets is readable only by root (0600 on the host); the app runs as
+# 'nodejs' and reads JWT_SECRET_FILE, so it gets a dedicated readable copy.
+APP_SECRETS_DIR="/tmp/app-secrets"
+mkdir -p "$APP_SECRETS_DIR"
+cp /run/secrets/* "$APP_SECRETS_DIR/"
+chown -R nodejs:nodejs "$APP_SECRETS_DIR"
+chmod 700 "$APP_SECRETS_DIR"
+chmod 400 "$APP_SECRETS_DIR"/*
+export JWT_SECRET_FILE="$APP_SECRETS_DIR/jwt_secret"
+
+# =============================================
 # Construction de DATABASE_URL
 # =============================================
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
@@ -57,4 +70,4 @@ done
 # Démarrage du backend
 # =============================================
 echo "[+] Starting backend-game..."
-exec "$@"
+exec su-exec nodejs "$@"
