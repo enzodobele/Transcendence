@@ -23,6 +23,7 @@ export function useSpectatorWebSocket({
   const syncRef = useRef(syncWithServerFen);
   const gameOverRef = useRef(onGameOver);
   const gameInfoRef = useRef(onGameInfo);
+  const lastGameInfo = useRef<SpectatorGameInfo | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
@@ -53,25 +54,40 @@ export function useSpectatorWebSocket({
       try {
         const message = JSON.parse(event.data);
         switch (message.type) {
-          case "sync":
-            syncRef.current(message.fen, message.history);
-            gameInfoRef.current({
+          case "sync": {
+            const info: SpectatorGameInfo = {
               player1Username: message.player1Username ?? "",
               player2Username: message.player2Username ?? "",
-            });
+            };
+            lastGameInfo.current = info;
+            syncRef.current(message.fen, message.history);
+            gameInfoRef.current(info);
             break;
+          }
           case "opponent_move":
             syncRef.current(message.fen);
             break;
-          case "game_over":
+          case "game_over": {
+            const info = lastGameInfo.current;
+            const winner =
+              message.winnerColor === "white"
+                ? info ? info.player1Username : "Les blancs"
+                : message.winnerColor === "black"
+                ? info ? info.player2Username : "Les noirs"
+                : null;
             gameOverRef.current(
               message.reason === "resign"
-                ? "Partie terminée par abandon"
+                ? winner
+                  ? `${winner} gagne — adversaire abandonné`
+                  : "Partie terminée par abandon"
                 : message.reason === "abandon"
-                ? "Partie terminée par forfait"
+                ? winner
+                  ? `${winner} gagne — adversaire forfait`
+                  : "Partie terminée par forfait"
                 : "Partie nulle !",
             );
             break;
+          }
         }
       } catch {
         // Silence: le spectateur ignore les messages invalides.
