@@ -41,13 +41,10 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(false);
-<<<<<<< HEAD
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-=======
   const isCurrentUserInGame = !!user?.currentGame?.id;
->>>>>>> origin/Arthur-healthcheck
 
   const reload = () => {
     getFriends().then(setFriends).catch(() => {});

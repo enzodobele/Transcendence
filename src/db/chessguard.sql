@@ -9,7 +9,6 @@ CREATE TABLE users (
     elo_rating INT DEFAULT 500,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME NULL,
-    is_active BOOLEAN DEFAULT TRUE,
     avatar_url VARCHAR(255) NULL,
     bio TEXT NULL
 );
