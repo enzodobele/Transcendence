@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { login, register } from "../../services/auth";
 import { useAuth } from "../../contexts/AuthContext";
 import { LegalModal, type LegalTab } from "../Legal/LegalModal";
@@ -19,6 +20,7 @@ export function Login({ isOpen, onClose }: LoginProps) {
   const [legalOpen, setLegalOpen] = useState(false);
   const [legalTab, setLegalTab] = useState<LegalTab>("privacy");
   const { login: loginUser } = useAuth();
+  const { t } = useTranslation();
 
   function resetFields() {
     setEmail("");
@@ -46,7 +48,7 @@ export function Login({ isOpen, onClose }: LoginProps) {
       setError("");
 
       if (isRegister && !acceptedTerms) {
-        setError("Vous devez accepter les CGU et la politique de confidentialité.");
+        setError(t("login.mustAcceptTerms"));
         return;
       }
 
@@ -67,8 +69,8 @@ export function Login({ isOpen, onClose }: LoginProps) {
           onClose();
         }
       }
-    } catch (err: any) {
-      setError(err.message || "Utilisateur introuvable");
+    } catch (err) {
+      setError(t("errors." + (err instanceof Error ? err.message : "GENERIC"), { defaultValue: t("errors.GENERIC") }));
     }
   }
 
@@ -99,41 +101,41 @@ export function Login({ isOpen, onClose }: LoginProps) {
         </button>
 
         <h2 className="login-title">
-          {isRegister ? "Créer un compte" : "Bon retour"}
+          {isRegister ? t("login.createAccount") : t("login.welcomeBack")}
         </h2>
 
         <p className="login-subtitle">
           {isRegister
-            ? "Créez un compte pour jouer en ligne"
-            : "Connectez-vous pour jouer en ligne"}
+            ? t("login.subtitleRegister")
+            : t("login.subtitleLogin")}
         </p>
 
         {error && <p className="login-error">{error}</p>}
 
         {isRegister && (
           <>
-            <strong className="login-label">Pseudo</strong>
+            <strong className="login-label">{t("login.pseudo")}</strong>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="JonDoe"
+              placeholder={t("login.usernamePlaceholder")}
               className="login-input login-input-username"
             />
           </>
         )}
 
-        <strong className="login-label">Email</strong>
+        <strong className="login-label">{t("login.email")}</strong>
         <input
           type="text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="vous@exemple.com"
+          placeholder={t("login.emailPlaceholder")}
           className="login-input"
         />
 
         <strong className="login-label login-password-label">
-          Mot de passe
+          {t("login.password")}
         </strong>
         <input
           type="password"
@@ -151,14 +153,9 @@ export function Login({ isOpen, onClose }: LoginProps) {
               onChange={(e) => setAcceptedTerms(e.target.checked)}
             />
             <span>
-              J'accepte les{" "}
-              <button type="button" className="login-terms-link" onClick={() => openLegal("terms")}>
-                CGU
-              </button>{" "}
-              et la{" "}
-              <button type="button" className="login-terms-link" onClick={() => openLegal("privacy")}>
-                politique de confidentialité
-              </button>
+              <Trans i18nKey="login.acceptTerms">
+                J'accepte les <button type="button" className="login-terms-link" onClick={() => openLegal("terms")}>CGU</button> et la <button type="button" className="login-terms-link" onClick={() => openLegal("privacy")}>politique de confidentialité</button>
+              </Trans>
             </span>
           </label>
         )}
@@ -168,7 +165,7 @@ export function Login({ isOpen, onClose }: LoginProps) {
           className="login-submit-button"
           disabled={isRegister && !acceptedTerms}
         >
-          {isRegister ? "Créer un compte" : "Se connecter"}
+          {isRegister ? t("login.createAccount") : t("login.signIn")}
         </button>
 
         <button
@@ -180,8 +177,8 @@ export function Login({ isOpen, onClose }: LoginProps) {
           className="login-switch-button"
         >
           {isRegister
-            ? "Déjà un compte ? Se connecter"
-            : "Pas encore de compte ? S'inscrire"}
+            ? t("login.switchToLogin")
+            : t("login.switchToRegister")}
         </button>
       </form>
 

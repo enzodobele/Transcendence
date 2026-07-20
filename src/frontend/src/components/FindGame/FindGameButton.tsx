@@ -1,4 +1,5 @@
 import { LayoutGrid } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import "../../styles/FindGame/FindGameButton.css";
 
 interface FindGameButtonProps {
@@ -6,8 +7,9 @@ interface FindGameButtonProps {
 }
 
 export function FindGameButton({ onClick }: FindGameButtonProps) {
+  const { t } = useTranslation();
   return (
-    <button onClick={onClick} className="button-find-game" title="Autres modes de jeu">
+    <button onClick={onClick} className="button-find-game" title={t("findGame.otherModes")}>
       <LayoutGrid size={18} />
     </button>
   );

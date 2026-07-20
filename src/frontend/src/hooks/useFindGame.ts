@@ -1,9 +1,11 @@
 // frontend/src/hooks/useFindGame.ts
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../contexts/AuthContext";
 import { joinWaitlistApi, leaveWaitlistApi } from "../services/findGame";
 
 export function useFindGame() {
+  const { t } = useTranslation();
   const { user, refreshUserStatus } = useAuth();
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState("");
@@ -39,14 +41,15 @@ const startSearch = async () => {
     // 2. LE CHECKSUM DE SÉCURITÉ : Si l'user n'est pas là, on arrête tout de suite.
     // TypeScript comprend alors que dans les lignes suivantes, 'user' ne PEUT PAS être null.
     if (!user || !user.id) {
-      throw new Error("Vous devez être connecté pour jouer.");
+      throw new Error("MUST_BE_LOGGED_IN");
     }
 
     setError("");
     await joinWaitlistApi(user.id); // 🔥 Ici, user.id est garanti 100% safe pour TS
     setIsSearching(true);
-  } catch (err: any) {
-    setError(err.message || "Erreur lors du lancement de la recherche");
+  } catch (err) {
+    const code = err instanceof Error ? err.message : "GENERIC";
+    setError(t("errors." + code, { defaultValue: t("errors.GENERIC") }));
   }
 };
 

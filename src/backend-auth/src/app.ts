@@ -29,7 +29,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     return res.status(400).json({ error: err.message });
   }
   console.error(err);
-  res.status(500).json({ error: "Erreur serveur" });
+  res.status(500).json({ error: "SERVER_ERROR" });
 });
 
 const PORT = process.env.PORT; // Il écoutera sur le port 3000 dans son conteneur

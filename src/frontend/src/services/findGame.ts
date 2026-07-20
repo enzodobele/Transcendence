@@ -21,7 +21,7 @@ export async function joinWaitlistApi(userId: string | number) {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.error || "Impossible de rejoindre la file d'attente");
+    throw new Error(error.error || "SERVER_ERROR");
   }
 
   return response.json();
@@ -39,7 +39,7 @@ export async function leaveWaitlistApi(userId: string | number) {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.error || "Impossible de quitter la file d'attente");
+    throw new Error(error.error || "SERVER_ERROR");
   }
 
   return response.json();

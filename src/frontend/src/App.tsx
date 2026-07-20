@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "./contexts/AuthContext";
 import { useGameLogic } from "./hooks/chess/useGameLogic";
 import { useFindGame } from "./hooks/useFindGame";
@@ -17,8 +18,10 @@ import { FindGameButton } from "./components/FindGame/FindGameButton";
 import { FindGameOverlay, type SelectedGameMode } from "./components/FindGame/FindGameOverlay";
 import { PlayButton } from "./components/Play/PlayButton";
 import { Switch3DButton } from "./components/Board/Switch3DButton";
+import { LanguageSwitcher } from "./components/LanguageSwitcher/LanguageSwitcher";
 
 export default function App() {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading, user, token, refreshUserStatus } = useAuth();
 
   // 1. Logique unifiée du jeu d'échecs
@@ -40,7 +43,7 @@ export default function App() {
   const { isSearching, error: findGameError, startSearch, cancelSearch } = useFindGame();
   const [selectedMode, setSelectedMode] = useState<SelectedGameMode>({
     id: "local",
-    label: "Partie Libre",
+    label: t("findGame.modes.local.title"),
   });
 
   // 3. Déclencheur du bouton d'action principal
@@ -59,7 +62,7 @@ export default function App() {
         startSearch();
         break;
       case "duel":
-        alert("Lien d'invitation bientôt dispo ! (En attente du backend)");
+        alert(t("findGame.inviteComingSoon"));
         break;
       case "local":
       default:
@@ -71,7 +74,7 @@ export default function App() {
   if (isLoading) {
     return (
       <div className="app-loading">
-        <div className="spinner">Chargement de ChessGuard...</div>
+        <div className="spinner">{t("common.loading")}</div>
       </div>
     );
   }
@@ -80,6 +83,8 @@ export default function App() {
 
   return (
     <div className={`app${is3D && isInActiveGame ? " app-3d" : ""}`}>
+      <LanguageSwitcher />
+
       {/* Profil / Connexion */}
       {isAuthenticated ? <ProfileButton /> : <LoginButton />}
 
@@ -146,9 +151,9 @@ export default function App() {
             {isAuthenticated && (
               <>
                 {findGameError && <p className="lobby-error">{findGameError}</p>}
-                <PlayButton 
-                  label={selectedMode.id === "matchmaking" ? "Trouver un adversaire" : selectedMode.label} 
-                  onClick={runSelectedMode} 
+                <PlayButton
+                  label={selectedMode.id === "matchmaking" ? t("findGame.findOpponent") : selectedMode.label}
+                  onClick={runSelectedMode}
                 />
               </>
             )}
