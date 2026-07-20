@@ -104,14 +104,11 @@ Le spectateur ne peut pas:
 
 La page spectateur affiche désormais:
 - si les deux joueurs observés sont des amis:
-  - `Alice joue les blancs (ami)`
-  - `Bob joue les noirs (ami)`
+  - `<Pseudo_joueur> joue les blancs (ami)`
+  - `<Pseudo_joueur> joue les noirs (ami)`
 - si un seul des deux joueurs est un ami:
-  - `Votre ami Alice joue les blancs.`
-  - ou `Votre ami Bob joue les noirs.`
-- sinon:
-  - `Alice joue les blancs.`
-  - `Bob joue les noirs.`
+  - `Votre ami <Pseudo_joueur> joue les blancs.`
+  - ou `Votre ami <Pseudo_joueur> joue les noirs.`
 
 Cela permet au spectateur de comprendre immédiatement quelle couleur joue son ami.
 
@@ -165,7 +162,3 @@ Montrer:
 Dire:
 - "Le spectateur ne peut pas interagir avec la partie."
 - "Un joueur déjà engagé dans une partie ne peut pas se spectate lui-même."
-
-## 6) Message final conseillé au jury (10s)
-Dire:
-- "Cette feature réutilise l'architecture temps réel existante, avec peu de code supplémentaire, tout en restant sûre et lisible côté utilisateur."

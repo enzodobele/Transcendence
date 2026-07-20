@@ -60,6 +60,7 @@ export function SpectatorPage() {
     syncWithServerFen,
     onGameOver: (message) => setCustomGameOver(message),
     onGameInfo: (info) => setGameInfo(info),
+    onGameNotAvailable: quitSpectatorMode,
   });
 
   useEffect(() => {
