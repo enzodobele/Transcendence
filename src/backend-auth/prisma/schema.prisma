@@ -20,7 +20,6 @@ model User {
   updatedAt      DateTime @updatedAt
   lastLogin      DateTime?
   lastSeen       DateTime?
-  isActive       Boolean @default(true)
   avatarUrl      String?
   bio            String?
   currentGameId  Int?
@@ -52,7 +51,6 @@ model Game {
   endTime      DateTime?
   status       String     @default("en_cours") // "en_cours" | "terminee" | "abandonnee" | "nulle"
   winnerId     Int?
-  timeControl  String     @default("5+0")
   isRated      Boolean    @default(true)
   fenString    String     // État actuel du plateau (FEN)
 
