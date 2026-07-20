@@ -51,6 +51,8 @@ export const initGameWebSocket = (server: http.Server) => {
           color: "spectator",
           fen: room.game.fen(),
           history: customMoveHistory,
+          player1Username: spectatorValidation.dbGame.player1?.username ?? "",
+          player2Username: spectatorValidation.dbGame.player2?.username ?? "",
         }),
       );
 

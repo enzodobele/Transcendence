@@ -4,13 +4,15 @@ export interface HealthPayload {
   uptime: string;
 }
 
+type BackendState = "online" | "degraded" | "offline";
+
 export interface BackupStatusPayload {
   lastBackup: string | null;
   file?: string;
 }
 
 export interface SystemStatus {
-  backendOnline: boolean;
+  backendState: BackendState;
   databaseOnline: boolean;
   webSocketOnline: boolean;
   uptime: string;
@@ -18,14 +20,21 @@ export interface SystemStatus {
   checkedAt: string;
 }
 
-async function getHealth(): Promise<HealthPayload | null> {
+async function getHealth(): Promise<{ payload: HealthPayload | null; reachable: boolean } | null> {
   try {
     const response = await fetch("/api/status/health", { cache: "no-store" });
-    if (!response.ok) {
-      return null;
+    let payload: HealthPayload | null = null;
+
+    try {
+      payload = (await response.json()) as HealthPayload;
+    } catch {
+      payload = null;
     }
 
-    return (await response.json()) as HealthPayload;
+    return {
+      payload,
+      reachable: true,
+    };
   } catch {
     return null;
   }
@@ -44,48 +53,13 @@ async function getBackupStatus(): Promise<BackupStatusPayload | null> {
   }
 }
 
-export function checkWebSocketOnline(timeoutMs = 3000): Promise<boolean> {
-  return new Promise((resolve) => {
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    let settled = false;
-    let opened = false;
-    let ws: WebSocket | null = null;
-
-    const finish = (online: boolean) => {
-      if (settled) {
-        return;
-      }
-
-      settled = true;
-      window.clearTimeout(timeoutId);
-
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close();
-      }
-
-      resolve(online);
-    };
-
-    const timeoutId = window.setTimeout(() => finish(false), timeoutMs);
-
-    try {
-      ws = new WebSocket(wsUrl);
-
-      ws.onopen = () => {
-        opened = true;
-        finish(true);
-      };
-
-      ws.onerror = () => finish(false);
-
-      ws.onclose = () => {
-        finish(opened);
-      };
-    } catch {
-      finish(false);
-    }
-  });
+export async function checkWebSocketOnline(): Promise<boolean> {
+  try {
+    const response = await fetch("/api/status/ws", { cache: "no-store" });
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 export async function fetchSystemStatus(): Promise<SystemStatus> {
@@ -95,11 +69,19 @@ export async function fetchSystemStatus(): Promise<SystemStatus> {
     checkWebSocketOnline(),
   ]);
 
+  const healthPayload = health?.payload ?? null;
+  const backendState: BackendState =
+    !health || !health.reachable
+      ? "offline"
+      : healthPayload?.status === "degraded"
+      ? "degraded"
+      : "online";
+
   return {
-    backendOnline: !!health,
-    databaseOnline: health?.database === "connected",
+    backendState,
+    databaseOnline: healthPayload?.database === "connected",
     webSocketOnline,
-    uptime: health?.uptime ?? "unknown",
+    uptime: healthPayload?.uptime ?? "unknown",
     lastBackup: backup?.lastBackup ?? "never",
     checkedAt: new Date().toISOString(),
   };

@@ -1,8 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GameView } from "./Board/GameView";
 import { useChessGame } from "../hooks/chess/useChessGame";
-import { useSpectatorWebSocket } from "../hooks/chess/useSpectatorWebSocket";
+import { getFriends } from "../services/auth";
+import { useSpectatorWebSocket, type SpectatorGameInfo } from "../hooks/chess/useSpectatorWebSocket";
 import "../styles/main.css";
+
+interface FriendSummary {
+  username: string;
+}
 
 function noopSquareClick(_square: string): void
 {
@@ -33,6 +38,8 @@ function getGameIdFromUrl(): number | undefined {
 export function SpectatorPage() {
   const gameId = useMemo(() => getGameIdFromUrl(), []);
   const [customGameOver, setCustomGameOver] = useState<string | null>(null);
+  const [friends, setFriends] = useState<FriendSummary[]>([]);
+  const [gameInfo, setGameInfo] = useState<SpectatorGameInfo | null>(null);
 
   const {
     game,
@@ -52,7 +59,53 @@ export function SpectatorPage() {
     gameId,
     syncWithServerFen,
     onGameOver: (message) => setCustomGameOver(message),
+    onGameInfo: (info) => setGameInfo(info),
   });
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      setFriends([]);
+      return;
+    }
+
+    getFriends()
+      .then((nextFriends) => {
+        setFriends(nextFriends.map((friend) => ({ username: friend.username })));
+      })
+      .catch(() => {
+        setFriends([]);
+      });
+  }, []);
+
+  const spectatorLabels = useMemo(() => {
+    if (!gameInfo) {
+      return [] as string[];
+    }
+
+    const friendNames = new Set(friends.map((friend) => friend.username.toLowerCase()));
+    const whiteIsFriend = friendNames.has(gameInfo.player1Username.toLowerCase());
+    const blackIsFriend = friendNames.has(gameInfo.player2Username.toLowerCase());
+
+    if (whiteIsFriend && blackIsFriend) {
+      return [
+        `Votre amie ${gameInfo.player1Username} joue les blancs.`,
+        `Votre ami ${gameInfo.player2Username} joue les noirs.`,
+      ];
+    }
+
+    if (whiteIsFriend) {
+      return [`Votre ami ${gameInfo.player1Username} joue les blancs.`];
+    }
+
+    if (blackIsFriend) {
+      return [`Votre ami ${gameInfo.player2Username} joue les noirs.`];
+    }
+
+    return [
+      `${gameInfo.player1Username} joue les blancs.`,
+      `${gameInfo.player2Username} joue les noirs.`,
+    ];
+  }, [friends, gameInfo]);
 
   if (!gameId) {
     return (
@@ -67,6 +120,28 @@ export function SpectatorPage() {
       <div style={{ position: "absolute", top: 16, left: 16, color: "white" }}>
         Spectator mode {isConnected ? "online" : "connecting..."}
       </div>
+
+      {spectatorLabels.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            top: 52,
+            left: 16,
+            zIndex: 10,
+            background: "rgba(8, 13, 24, 0.78)",
+            color: "#f2f5ff",
+            border: "1px solid rgba(255, 255, 255, 0.14)",
+            borderRadius: 12,
+            padding: "10px 12px",
+            display: "grid",
+            gap: 4,
+          }}
+        >
+          {spectatorLabels.map((label) => (
+            <span key={label}>{label}</span>
+          ))}
+        </div>
+      )}
 
       <button
         type="button"
