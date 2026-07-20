@@ -10,7 +10,7 @@
 
 .matchmaking-content {
   position: absolute;
-  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  top: clamp(4rem, 0.8vw, 0.6rem);
   right: clamp(0.4rem, 0.8vw, 0.6rem);
   width: 16rem;
 

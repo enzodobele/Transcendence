@@ -17,12 +17,11 @@ import { FindGameButton } from "./components/FindGame/FindGameButton";
 import { FindGameOverlay, type SelectedGameMode } from "./components/FindGame/FindGameOverlay";
 import { PlayButton } from "./components/Play/PlayButton";
 import { Switch3DButton } from "./components/Board/Switch3DButton";
-import { LegalLinks } from "./components/Legal/LegalLinks";
 
 export default function App() {
   const { isAuthenticated, isLoading, user, token, refreshUserStatus } = useAuth();
 
-  // 1. Logique unifiée du jeu d'échecs (Hook propre)
+  // 1. Logique unifiée du jeu d'échecs
   const {
     isLocalGame, isAIGame, isAIvsAI, is3D, setIs3D,
     customGameOver, drawOfferPending, isInActiveGame, playerColor,
@@ -57,7 +56,6 @@ export default function App() {
         handleStartAIvsAI(selectedMode.difficulty ?? 3);
         break;
       case "matchmaking":
-        setIsFindGameOpen(true);
         startSearch();
         break;
       case "duel":
@@ -92,13 +90,21 @@ export default function App() {
         isAuthenticated && <FindGameButton onClick={() => setIsFindGameOpen(true)} />
       )}
 
-      {/* Overlay de gestion des modes */}
+      {/* 🟢 Overlay d'attente et de sélection combiné */}
       <FindGameOverlay
-        isOpen={isFindGameOpen}
-        onClose={() => setIsFindGameOpen(false)}
+        isOpen={isFindGameOpen || isSearching} // Reste ouvert si la modale est appelée OU si une recherche s'exécute
+        onClose={() => {
+          if (!isSearching) setIsFindGameOpen(false);
+        }}
         isSearching={isSearching}
-        onCancelMatchmaking={cancelSearch}
-        onModeSelected={setSelectedMode}
+        onCancelMatchmaking={() => {
+          cancelSearch();
+          setIsFindGameOpen(false);
+        }}
+        onModeSelected={(mode: SelectedGameMode) => {
+          setSelectedMode(mode);
+          setIsFindGameOpen(false);
+        }}
       />
 
       {/* Rendu principal */}
@@ -123,29 +129,32 @@ export default function App() {
           onDrawRefuse={handleDrawRefuse}
         />
       ) : (
-<>
-    <LobbyView
-      isAuthenticated={isAuthenticated}
-      game={game} 
-      board={board} 
-      selected={selected}
-      capturedPieces={capturedPieces} 
-      pendingPromotion={pendingPromotion}
-      resetGame={handleResetGame} 
-      handlePromotionChoice={handlePromotionChoice}
-      handleSquareClick={handleSquareClick}
-    /> 
+        <>
+          <LobbyView
+            isAuthenticated={isAuthenticated}
+            game={game} 
+            board={board} 
+            selected={selected}
+            capturedPieces={capturedPieces} 
+            pendingPromotion={pendingPromotion}
+            resetGame={handleResetGame} 
+            handlePromotionChoice={handlePromotionChoice}
+            handleSquareClick={handleSquareClick}
+          /> 
 
-    <div className="lobby-actions">
-		{isAuthenticated && (
-			<>
-			{findGameError && <p className="lobby-error">{findGameError}</p>}
-			<PlayButton label={selectedMode.label} onClick={runSelectedMode} />
-			</>
-		)}
-	</div>
-	</>
-	)}
+          <div className="lobby-actions">
+            {isAuthenticated && (
+              <>
+                {findGameError && <p className="lobby-error">{findGameError}</p>}
+                <PlayButton 
+                  label={selectedMode.id === "matchmaking" ? "Trouver un adversaire" : selectedMode.label} 
+                  onClick={runSelectedMode} 
+                />
+              </>
+            )}
+          </div>
+        </>
+      )}
 
       {/* Éléments Flottants & Overlays de déconnexion */}
       <FloatingPiece dragPiece={dragPiece} game={game} />
@@ -157,8 +166,6 @@ export default function App() {
         onClaimVictory={sendClaimVictory}
       />
 
-      {/* Footer Légal global */}
-      <LegalLinks />
     </div>
   );
 }

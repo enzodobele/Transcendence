@@ -6,7 +6,7 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background-color: transparent; /* 🌟 Invisible pour capter les clics sur l'échiquier */
+  background-color: transparent;
   z-index: 100;
   overflow: visible;
 }
@@ -15,15 +15,15 @@
    2. PANNEAU DE PROFIL ANCRÉ EN HAUT À GAUCHE
    ========================================================================== */
 .profile-content {
-  position: absolute; /* Se repère par rapport au coin supérieur gauche de l'overlay */
-  top: clamp(0.4rem, 0.8vw, 0.6rem);  /* Même alignement vertical que ton sélecteur de modes */
-  left: clamp(0.4rem, 0.8vw, 0.6rem); /* Calé à gauche */
+  position: absolute;
+  top: clamp(4rem, 0.8vw, 0.6rem);
+  left: clamp(0.4rem, 0.8vw, 0.6rem);
   
   min-width: 15.5rem;
   padding: 1.8rem;
   border-radius: 1rem;
   background: rgba(251, 248, 241, 0.97);
-  backdrop-filter: blur(0.625rem); /* Optionnel : léger flou sous la modale pour le style */
+  backdrop-filter: blur(0.625rem);
   color: #1f1c17;
   border: 0.0625rem solid rgba(30, 25, 18, 0.1);
   box-shadow: 0 1.375rem 3.125rem rgba(14, 16, 18, 0.3); /* Converti en rem */

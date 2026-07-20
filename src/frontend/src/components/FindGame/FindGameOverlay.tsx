@@ -82,14 +82,14 @@ export function FindGameOverlay({
       action: () => setIsAIvsAIOpen(true),
       icon: Cpu,
     },
-    {
+	{
       id: "matchmaking",
       title: "Matchmaking Aléatoire",
       description: "Trouvez un adversaire à votre taille en ligne (Classement Elo).",
       direction: "up" as const,
       action: () => {
-        // Le matchmaking s'active immédiatement à la sélection
-        onModeSelected({ id: "matchmaking", label: "Matchmaking en cours..." });
+        onModeSelected({ id: "matchmaking", label: "Matchmaking" });
+        onClose();
       },
       icon: Globe,
     },

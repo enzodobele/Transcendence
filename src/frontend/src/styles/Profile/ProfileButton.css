@@ -61,8 +61,8 @@ button.profile-button {
   position: absolute;
   top: clamp(0.4rem, 0.8vw, 0.6rem);
   left: clamp(0.4rem, 0.8vw, 0.6rem);
-  width: 2.9rem;
-  height: 2.9rem;
+  width: 2.8rem;
+  height: 2.8rem;
   z-index: 6;
   overflow: hidden;
   border-radius: 0.9rem;
