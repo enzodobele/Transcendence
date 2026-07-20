@@ -73,7 +73,7 @@ export function StatusPage() {
     <main className="status-page">
       <section className="status-panel">
         <h1>ChessGuard Status</h1>
-        <p className="subtitle">Real-time monitoring of critical services</p>
+        <p className="subtitle">Etat en temps reel des services critiques</p>
 
         {isLoading && !status ? (
           <p>Chargement du statut...</p>

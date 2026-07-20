@@ -25,6 +25,11 @@ if ! docker ps --format '{{.Names}}' | grep -qx "$DB_CONTAINER"; then
   exit 1
 fi
 
+echo "[restore] Resetting database schema..."
+docker exec -i -e PGPASSWORD="$DB_PASSWORD" "$DB_CONTAINER" \
+  psql -U "$DB_USER" -d "$DB_NAME" \
+  -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+
 if echo "$INPUT_FILE" | grep -q '\.gz$'; then
   gzip -dc "$INPUT_FILE" | docker exec -i -e PGPASSWORD="$DB_PASSWORD" "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME"
 else

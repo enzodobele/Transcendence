@@ -53,9 +53,6 @@ Ce document récapitule exactement ce qui a été modifié pour la feature:
   - cible `backup`
   - cible `restore FILE=...`
 
-### Documentation
-- `documents/backup-restore.md`
-  - procédures backup, cron, restore, validation post-restore
 
 ## 2) Ce que la feature affiche concrètement
 
@@ -77,74 +74,57 @@ Page `/status`:
 - Last backup: date ISO du dernier backup
 - Last check: date/heure du dernier refresh
 
-## 3) Démo orale jury (script prêt à l'emploi)
 
-Durée cible: 2 à 4 minutes.
+## 3) Backup and Restore
 
-### Étape A - Contexte (20s)
-Dire:
-- "J'ai implémenté une brique DevOps légère: health check applicatif, page de statut temps réel, backup quotidien et procédure de restauration."
+### Backup script
 
-### Étape B - Health check backend (30s)
-Montrer:
-- Ouvrir `/api/status/health` (ou curl)
+The project now includes [scripts/backup.sh](../scripts/backup.sh).
 
-Dire:
-- "Cet endpoint vérifie que le service auth répond et que la DB est accessible."
-- "Il renvoie un JSON standard avec `status`, `database` et `uptime`."
+What it does:
+- creates a PostgreSQL dump from the running DB container
+- compresses it as `.sql.gz` in `backups/`
+- updates `src/nginx/html/backup-status.json` (read by the `/status` page)
+- keeps only the latest 7 backups
 
-### Étape C - Status page (45s)
-Montrer:
-- Ouvrir `/status`
-- Montrer les indicateurs Backend / Database / WebSocket / Last backup
-- Cliquer sur `Refresh`
-
-Dire:
-- "Cette page permet de diagnostiquer rapidement l'état plateforme sans lire les logs."
-- "On distingue un backend `degraded` d'un backend `offline`, ce qui est plus professionnel côté exploitation."
-
-### Étape D - Backup (45s)
-Montrer en terminal:
+Run manually:
 
 ```bash
 make backup
 ```
 
-Puis:
-- Montrer le dossier `backups/`
-- Montrer que `src/nginx/html/backup-status.json` est mis à jour
-- Rafraîchir `/status` et montrer la nouvelle date de Last backup
+### Automatic backup (cron)
 
-Dire:
-- "Le backup est compressé et historisé, avec rétention."
-
-### Étape E - Cron (20s)
-Montrer la ligne prévue:
+Example daily backup at 03:00:
 
 ```cron
 0 3 * * * /home/arthu/tronc_commun/Cercle_6/Transcendence/scripts/backup.sh >> /var/log/chessguard-backup.log 2>&1
 ```
 
-Dire:
-- "La sauvegarde est automatisée tous les jours à 03:00."
+### Restore script
 
-### Étape F - Restore documenté (30s)
-Montrer:
-- `documents/backup-restore.md`
-- commande:
+The project includes [scripts/restore.sh](../scripts/restore.sh).
+
+Run restore:
 
 ```bash
-make restore FILE=backups/<dump.sql.gz>
+make restore FILE=backups/<your_dump.sql.gz>
 ```
 
-Dire:
-- "La procédure de reprise est documentée, testable, et réutilisable par l'équipe."
+### Disaster recovery procedure (simple)
 
-## 4) Message final conseillé au jury (10s)
-Dire:
-- "Cette feature apporte observabilité, résilience et reprise après incident, avec une implémentation simple et maintenable."
+1. Stop write-heavy traffic to the app.
+2. Ensure the DB container is running.
+3. Run restore command with the selected backup.
+4. Restart application services.
+5. Validate:
+   - `/api/status/health` returns `status: ok` and `database: connected`
+   - `/status` shows Backend/Database/WebSocket online
 
-## 5) Commandes utiles
+
+
+
+## 4) Commandes utiles
 
 ```bash
 # Lancer un backup manuel
@@ -159,3 +139,4 @@ curl -sk https://localhost/api/status/health
 # Vérifier le statut game/ws
 curl -sk https://localhost/api/status/ws
 ```
+
