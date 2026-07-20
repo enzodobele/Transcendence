@@ -134,21 +134,18 @@ export default function App() {
       resetGame={handleResetGame} 
       handlePromotionChoice={handlePromotionChoice}
       handleSquareClick={handleSquareClick}
-    /> {/* 👈 Fermeture immédiate ici, plus de children ! */}
+    /> 
 
-    {/* 🟢 Le bloc d'actions est maintenant un composant frère classique */}
     <div className="lobby-actions">
-      {isAuthenticated ? (
-        <>
-          {findGameError && <p className="lobby-error">{findGameError}</p>}
-          <PlayButton label={selectedMode.label} onClick={runSelectedMode} />
-        </>
-      ) : (
-        <p className="login-prompt">Connectez-vous pour d'autres fonctionnalités.</p>
-      )}
-    </div>
-  </>
-)}
+		{isAuthenticated && (
+			<>
+			{findGameError && <p className="lobby-error">{findGameError}</p>}
+			<PlayButton label={selectedMode.label} onClick={runSelectedMode} />
+			</>
+		)}
+	</div>
+	</>
+	)}
 
       {/* Éléments Flottants & Overlays de déconnexion */}
       <FloatingPiece dragPiece={dragPiece} game={game} />

@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 // Prisma configuration file for the backend-auth service
 import { defineConfig } from '@prisma/config';
 
