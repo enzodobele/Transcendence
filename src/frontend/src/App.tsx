@@ -123,26 +123,32 @@ export default function App() {
           onDrawRefuse={handleDrawRefuse}
         />
       ) : (
-        <LobbyView
-          isAuthenticated={isAuthenticated}
-          game={game} board={board} selected={selected}
-          capturedPieces={capturedPieces} pendingPromotion={pendingPromotion}
-          resetGame={handleResetGame} handlePromotionChoice={handlePromotionChoice}
-          handleSquareClick={handleSquareClick}
-        >
-          {/* Le bouton d'action se greffe de manière transparente dans le Lobby */}
-          <div className="lobby-actions">
-            {isAuthenticated ? (
-              <>
-                {findGameError && <p className="lobby-error">{findGameError}</p>}
-                <PlayButton label={selectedMode.label} onClick={runSelectedMode} />
-              </>
-            ) : (
-              <p className="login-prompt">Connectez-vous pour défier des joueurs en ligne.</p>
-            )}
-          </div>
-        </LobbyView>
+<>
+    <LobbyView
+      isAuthenticated={isAuthenticated}
+      game={game} 
+      board={board} 
+      selected={selected}
+      capturedPieces={capturedPieces} 
+      pendingPromotion={pendingPromotion}
+      resetGame={handleResetGame} 
+      handlePromotionChoice={handlePromotionChoice}
+      handleSquareClick={handleSquareClick}
+    /> {/* 👈 Fermeture immédiate ici, plus de children ! */}
+
+    {/* 🟢 Le bloc d'actions est maintenant un composant frère classique */}
+    <div className="lobby-actions">
+      {isAuthenticated ? (
+        <>
+          {findGameError && <p className="lobby-error">{findGameError}</p>}
+          <PlayButton label={selectedMode.label} onClick={runSelectedMode} />
+        </>
+      ) : (
+        <p className="login-prompt">Connectez-vous pour d'autres fonctionnalités.</p>
       )}
+    </div>
+  </>
+)}
 
       {/* Éléments Flottants & Overlays de déconnexion */}
       <FloatingPiece dragPiece={dragPiece} game={game} />

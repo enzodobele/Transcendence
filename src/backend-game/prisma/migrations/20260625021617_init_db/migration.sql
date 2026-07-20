@@ -8,7 +8,6 @@ CREATE TABLE "users" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "lastLogin" TIMESTAMP(3),
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "avatarUrl" TEXT,
     "bio" TEXT,
     "currentGameId" INTEGER,
