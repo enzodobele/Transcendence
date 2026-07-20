@@ -1,17 +1,54 @@
-// src/backend/src/services/waitlistService.ts
+// src/backend-matchmaking/services/waitlistService.ts
 import prisma from "../prisma";
 
-export const addToWaitlist = async (
-  userId: number,
-  timeControl: string = "5+0",
-) => {
+const WAITLIST_ONLINE_THRESHOLD_MS = 2 * 60 * 1000;
+
+/**
+ * Purgers les utilisateurs qui ne sont plus en ligne
+ */
+export const cleanInactiveUsers = async () => {
+  const cutoff = new Date(Date.now() - WAITLIST_ONLINE_THRESHOLD_MS);
+
+  const staleEntries = await prisma.waitlistEntry.findMany({
+    where: {
+      OR: [
+        { user: { is: { lastSeen: null } } },
+        { user: { is: { lastSeen: { lt: cutoff } } } },
+      ],
+    },
+    select: { id: true },
+  });
+
+  if (staleEntries.length === 0) {
+    return { count: 0 };
+  }
+
+  return prisma.waitlistEntry.deleteMany({
+    where: {
+      id: { in: staleEntries.map((entry) => entry.id) },
+    },
+  });
+};
+
+export const addToWaitlist = async (userId: number) => {
+  try {
+    const deleted = await cleanInactiveUsers();
+    if (deleted.count > 0) {
+      console.log(
+        `[🧹 Purge opportuniste] ${deleted.count} joueur(s) inactif(s) retiré(s).`,
+      );
+    }
+  } catch (err) {
+    console.error("[🧹 Purge] Échec du nettoyage automatique :", err);
+  }
+
   const existing = await prisma.waitlistEntry.findUnique({ where: { userId } });
   if (existing) {
-    throw new Error("L'utilisateur est déjà dans la file d'attente.");
+    return existing;
   }
 
   return prisma.waitlistEntry.create({
-    data: { userId, timeControl },
+    data: { userId },
   });
 };
 
@@ -21,24 +58,15 @@ export const removeFromWaitlist = async (userId: number) => {
   });
 };
 
-export const findOpponent = async (userId: number, timeControl: string) => {
-  const opponent = await prisma.waitlistEntry.findFirst({
+/**
+ * Trouve un adversaire disponible sans le supprimer immédiatement.
+ */
+export const findOpponent = async (userId: number) => {
+  return await prisma.waitlistEntry.findFirst({
     where: {
       userId: { not: userId },
-      timeControl,
     },
     orderBy: { createdAt: "asc" },
     include: { user: true },
   });
-
-  if (!opponent) {
-    return null;
-  }
-
-  // Retire les deux joueurs de la file
-  await prisma.waitlistEntry.deleteMany({
-    where: { userId: { in: [userId, opponent.userId] } },
-  });
-
-  return opponent;
 };

@@ -1,32 +1,39 @@
 
-/* ==========================================================================
-   STYLE COMMUN DES CARTES (AU REPOS)
-   ========================================================================== */
 .mode-card {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: 0.6rem;
   padding: 0.5rem 1rem;
   background: #fffdfa;
   border: 0.0625rem solid rgba(0, 0, 0, 0.08);
   border-radius: 0.75rem;
   cursor: pointer;
   text-align: left;
-  height: 2.5rem; 
+  overflow: hidden;
   box-sizing: border-box;
-  z-index: 1; 
-  transition: 
-    background-color 0.2s, 
-    border-color 0.2s, 
-    box-shadow 0.25s, 
-    border-radius 0.15s,
-    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  flex: 1 1 0%;
+  min-height: 2.5rem;
+
+  transition:
+    flex-grow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.25s;
+}
+
+.mode-card-icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s;
 }
 
 .mode-info {
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 0;
 }
 
 .mode-info h3 {
@@ -36,67 +43,40 @@
   color: var(--color-secondary-dark);
 }
 
-/* ==========================================================================
-   BASE COMMUNE DES DESCRIPTIONS (TOUJOURS EN DESSOUS DU TITRE)
-   ========================================================================== */
 .mode-info p {
-  margin: 0;
+  margin: 0.2rem 0 0;
   font-size: 0.8rem;
   color: var(--color-primary-dark);
-  line-height: 1.2;
-  position: absolute;
-  left: -0.0625rem;
-  right: -0.0625rem;
-  top: 100%;
-  background: #ffffff;
-  border: 0.0625rem solid rgba(181, 136, 99, 0.5);
-  border-top: none;
-  border-radius: 0 0 0.75rem 0.75rem;
-  
-  max-height: 0;
+  line-height: 1.25;
+
   opacity: 0;
+  max-height: 0;
   overflow: hidden;
-  pointer-events: none;
-  transition: max-height 0.2s ease, opacity 0.15s ease;
-  box-shadow: 0 0.625rem 1.25rem rgba(0, 0, 0, 0.1);
+  transition: opacity 0.2s ease, max-height 0.25s ease;
 }
 
-/* ==========================================================================
-   LOGIQUE HOVER : DÉPLOYAGE VERS LE BAS (Partie Libre & Entraînement)
-   ========================================================================== */
-.mode-card.open-down:hover {
-  z-index: 99;
+.mode-card:hover,
+.mode-card:focus-visible {
+  flex-grow: 6;
   background: #ffffff;
   border-color: rgba(181, 136, 99, 0.5);
-  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
-.mode-card.open-down:hover p {
-  max-height: 4.5rem;
+.mode-card:hover .mode-card-icon,
+.mode-card:focus-visible .mode-card-icon {
+  transform: scale(1.15);
+  color: var(--color-secondary, #b58863);
+}
+
+.mode-card:hover .mode-info p,
+.mode-card:focus-visible .mode-info p {
   opacity: 1;
-  padding: 0rem 1rem 0.5rem 1rem;
-  pointer-events: auto;
+  max-height: 4rem;
 }
 
-/* ==========================================================================
-   LOGIQUE HOVER : GLISSEMENT VERS LE HAUT (Matchmaking & Duel)
-   ========================================================================== */
-.mode-card.open-up:hover {
-  z-index: 99;
-  background: #ffffff;
-  border-color: rgba(181, 136, 99, 0.5);
-  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-
-  transform: translateY(-2.5rem); 
-}
-
-.mode-card.open-up:hover p {
-  max-height: 2.5rem;
-  opacity: 1;
-  padding: 0rem 1rem 0.5rem 1rem;
-  pointer-events: auto;
+.mode-card:focus-visible {
+  outline: 2px solid rgba(181, 136, 99, 0.8);
+  outline-offset: 2px;
 }

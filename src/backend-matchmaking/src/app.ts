@@ -1,7 +1,7 @@
 // src/backend-matchmaking/app.ts
 import express, { Request, Response } from "express";
 import { addToWaitlist, removeFromWaitlist, findOpponent } from "./services/waitlistService";
-import jwt from "jsonwebtoken"; // 👈 Ajout pour la validation de l'identité
+import jwt from "jsonwebtoken";
 import axios from "axios";
 import fs from "fs";
 
@@ -9,33 +9,23 @@ const app = express();
 app.use(express.json());
 
 // =========================================================================
-// 🚨 VÉRIFICATION STRICTE DE LA CONFIGURATION (FAIL-FAST)
+// 🚨 VÉRIFICATION STRICTE DE LA CONFIGURATION
 // =========================================================================
-
-// 1. Validation de la variable GAME_SERVICE_URL
 if (!process.env.GAME_SERVICE_URL) {
   console.error("❌ CRITICAL ERROR: La variable d'environnement GAME_SERVICE_URL est manquante.");
   process.exit(1);
 }
 const GAME_SERVICE_URL = process.env.GAME_SERVICE_URL;
 
-// 2. Validation et lecture du Secret JWT
 if (!process.env.JWT_SECRET_FILE) {
   console.error("❌ CRITICAL ERROR: La variable JWT_SECRET_FILE n'est pas définie.");
-  process.exit(1);
-}
-
-if (!fs.existsSync(process.env.JWT_SECRET_FILE)) {
-  console.error(`❌ CRITICAL ERROR: Le fichier secret requis n'existe pas à l'emplacement : ${process.env.JWT_SECRET_FILE}`);
   process.exit(1);
 }
 
 let JWT_SECRET: string;
 try {
   JWT_SECRET = fs.readFileSync(process.env.JWT_SECRET_FILE, "utf8").trim();
-  if (!JWT_SECRET) {
-    throw new Error("Le fichier secret est vide.");
-  }
+  if (!JWT_SECRET) throw new Error("Le fichier secret est vide.");
 } catch (err: any) {
   console.error(`❌ CRITICAL ERROR: Impossible de lire le secret JWT : ${err.message}`);
   process.exit(1);
@@ -43,7 +33,6 @@ try {
 
 console.log("✅ Configuration chargée avec succès. Lancement du service...");
 // =========================================================================
-
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
@@ -56,59 +45,77 @@ app.post("/matchmaking/join", async (req: Request, res: Response) => {
   }
 
   const token = authHeader.split(" ")[1];
+  let userId: number;
 
+  // 1. 🛡️ ÉTAPE 1 : Validation stricte du JWT
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string | number };
-    
-    // 🎯 ON LE FIXE EN NUMBER ICI, UNE FOIS POUR TOUTES !
-    const userId = Number(decoded.userId); 
-    console.log(`[Matchmaking] Jeton validé pour l'userId (number): ${userId}`);
+    userId = Number(decoded.userId);
+  } catch (error) {
+    console.error("[Matchmaking] Échec d'authentification JWT:", error);
+    return res.status(401).json({ error: "Session expirée ou jeton invalide" });
+  }
 
-    // À partir d'ici, 'userId' est un pur 'number'. Plus besoin de conversion !
-    await addToWaitlist(userId, "5+0");
-    const opponent = await findOpponent(userId, "5+0");
+  // 2. ♟️ ÉTAPE 2 : Logique de Matchmaking
+  try {
+    // Ajout à la waitlist sécurisé (gère le fait d'y être déjà de manière transparente)
+    await addToWaitlist(userId);
+    console.log(`[Matchmaking] User #${userId} est dans la file d'attente.`);
+
+    const opponent = await findOpponent(userId);
 
     if (opponent) {
-      const gameRes = await axios.post(`${GAME_SERVICE_URL}/internal/games`, {
-        player1Id: userId,
-        player2Id: opponent.userId,
-        timeControl: "5+0"
-      });
+      console.log(`[Matchmaking] Match trouvé ! Tentative d'établissement : #${userId} vs #${opponent.userId}`);
+      
+      try {
+        // Demande de création de la partie au serveur de jeu
+        const gameRes = await axios.post(`${GAME_SERVICE_URL}/internal/games`, {
+          player1Id: userId,
+          player2Id: opponent.userId,
+        });
 
-      await removeFromWaitlist(userId);
-      await removeFromWaitlist(opponent.userId);
+        // 🧹 Nettoyage : On supprime les deux joueurs de la file SEULEMENT si la partie a été créée avec succès
+        await removeFromWaitlist(userId);
+        await removeFromWaitlist(opponent.userId);
 
-      return res.status(201).json(gameRes.data);
+        console.log(`[Matchmaking] Partie créée avec succès. Joueurs retirés de la file d'attente.`);
+        return res.status(201).json(gameRes.data);
+      } catch (axiosError: any) {
+        console.error("❌ [Matchmaking] Échec lors de la création de la partie par le Game Service :", axiosError.message);
+        
+        // On ne supprime personne de la waitlist pour qu'ils retentent leur chance lors du prochain cycle
+        return res.status(502).json({ 
+          error: "Le service de jeu n'a pas pu démarrer la partie. Veuillez patienter..." 
+        });
+      }
     }
 
+    // Aucun adversaire trouvé pour le moment
     return res.json({ waiting: true, message: "En attente d'un adversaire..." });
   } catch (error) {
-    console.error("[Matchmaking] Échec:", error);
-    return res.status(401).json({ error: "Session expirée ou jeton invalide" });
+    console.error("[Matchmaking] Erreur critique lors de l'exécution du matchmaking:", error);
+    return res.status(500).json({ error: "Erreur interne du serveur de matchmaking" });
   }
 });
 
 app.post("/matchmaking/leave", async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    try {
-      const token = authHeader.split(" ")[1];
-      // 1. On décode (on accepte string | number pour être safe avec le payload de l'auth)
-      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string | number };
-      
-      // 2. On fixe la variable en number une bonne fois pour toutes 🎯
-      const userId = Number(decoded.userId);
-      
-      // 3. Plus aucun problème, c'est un pur number !
-      await removeFromWaitlist(userId);
-      return res.json({ message: "Vous avez quitté la file d'attente." });
-    } catch (e) {
-      return res.status(401).json({ error: "Jeton invalide" });
-    }
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Non autorisé" });
   }
 
-  return res.status(401).json({ error: "Non autorisé" });
+  try {
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string | number };
+    const userId = Number(decoded.userId);
+    
+    await removeFromWaitlist(userId);
+    console.log(`[Matchmaking] User #${userId} a quitté manuellement la file d'attente.`);
+    return res.json({ message: "Vous avez quitté la file d'attente." });
+  } catch (e) {
+    return res.status(401).json({ error: "Jeton invalide" });
+  }
 });
 
 app.listen(3001, () => console.log("Matchmaking service running on port 3001"));

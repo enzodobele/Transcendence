@@ -2,10 +2,18 @@
 import { Request, Response } from "express";
 import prisma from "../prisma";
 
+const ONLINE_THRESHOLD_MS = 2 * 60 * 1000;
+
 export const getConnectedUsers = async (_req: Request, res: Response) => {
   try {
+    const cutoff = new Date(Date.now() - ONLINE_THRESHOLD_MS);
+
     const users = await prisma.user.findMany({
-      where: { isActive: true },
+      where: {
+        lastSeen: {
+          gte: cutoff,
+        },
+      },
       select: {
         id: true,
         username: true,
@@ -13,6 +21,7 @@ export const getConnectedUsers = async (_req: Request, res: Response) => {
         avatarUrl: true,
       },
     });
+
     return res.json(users);
   } catch (error) {
     console.error(
