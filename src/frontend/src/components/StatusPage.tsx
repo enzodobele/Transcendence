@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchSystemStatus, type SystemStatus } from "../services/status";
 import "../styles/status.css";
 
+type BackendState = "online" | "degraded" | "offline";
+
 function statusLabel(isOnline: boolean): string {
   return isOnline ? "Online" : "Offline";
 }
@@ -10,19 +12,49 @@ function statusClass(isOnline: boolean): string {
   return isOnline ? "ok" : "ko";
 }
 
+function backendLabel(state: BackendState): string {
+  if (state === "online") {
+    return "Online";
+  }
+
+  if (state === "degraded") {
+    return "Degraded";
+  }
+
+  return "Offline";
+}
+
+function backendClass(state: BackendState): string {
+  if (state === "online") {
+    return "ok";
+  }
+
+  if (state === "degraded") {
+    return "warn";
+  }
+
+  return "ko";
+}
+
 export function StatusPage() {
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const load = async () => {
-    setIsLoading(true);
+  const load = async (showLoader = false) => {
+    if (showLoader) {
+      setIsLoading(true);
+    }
+
     const next = await fetchSystemStatus();
     setStatus(next);
-    setIsLoading(false);
+
+    if (showLoader) {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    void load();
+    void load(true);
     const interval = window.setInterval(() => {
       void load();
     }, 30000);
@@ -48,9 +80,9 @@ export function StatusPage() {
         ) : (
           <>
             <ul className="status-list">
-              <li className={statusClass(!!status?.backendOnline)}>
+              <li className={backendClass(status?.backendState ?? "offline")}>
                 <span>Backend</span>
-                <strong>{statusLabel(!!status?.backendOnline)}</strong>
+                <strong>{backendLabel(status?.backendState ?? "offline")}</strong>
               </li>
               <li className={statusClass(!!status?.databaseOnline)}>
                 <span>Database</span>

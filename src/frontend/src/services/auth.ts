@@ -115,7 +115,7 @@ export async function heartbeat(): Promise<void> {
   await fetch("/api/auth/heartbeat", { method: "POST", headers: getAuthHeaders() });
 }
 
-export async function getFriends(): Promise<{ id: number; username: string; avatarUrl: string | null; isOnline: boolean }[]> {
+export async function getFriends(): Promise<{ id: number; username: string; avatarUrl: string | null; isOnline: boolean; currentGameId?: number | null }[]> {
   const response = await fetch("/api/friends", {
     method: "GET",
     headers: getAuthHeaders(),

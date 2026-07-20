@@ -1,20 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import type { CustomMove } from "../../types/types";
 
+export interface SpectatorGameInfo {
+  player1Username: string;
+  player2Username: string;
+}
+
 interface UseSpectatorWebSocketProps {
   gameId: number | undefined;
   syncWithServerFen: (fen: string, history?: CustomMove[]) => void;
   onGameOver: (message: string) => void;
+  onGameInfo: (info: SpectatorGameInfo) => void;
 }
 
 export function useSpectatorWebSocket({
   gameId,
   syncWithServerFen,
   onGameOver,
+  onGameInfo,
 }: UseSpectatorWebSocketProps) {
   const wsRef = useRef<WebSocket | null>(null);
   const syncRef = useRef(syncWithServerFen);
   const gameOverRef = useRef(onGameOver);
+  const gameInfoRef = useRef(onGameInfo);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
@@ -24,6 +32,10 @@ export function useSpectatorWebSocket({
   useEffect(() => {
     gameOverRef.current = onGameOver;
   }, [onGameOver]);
+
+  useEffect(() => {
+    gameInfoRef.current = onGameInfo;
+  }, [onGameInfo]);
 
   useEffect(() => {
     if (!gameId) return;
@@ -43,6 +55,10 @@ export function useSpectatorWebSocket({
         switch (message.type) {
           case "sync":
             syncRef.current(message.fen, message.history);
+            gameInfoRef.current({
+              player1Username: message.player1Username ?? "",
+              player2Username: message.player2Username ?? "",
+            });
             break;
           case "opponent_move":
             syncRef.current(message.fen);
