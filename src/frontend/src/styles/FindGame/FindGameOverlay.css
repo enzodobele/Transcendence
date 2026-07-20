@@ -1,6 +1,4 @@
-/* ==========================================================================
-   1. CONTENEUR GLOBAL DE L'OVERLAY (FIXÉ EN HAUT À DROITE)
-   ========================================================================== */
+
 .matchmaking-overlay {
   position: fixed; 
   inset: 0;        
@@ -12,7 +10,7 @@
 
 .matchmaking-content {
   position: absolute;
-  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  top: clamp(4rem, 0.8vw, 0.6rem);
   right: clamp(0.4rem, 0.8vw, 0.6rem);
   width: 16rem;
 
@@ -30,14 +28,12 @@
 .modes-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-  overflow: visible;
+  gap: 0.5rem;
+  height: 19rem;
+  overflow: hidden;
 }
 
 
-/* ==========================================================================
-   6. VUE RECHERCHE EN COURS (MATCHMAKING ACTIF)
-   ========================================================================== */
 .matchmaking-searching-view {
   display: flex;
   flex-direction: column;

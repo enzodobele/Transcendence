@@ -11,7 +11,6 @@ interface User {
   currentGame?: {
     id: number;
     status: string;
-    timeControl: string;
     player1: { username: string };
     player2: { username: string };
   } | null;

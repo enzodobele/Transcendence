@@ -1,4 +1,4 @@
-.title-chess,
+/* .title-chess,
 .subtitle-chess-guard {
   position: absolute;
   left: 50%;
@@ -27,6 +27,41 @@
 
 .subtitle-chess-guard {
   top: clamp(1.8rem, 2.5vw, 2.4rem);
+  font-size: clamp(0.55rem, 0.8vw, 0.68rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(34, 38, 34, 0.7);
+} */
+
+.title-chess,
+.subtitle-chess-guard {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  margin: 0;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.title-chess {
+  top: clamp(0.4rem, 0.8vw, 0.6rem);
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--color-primary);
+  text-shadow: 0 12px 30px rgba(74, 46, 18, 0.12);
+}
+
+.title-guard {
+  color: var(--color-secondary);
+}
+
+.subtitle-chess-guard {
+  top: clamp(2.6rem, 4vw, 3.4rem);
   font-size: clamp(0.55rem, 0.8vw, 0.68rem);
   letter-spacing: 0.28em;
   text-transform: uppercase;

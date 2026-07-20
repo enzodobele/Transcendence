@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useAuth } from "./contexts/AuthContext";
 import { useGameLogic } from "./hooks/chess/useGameLogic";
+import { useFindGame } from "./hooks/useFindGame";
 
 import "./styles/main.css";
 
@@ -12,11 +14,14 @@ import { DisconnectionOverlay } from "./components/Disconnect/DisconnectOverlay"
 import { LoginButton } from "./components/Login/LoginButton";
 import { ProfileButton } from "./components/Profile/ProfileButton";
 import { FindGameButton } from "./components/FindGame/FindGameButton";
+import { FindGameOverlay, type SelectedGameMode } from "./components/FindGame/FindGameOverlay";
+import { PlayButton } from "./components/Play/PlayButton";
 import { Switch3DButton } from "./components/Board/Switch3DButton";
 
 export default function App() {
   const { isAuthenticated, isLoading, user, token, refreshUserStatus } = useAuth();
 
+  // 1. Logique unifiée du jeu d'échecs
   const {
     isLocalGame, isAIGame, isAIvsAI, is3D, setIs3D,
     customGameOver, drawOfferPending, isInActiveGame, playerColor,
@@ -29,6 +34,39 @@ export default function App() {
     handleStartLocalGame, handleResign, handleOfferDraw, handleDrawAccept,
     handleDrawRefuse, handleResetGame, sendClaimVictory
   } = useGameLogic({ user, token, refreshUserStatus });
+
+  // 2. Logique du Matchmaking & Sélection du Mode
+  const [isFindGameOpen, setIsFindGameOpen] = useState(false);
+  const { isSearching, error: findGameError, startSearch, cancelSearch } = useFindGame();
+  const [selectedMode, setSelectedMode] = useState<SelectedGameMode>({
+    id: "local",
+    label: "Partie Libre",
+  });
+
+  // 3. Déclencheur du bouton d'action principal
+  const runSelectedMode = () => {
+    switch (selectedMode.id) {
+      case "ai":
+        handleStartAiGame(selectedMode.difficulty ?? 3);
+        break;
+      case "custom-ai":
+        handleStartCustomAI();
+        break;
+      case "ai-vs-ai":
+        handleStartAIvsAI(selectedMode.difficulty ?? 3);
+        break;
+      case "matchmaking":
+        startSearch();
+        break;
+      case "duel":
+        alert("Lien d'invitation bientôt dispo ! (En attente du backend)");
+        break;
+      case "local":
+      default:
+        handleStartLocalGame();
+        break;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -45,21 +83,31 @@ export default function App() {
       {/* Profil / Connexion */}
       {isAuthenticated ? <ProfileButton /> : <LoginButton />}
 
-      {/* Boutons d'actions principaux */}
+      {/* Menu Haut : Switch 3D si en jeu, sinon choix de mode */}
       {isInActiveGame && !gameIsOver ? (
         <Switch3DButton is3D={is3D} setIs3D={setIs3D} />
       ) : (
-        isAuthenticated && (
-          <FindGameButton
-            onStartLocalGame={handleStartLocalGame}
-            onStartAiGame={handleStartAiGame}
-            onStartCustomAI={handleStartCustomAI}
-            onStartAIvsAI={handleStartAIvsAI}
-          />
-        )
+        isAuthenticated && <FindGameButton onClick={() => setIsFindGameOpen(true)} />
       )}
 
-      {/* Rendu principal : Partie active OU Lobby d'accueil */}
+      {/* 🟢 Overlay d'attente et de sélection combiné */}
+      <FindGameOverlay
+        isOpen={isFindGameOpen || isSearching} // Reste ouvert si la modale est appelée OU si une recherche s'exécute
+        onClose={() => {
+          if (!isSearching) setIsFindGameOpen(false);
+        }}
+        isSearching={isSearching}
+        onCancelMatchmaking={() => {
+          cancelSearch();
+          setIsFindGameOpen(false);
+        }}
+        onModeSelected={(mode: SelectedGameMode) => {
+          setSelectedMode(mode);
+          setIsFindGameOpen(false);
+        }}
+      />
+
+      {/* Rendu principal */}
       {isInActiveGame ? (
         <GameView
           game={game} board={board} selected={selected} lastMove={lastMove}
@@ -81,25 +129,43 @@ export default function App() {
           onDrawRefuse={handleDrawRefuse}
         />
       ) : (
-        <LobbyView
-          isAuthenticated={isAuthenticated}
-          game={game} board={board} selected={selected}
-          capturedPieces={capturedPieces} pendingPromotion={pendingPromotion}
-          resetGame={handleResetGame} handlePromotionChoice={handlePromotionChoice}
-          handleSquareClick={handleSquareClick}
-        />
+        <>
+          <LobbyView
+            isAuthenticated={isAuthenticated}
+            game={game} 
+            board={board} 
+            selected={selected}
+            capturedPieces={capturedPieces} 
+            pendingPromotion={pendingPromotion}
+            resetGame={handleResetGame} 
+            handlePromotionChoice={handlePromotionChoice}
+            handleSquareClick={handleSquareClick}
+          /> 
+
+          <div className="lobby-actions">
+            {isAuthenticated && (
+              <>
+                {findGameError && <p className="lobby-error">{findGameError}</p>}
+                <PlayButton 
+                  label={selectedMode.id === "matchmaking" ? "Trouver un adversaire" : selectedMode.label} 
+                  onClick={runSelectedMode} 
+                />
+              </>
+            )}
+          </div>
+        </>
       )}
 
-      {/* Éléments Flottants & Overlays */}
+      {/* Éléments Flottants & Overlays de déconnexion */}
       <FloatingPiece dragPiece={dragPiece} game={game} />
       {animatingPiece && <AnimatedPiece data={animatingPiece} onDone={clearAnimation} />}
 
-      {/* ⏱️ Overlay de déconnexion réseau de l'adversaire */}
       <DisconnectionOverlay
         isOpen={isOpponentDisconnected}
         initialSeconds={disconnectTimeout}
         onClaimVictory={sendClaimVictory}
       />
+
     </div>
   );
 }

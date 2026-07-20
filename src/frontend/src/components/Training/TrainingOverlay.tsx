@@ -52,7 +52,7 @@ export function TrainingOverlay({ isOpen, onClose, onStart }: TrainingOverlayPro
         </div>
 
         <button className="training-start-button" onClick={() => onStart(selected)}>
-          Jouer
+          Sélectionner ce niveau
         </button>
 
       </div>

@@ -59,10 +59,10 @@ app.post("/matchmaking/join", async (req: Request, res: Response) => {
   // 2. ♟️ ÉTAPE 2 : Logique de Matchmaking
   try {
     // Ajout à la waitlist sécurisé (gère le fait d'y être déjà de manière transparente)
-    await addToWaitlist(userId, "5+0");
+    await addToWaitlist(userId);
     console.log(`[Matchmaking] User #${userId} est dans la file d'attente.`);
 
-    const opponent = await findOpponent(userId, "5+0");
+    const opponent = await findOpponent(userId);
 
     if (opponent) {
       console.log(`[Matchmaking] Match trouvé ! Tentative d'établissement : #${userId} vs #${opponent.userId}`);
@@ -72,7 +72,6 @@ app.post("/matchmaking/join", async (req: Request, res: Response) => {
         const gameRes = await axios.post(`${GAME_SERVICE_URL}/internal/games`, {
           player1Id: userId,
           player2Id: opponent.userId,
-          timeControl: "5+0"
         });
 
         // 🧹 Nettoyage : On supprime les deux joueurs de la file SEULEMENT si la partie a été créée avec succès

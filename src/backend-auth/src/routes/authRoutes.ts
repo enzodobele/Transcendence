@@ -1,10 +1,14 @@
-// src/backend/src/routes/authRoutes.ts
 import express from "express";
-import { register, login } from "../controllers/authController";
+import { authenticate } from "../middlewares/authMiddleware";
+import { getMe, updateProfile, uploadAvatar, heartbeat, deleteAccount } from "../controllers/userController";
+import { avatarUpload } from "../services/uploadService";
 
 const router = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
+router.get("/me", authenticate, getMe);
+router.post("/heartbeat", authenticate, heartbeat);
+router.patch("/profile", authenticate, updateProfile);
+router.post("/avatar", authenticate, avatarUpload.single("avatar"), uploadAvatar);
+router.delete("/me", authenticate, deleteAccount);
 
 export default router;
