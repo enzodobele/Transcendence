@@ -162,7 +162,7 @@ Point values: Major = 2 pts, Minor = 1 pt.
 | ORM for the database | Minor | 1 | Prisma schemas and client generation for typed persistence. | mzimeris |
 | Custom-made design system | Minor | 1 | Reusable UI components, icons, board controls, and gameplay actions. | all |
 | |
-| Support for multiple langages | 1 | French, English and Turkish. | Batu, nefadli |
+| Support for multiple langages | Minor | 1 | French, English and Turkish. | Batu, nefadli |
 | |
 | Standard User management and auth. | Major | 2 | Profiles, avatars, auth, and account lifecycle. | edobele, mzimeris |
 | |
