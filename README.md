@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by edobele, , ArthurBauu, Batu, fyllena.*
+*This project has been created as part of the 42 curriculum by edobele, , ArthurBauu, Batu, nefadli.*
 
 # ChessGuard
 
@@ -15,11 +15,11 @@ Key features:
 ## Team Information
 | Member | Main role | Responsibilities |
 |---|---|---|
-| Hermes | Tech / infra lead | Docker, deployment flow, health services, backups, secrets, and overall service orchestration. |
-| Enzo | Frontend lead | React UI integration, layout, visual polish, and Vite-based frontend workflow. |
+| mzimeris | Tech / infra lead | Docker, deployment flow, health services, backups, secrets, and overall service orchestration. |
+| edobele | Frontend lead | React UI integration, layout, visual polish, and Vite-based frontend workflow. |
 | ArthurBauu | Game / realtime lead | Game flow, WebSocket synchronization, lobby logic, and remote gameplay. |
 | Batu | Backend / data lead | Auth, user management, Prisma schemas, and database-backed services. |
-| fyllena | Product / social features | Friends, matchmaking, chat, spectator-related features, and documentation support. |
+| nefadli | Product / social features | Friends, matchmaking, chat, spectator-related features, and documentation support. |
 
 ## Project Management
 The team organized the work by splitting the project into services and feature blocks: frontend, game engine, auth, matchmaking, social features, AI, and infrastructure. This allowed several parts to move in parallel while keeping API contracts stable.
@@ -140,48 +140,55 @@ erDiagram
 ## Features List
 | Feature | Main contributors | Description |
 |---|---|---|
-| Authentication and profile management | Batu, Hermes | Register, login, JWT-based session handling, avatars, and profile data. |
+| Authentication and profile management | Batu, mzimeris | Register, login, JWT-based session handling, avatars, and profile data. |
 | Real-time chess game engine | ArthurBauu | Live board synchronization, move validation, turn handling, and game state updates. |
-| Remote multiplayer | ArthurBauu, fyllena | Real-time games between two remote players with disconnection handling in progress. |
-| Matchmaking | fyllena, ArthurBauu | Queue-based opponent search and game creation flow. |
+| Remote multiplayer | ArthurBauu, nefadli | Real-time games between two remote players with disconnection handling in progress. |
+| Matchmaking | nefadli, ArthurBauu | Queue-based opponent search and game creation flow. |
 | AI opponent | Koweit | AI game mode with Stockfish-backed analysis and custom AI behavior. |
-| 3D board mode | Koweit, Enzo | Immersive 3D rendering for the board and piece interactions. |
-| Friends system | Batu, fyllena | Friend requests and social graph management. |
-| Chat | fyllena | Player-to-player messaging support. |
-| Spectator mode | ArthurBauu, fyllena | Observe active games without interacting with the board. |
-| Design system and UI components | Enzo | Reusable components, visuals, icons, and gameplay controls. |
-| Health, backup, and status services | Hermes | Service health checks, database health validation, and backup flow. |
-| RGPD-related user management | Hermes, Batu | User data handling, account lifecycle, and privacy-oriented service boundaries. |
+| 3D board mode | Koweit, edobele | Immersive 3D rendering for the board and piece interactions. |
+| Friends system | Batu, nefadli | Friend requests and social graph management. |
+| Spectator mode | ArthurBauu, nefadli | Observe active games without interacting with the board. |
+| Design system and UI components | edobele | Reusable components, visuals, icons, and gameplay controls. |
+| Health, backup, and status services | mzimeris | Service health checks, database health validation, and backup flow. |
 
 ## Modules
 Point values: Major = 2 pts, Minor = 1 pt.
 
 | Module | Type | Points | Implementation summary | Contributors |
 |---|---|---:|---|---|
-| Use a frontend framework | Minor | 1 | React SPA with Vite build tooling. | Enzo, Hermes |
-| Use a backend framework | Minor | 1 | Express-based microservices for auth, game, friends, matchmaking, and status. | Batu, ArthurBauu, Hermes |
+| Use a frontend framework | Minor | 1 | React SPA with Vite build tooling. | all |
+| Use a backend framework | Minor | 1 | Express-based microservices for auth, game, friends, matchmaking, and status. | all |
 | Real-time features using WebSockets | Major | 2 | Live move sync, disconnections, and message broadcasting over sockets. | ArthurBauu |
-| Custom-made design system | Minor | 1 | Reusable UI components, icons, board controls, and gameplay actions. | Enzo |
-| AI opponent | Major | 2 | FastAPI service exposing prediction endpoints for computer play. | Koweit |
-| Advanced 3D graphics | Major | 2 | 3D board mode built with Three.js via react-three-fiber/drei. | Koweit, Enzo |
-| ORM for the database | Minor | 1 | Prisma schemas and client generation for typed persistence. | Batu |
-| Complete web-based game | Major | 2 | Full chess gameplay with clear win/loss/draw conditions and live matches. | ArthurBauu |
-| Custom module: homemade AI | Major | 2 | Project-specific AI logic beyond the standard framework choice. | Koweit |
-| Backend as microservices | Major | 2 | Split into auth, friends, game, matchmaking, and status services. | Hermes, Batu, ArthurBauu |
-| Remote players | Major | 2 | Two players can play the same game from separate clients in real time. | ArthurBauu, fyllena |
-| User management | Minor | 1 | Profiles, avatars, auth, and account lifecycle. | Batu, Hermes |
-| Chat | Minor | 1 | Player-to-player messaging support in the social layer. | fyllena |
+| ORM for the database | Minor | 1 | Prisma schemas and client generation for typed persistence. | mzimeris |
+| Custom-made design system | Minor | 1 | Reusable UI components, icons, board controls, and gameplay actions. | all |
+| |
+| Support for multiple langages | 1 | French, English and Turkish. | Batu, nefadli |
+| |
+| Standard User management and auth. | Major | 2 | Profiles, avatars, auth, and account lifecycle. | edobele, mzimeris |
+| |
+| AI opponent | Major | 2 | FastAPI service exposing prediction endpoints for computer play. | edobele |
+| |
+| Complete web-based game | Major | 2 | Full chess gameplay with clear win/loss/draw conditions and live matches. | all |
+| Remote players | Major | 2 | Two players can play the same game from separate clients in real time. | ArthurBauu, nefadli |
+| Advanced 3D graphics | Major | 2 | 3D board mode built with Three.js via react-three-fiber/drei. | edobele |
+| Spectator mode | Minor | 1 | Allow users to watch friends games | ArthurBauu |
+| |
+| Backend as microservices | Major | 2 | Split into auth, friends, game, matchmaking, and status services. | all |
+| Healthcheck & status page | Minor | 1 | with automated backups and disaster recovery procedures. | ArthurBauu |
+| |
+| Custom module: homemade AI | Major | 2 | Project-specific AI logic beyond the standard framework choice. | edobele |
 
-Total: 20 points.
+
+Total: 23 points.
 
 ## Individual Contributions
-### Hermes
+### mzimeris
 - Set up and maintained the Docker / Compose / secrets workflow.
 - Worked on health, backup, and infrastructure-oriented services.
 - Helped define the service boundaries for the microservice architecture.
 - Main challenge: keeping several containers and secrets synchronized; solved by using file-based secrets and a consistent Makefile workflow.
 
-### Enzo
+### edobele
 - Built and polished the frontend application shell and reusable UI pieces.
 - Contributed to the 3D mode integration and visual consistency.
 - Helped shape the design system and gameplay controls.
@@ -197,8 +204,8 @@ Total: 20 points.
 - Contributed to the social and profile-oriented backend features.
 - Main challenge: keeping auth, database, and microservice boundaries type-safe; solved by using Prisma and strict service contracts.
 
-### fyllena
-- Contributed to matchmaking, chat, social features, and documentation support.
+### nefadli
+- Contributed to matchmaking, social features, and documentation support.
 - Helped connect player-facing flows across the game and social layers.
 - Main challenge: coordinating several user journeys without making the app feel fragmented; solved by keeping the feature set consistent around the lobby and player profile flows.
 
