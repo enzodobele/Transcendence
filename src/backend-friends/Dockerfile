@@ -21,7 +21,7 @@ COPY --chown=nodejs:nodejs . .
 # =========================
 FROM node:22-alpine
 
-RUN apk add --no-cache wget postgresql-client
+RUN apk add --no-cache wget postgresql-client su-exec
 
 RUN addgroup -g 1001 -S nodejs && \
     adduser -u 1001 -S nodejs -G nodejs
@@ -42,7 +42,8 @@ RUN chmod +x /app/entrypoint.sh
 
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 
-USER nodejs
+# No USER here: the entrypoint starts as root to read the secrets mounted
+# with 0600 host perms, then drops to 'nodejs' via su-exec.
 
 EXPOSE 3003
 

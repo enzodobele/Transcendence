@@ -15,7 +15,11 @@ interface GamePlayersOnly {
 export async function findGameWithMoves(gameId: number) {
   return await prisma.game.findUnique({
     where: { id: gameId },
-    include: { moves: true },
+    include: {
+      moves: true,
+      player1: { select: { username: true } },
+      player2: { select: { username: true } },
+    },
   });
 }
 
@@ -102,7 +106,7 @@ export function saveMoveToDatabase(
           ]
         : []),
     ])
-    .catch((err) =>
+    .catch((err: unknown) =>
       console.error(
         "[-] Erreur critique lors de l'enregistrement Prisma :",
         err,

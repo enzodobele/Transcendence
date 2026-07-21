@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useChessGame } from "./useChessGame";
 import { useStockfish } from "../useStockfish";
 import { useChessAI } from "../useChessAI";
@@ -11,6 +12,7 @@ interface UseGameLogicProps {
 }
 
 export function useGameLogic({ user, token, refreshUserStatus }: UseGameLogicProps) {
+  const { t } = useTranslation();
   const [isLocalGame, setIsLocalGame] = useState(false);
   const [isAIGame, setIsAIGame] = useState(false);
   const [isCustomAI, setIsCustomAI] = useState(false);
@@ -76,15 +78,15 @@ export function useGameLogic({ user, token, refreshUserStatus }: UseGameLogicPro
     onGameOver: (reason, winnerColor) => {
       setCustomGameOver(
         reason === "resign"
-          ? winnerColor === "white" ? "Les blancs gagnent !" : "Les noirs gagnent !"
+          ? winnerColor === "white" ? t("game.result.whiteWins") : t("game.result.blackWins")
           : reason === "abandon"
-          ? winnerColor === "white" ? "Victoire par forfait des blancs !" : "Victoire par forfait des noirs !"
-          : "Partie nulle !"
+          ? winnerColor === "white" ? t("game.result.whiteWinsForfeit") : t("game.result.blackWinsForfeit")
+          : t("game.result.draw")
       );
       refreshUserStatus();
     },
     onDrawOffer: () => setDrawOfferPending(true),
-    onDrawRefused: () => alert("La nulle a été refusée."),
+    onDrawRefused: () => alert(t("game.result.drawRefused")),
   });
 
   triggerServerMove = sendMoveToServer;
@@ -142,12 +144,12 @@ export function useGameLogic({ user, token, refreshUserStatus }: UseGameLogicPro
 
   const handleResign = () => {
     if (isOnlineGame) sendResign();
-    else setCustomGameOver(playerColor === "white" ? "Les noirs gagnent !" : "Les blancs gagnent !");
+    else setCustomGameOver(playerColor === "white" ? t("game.result.blackWins") : t("game.result.whiteWins"));
   };
 
   const handleOfferDraw = () => {
     if (isOnlineGame) sendDrawOffer();
-    else setCustomGameOver("Partie nulle !");
+    else setCustomGameOver(t("game.result.draw"));
   };
 
   const handleDrawAccept = () => { setDrawOfferPending(false); sendDrawAccept(); };

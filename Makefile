@@ -23,11 +23,10 @@ REQUIRED_DEV_SECRETS := \
     $(SECRETS_DIR)/db_name.txt \
     $(SECRETS_DIR)/db_password.txt \
     $(SECRETS_DIR)/jwt_secret.txt \
-    $(SECRETS_DIR)/pgadmin_password.txt \
     $(SECRETS_DIR)/portainer_password.txt
 
 
-.PHONY: up down rebuild restart logs ps exec db-seed db-migrate format \
+.PHONY: up down rebuild restart logs ps exec db-seed db-migrate format backup restore \
         prod prod-down prod-rebuild prod-logs prod-ps prod-exec prod-db-seed \
         clean fclean prod-clean prod-fclean check-types
 
@@ -89,6 +88,15 @@ format:
 	@$(COMPOSE_DEV) exec backend-matchmaking npm run format || true
 	@$(COMPOSE_DEV) exec frontend npm run format || true
 
+backup:
+	@echo "[+] Lancement d'un backup PostgreSQL..."
+	@./scripts/backup.sh
+
+restore:
+	@if [ -z "$(FILE)" ]; then echo "Usage: make restore FILE=backups/<dump.sql.gz>"; exit 1; fi
+	@echo "[+] Restauration de la sauvegarde $(FILE)..."
+	@./scripts/restore.sh "$(FILE)"
+
 # =========================================================================
 # 🚀 ENVIRONNEMENT DE PRODUCTION (VPS / Serveur)
 # =========================================================================
@@ -137,8 +145,35 @@ clean:
 	@$(COMPOSE_DEV) down --remove-orphans
 
 fclean:
-	@echo "[!] Purge complète de l'environnement de DEV..."
-	@$(COMPOSE_DEV) down -v --rmi all --remove-orphans
+	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
+	@sleep 5
+	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
+
+hclean:
+	@echo "🚨 Arrêt des conteneurs et suppression des volumes de DEV..."
+	@$(COMPOSE_DEV) down -v --remove-orphans
+	
+	@echo "🗑️ Suppression de toutes les images du projet Chessguard..."
+	@if [ $$(docker images 'chessguard*' -q | wc -l) -gt 0 ]; then \
+		docker rmi $$(docker images 'chessguard*' -q) --force; \
+	else \
+		echo "Aucune image Chessguard à supprimer."; \
+	fi
+	
+	@echo "🧹 Purge du cache de build Docker (BuildKit)..."
+	docker builder prune -a -f
+	
+	@echo "🧼 Nettoyage du système Docker global (réseaux, conteneurs éteints)..."
+	docker system prune -f
+	
+	@echo "📦 Suppression des node_modules et builds locaux de chaque service..."
+	rm -rf node_modules dist build .next
+	rm -rf src/backend-auth/node_modules src/backend-auth/dist src/backend-auth/.prisma
+	rm -rf src/backend-game/node_modules src/backend-game/dist
+	rm -rf src/backend-matchmaking/node_modules src/backend-matchmaking/dist
+	rm -rf src/frontend/node_modules src/frontend/.next
+	
+	@echo "✨ Environnement de DEV 100% purifié !"
 
 # =========================================================================
 # 🚨 NETTOYAGE & MAINTENANCE (PRODUCTION)
@@ -153,7 +188,33 @@ prod-fclean:
 	@sleep 5
 	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
 
-
+prod-hclean:
+	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
+	@sleep 5
+	@echo "🚨 Arrêt des conteneurs et suppression des volumes de PRODUCTION..."
+	@$(COMPOSE_PROD) down -v --remove-orphans
+	
+	@echo "🗑️ Suppression de toutes les images du projet Chessguard..."
+	@if [ $$(docker images 'chessguard*' -q | wc -l) -gt 0 ]; then \
+		docker rmi $$(docker images 'chessguard*' -q) --force; \
+	else \
+		echo "Aucune image Chessguard à supprimer."; \
+	fi
+	
+	@echo "🧹 Purge du cache de build Docker (BuildKit)..."
+	docker builder prune -a -f
+	
+	@echo "🧼 Nettoyage du système Docker global (réseaux, conteneurs éteints)..."
+	docker system prune -f
+	
+	@echo "📦 Suppression des dossiers de build locaux..."
+	rm -rf node_modules dist build .next
+	rm -rf src/backend-auth/node_modules src/backend-auth/dist src/backend-auth/.prisma
+	rm -rf src/backend-game/node_modules src/backend-game/dist
+	rm -rf src/backend-matchmaking/node_modules src/backend-matchmaking/dist
+	rm -rf src/frontend/node_modules src/frontend/.next
+	
+	@echo "✨ Infrastructure de PRODUCTION 100% purifiée !"
 
 check-types:
 	@echo "🔍 [Vérification] Analyse du dossier Matchmaking..."
@@ -165,3 +226,35 @@ check-types:
 	@echo "\n🔍 [Vérification] Analyse du dossier Frontend..."
 	@cd src/frontend && npx tsc --noEmit || echo "❌ Erreurs trouvées dans le Frontend"
 	@echo "\n✨ [Vérification] Scan terminé !"
+
+install-local:
+	@echo "[+] Installation locale des dépendances pour chaque microservice..."
+	@for dir in \
+		src/backend-auth \
+		src/backend-friends \
+		src/backend-game \
+		src/backend-matchmaking \
+		src/backend-status \
+		src/frontend; \
+		do \
+		echo "📦 Installation dans $$dir..."; \
+		(cd $$dir && npm install); \
+	done
+	@echo "[+] Génération du client Prisma local pour l'autocomplétion..."
+	@cd src/backend-auth && npx prisma generate
+	@echo "✨ Toutes les dépendances locales sont installées !"
+
+npm-audit:
+	@echo "[+] Audit npm pour chaque microservice..."
+	@for dir in \
+		src/backend-auth \
+		src/backend-friends \
+		src/backend-game \
+		src/backend-matchmaking \
+		src/backend-status \
+		src/frontend; \
+		do \
+		echo "📦 Audit de $$dir..."; \
+		(cd $$dir && npm audit); \
+	done
+	@echo "✨ Audits réalisés !"

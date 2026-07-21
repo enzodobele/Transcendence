@@ -20,6 +20,7 @@ model User {
   updatedAt      DateTime @updatedAt
   lastLogin      DateTime?
   lastSeen       DateTime?
+  isAdmin        Boolean @default(false)
   avatarUrl      String?
   bio            String?
   currentGameId  Int?

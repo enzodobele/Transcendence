@@ -46,8 +46,9 @@ export const generateToken = (
   userId: number,
   email: string,
   username: string,
+  isAdmin: boolean = false,
 ): string => {
-  const token = jwt.sign({ userId, email, username }, JWT_SECRET, {
+  const token = jwt.sign({ userId, email, username, isAdmin }, JWT_SECRET, {
     expiresIn: "24h",
   });
   return token;

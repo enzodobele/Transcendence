@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import type { CustomMove } from "../types/types";
 import "../styles/MoveHistory.css";
 
@@ -21,9 +22,10 @@ const getPieceSymbol = (piece: string) => {
 
 export function MoveHistory({
   history,
-  player1Name = "Joueur 1",
-  player2Name = "Joueur 2",
+  player1Name,
+  player2Name,
 }: MoveHistoryProps) {
+  const { t } = useTranslation();
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export function MoveHistory({
 
   return (
     <div className="move-history-container">
-      <h3>Historique des coups</h3>
+      <h3>{t("game.moveHistory")}</h3>
 
       {/* 👑 PREMIÈRE LIGNE : Affichage des adversaires */}
       <div
@@ -86,14 +88,14 @@ export function MoveHistory({
           borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
         }}
       >
-        <span style={{ color: "#fff" }}>⚪ {player1Name}</span>
+        <span style={{ color: "#fff" }}>⚪ {player1Name ?? t("game.player1")}</span>
         <span style={{ color: "rgba(255, 255, 255, 0.4)" }}>vs</span>
-        <span style={{ color: "#aaa" }}>⚫ {player2Name}</span>
+        <span style={{ color: "#aaa" }}>⚫ {player2Name ?? t("game.player2")}</span>
       </div>
 
       <div className="move-list">
         {history.length === 0 ? (
-          <p className="no-moves">Aucun coup joué</p>
+          <p className="no-moves">{t("game.noMoves")}</p>
         ) : (
           renderMoves()
         )}

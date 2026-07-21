@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { ChessGame3D } from "./Board/ChessGame3D";
 
 interface LobbyViewProps {
@@ -24,6 +25,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   handlePromotionChoice,
   handleSquareClick,
 }) => {
+  const { t } = useTranslation();
   const [isDemoMode, setIsDemoMode] = useState(true);
   const demoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -43,7 +45,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   return (
     <div className="lobby-container">
       <h1 className="title-chess">CHESS <span className="title-guard">GUARD</span></h1>
-      <p className="subtitle-chess-guard">Jouez en local ou en ligne</p>
+      <p className="subtitle-chess-guard">{t("common.playLocalOrOnline")}</p>
 
       <div className="lobby-chessboard-preview" onClick={() => handleLobbyInteraction()}>
         <ChessGame3D
@@ -61,7 +63,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
 
       <div className="lobby-actions">
         {!isAuthenticated && (
-          <p className="login-prompt">Connectez-vous pour défier des joueurs en ligne.</p>
+          <p className="login-prompt">{t("common.loginToChallenge")}</p>
         )}
       </div>
     </div>

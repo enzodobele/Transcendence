@@ -1,0 +1,79 @@
+.status-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 20% 20%, #1f2a44 0%, #0b111f 45%, #070a12 100%);
+  color: #e8eefc;
+  padding: 24px;
+}
+
+.status-panel {
+  width: min(680px, 100%);
+  background: rgba(11, 17, 31, 0.8);
+  border: 1px solid rgba(232, 238, 252, 0.12);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.status-panel h1 {
+  margin: 0;
+}
+
+.subtitle {
+  margin-top: 8px;
+  margin-bottom: 20px;
+  color: #a9b5d6;
+}
+
+.status-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.status-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+}
+
+.status-list li.ok {
+  background: rgba(26, 97, 53, 0.2);
+  border-color: rgba(63, 185, 80, 0.45);
+}
+
+.status-list li.warn {
+  background: rgba(147, 98, 24, 0.2);
+  border-color: rgba(240, 182, 74, 0.5);
+}
+
+.status-list li.ko {
+  background: rgba(128, 27, 44, 0.2);
+  border-color: rgba(248, 81, 73, 0.45);
+}
+
+.meta {
+  margin-top: 18px;
+  color: #c6d2f0;
+}
+
+.refresh-btn {
+  margin-top: 8px;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #4e7cff;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.refresh-btn:hover {
+  filter: brightness(1.08);
+}

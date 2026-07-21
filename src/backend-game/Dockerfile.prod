@@ -30,7 +30,7 @@ RUN npm prune --production
 FROM node:22-alpine
 
 # Installe uniquement les binaires requis (wget pour les healthchecks, psql au cas où)
-RUN apk add --no-cache wget postgresql-client
+RUN apk add --no-cache wget postgresql-client su-exec
 
 # Sécurité : création de l'utilisateur non-root
 RUN addgroup -g 1001 -S nodejs && \
@@ -57,7 +57,8 @@ RUN chmod +x /app/entrypoint.sh
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 ENV NODE_ENV=production
 
-USER nodejs
+# No USER here: the entrypoint starts as root to read the secrets mounted
+# with 0600 host perms, then drops to 'nodejs' via su-exec.
 
 # 🎯 Port ajusté pour le Game Engine
 EXPOSE 3002
