@@ -145,6 +145,11 @@ clean:
 	@$(COMPOSE_DEV) down --remove-orphans
 
 fclean:
+	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
+	@sleep 5
+	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
+
+hclean:
 	@echo "🚨 Arrêt des conteneurs et suppression des volumes de DEV..."
 	@$(COMPOSE_DEV) down -v --remove-orphans
 	
@@ -181,6 +186,11 @@ prod-clean:
 prod-fclean:
 	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
 	@sleep 5
+	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
+
+prod-hclean:
+	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
+	@sleep 5
 	@echo "🚨 Arrêt des conteneurs et suppression des volumes de PRODUCTION..."
 	@$(COMPOSE_PROD) down -v --remove-orphans
 	
@@ -205,8 +215,6 @@ prod-fclean:
 	rm -rf src/frontend/node_modules src/frontend/.next
 	
 	@echo "✨ Infrastructure de PRODUCTION 100% purifiée !"
-
-
 
 check-types:
 	@echo "🔍 [Vérification] Analyse du dossier Matchmaking..."
