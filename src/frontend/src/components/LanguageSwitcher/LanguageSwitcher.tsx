@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { SUPPORTED_LANGUAGES, setLanguage, type Language } from "../../i18n";
-import "./LanguageSwitcher.css";
+import "../../styles/LanguageSwitcher/LanguageSwitcher.css";
 
 const LABELS: Record<Language, string> = {
   fr: "FR",
