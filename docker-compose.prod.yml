@@ -147,7 +147,7 @@ services:
     restart: always
 
 # =========================================================================
-  # 🤖 MICROSERVICE : IA Maison (FastAPI + PyTorch)
+  # 🤖 MICROSERVICE : IA Maison (FastAPI + ONNX Runtime)
   # =========================================================================
   ai:
     build:

@@ -6,3 +6,12 @@ src/__pycache__/
 *.pth
 export/
 README.md
+
+# Pipeline d'entraînement : jamais exécuté par le conteneur (inférence seule),
+# inutile de l'embarquer dans l'image.
+src/train.py
+src/dataset.py
+src/parse.py
+src/filter.py
+src/preprocess.py
+models/model.pt

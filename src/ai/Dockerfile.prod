@@ -9,7 +9,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# On copie l'intégralité du code de l'IA (api.py, modèles PyTorch, etc.)
+# On copie l'intégralité du code de l'IA (api.py, modèle ONNX, etc.)
+# Le pipeline d'entraînement (torch) reste exclu via .dockerignore : jamais exécuté ici.
 COPY . .
 
 EXPOSE 8000

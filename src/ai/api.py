@@ -1,27 +1,25 @@
 import os
 import sys
 import random
+import numpy as np
 import chess
-import torch
+import onnxruntime as ort
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 sys.path.append("/app/src")
-from model import ChessNet
 from encode import fen_to_tensor
 
-MODEL_PATH = "/app/models/model.pt"
+MODEL_PATH = "/app/models/model.onnx"
 DEPTH = 3
 TOP_K = 5
 
 app = FastAPI()
-device = torch.device("cpu")
-model = ChessNet().to(device)
+session = None
 model_loaded = False
 
 if os.path.exists(MODEL_PATH):
-    model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
-    model.eval()
+    session = ort.InferenceSession(MODEL_PATH, providers=["CPUExecutionProvider"])
     model_loaded = True
     print(f"Modèle chargé depuis {MODEL_PATH}")
 else:
@@ -33,10 +31,9 @@ class PredictRequest(BaseModel):
 
 
 def get_top_k_moves(board: chess.Board, k: int):
-    tensor = torch.FloatTensor(fen_to_tensor(board.fen())).unsqueeze(0).to(device)
-    with torch.no_grad():
-        policy, _ = model(tensor)
-        policy = policy.squeeze(0).cpu().numpy()
+    tensor = np.expand_dims(fen_to_tensor(board.fen()), axis=0)
+    policy, _ = session.run(["policy", "value"], {"input": tensor})
+    policy = policy[0]
     legal = list(board.legal_moves)
     legal.sort(key=lambda m: policy[m.from_square * 64 + m.to_square], reverse=True)
     return legal[:k]
@@ -47,10 +44,9 @@ def evaluate(board: chess.Board) -> float:
         return -1.0 if board.turn == chess.WHITE else 1.0
     if board.is_game_over():
         return 0.0
-    tensor = torch.FloatTensor(fen_to_tensor(board.fen())).unsqueeze(0).to(device)
-    with torch.no_grad():
-        _, value = model(tensor)
-    return value.item()
+    tensor = np.expand_dims(fen_to_tensor(board.fen()), axis=0)
+    _, value = session.run(["policy", "value"], {"input": tensor})
+    return float(value[0].item())
 
 
 def minimax(board: chess.Board, depth: int, alpha: float, beta: float, maximizing: bool) -> float:
