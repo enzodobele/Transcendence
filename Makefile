@@ -63,7 +63,7 @@ exec:
 
 db-seed:
 	@echo "[+] Exécution du seeding de la DB (DEV)..."
-	@$(COMPOSE_DEV) exec backend-auth npm run db:seed
+	@$(COMPOSE_DEV) run --rm backend-auth npm run db:seed
 
 db-migrate:
 	@echo "[+] Running Prisma migrations (DEV)..."
@@ -118,7 +118,7 @@ prod-exec:
 
 prod-db-seed:
 	@echo "[!] ATTENTION : Seeding de la DB de PRODUCTION..."
-	@$(COMPOSE_PROD) exec backend-auth npx prisma db seed
+	@$(COMPOSE_PROD) run --rm backend-auth npx prisma db seed
 
 # VAULT OPERATIONS
 vault-status:

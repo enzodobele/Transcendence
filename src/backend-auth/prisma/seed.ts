@@ -1,31 +1,21 @@
-import fs from 'fs';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
-const readSecret = (value?: string): string | undefined => {
-  if (!value) return undefined;
-  if (fs.existsSync(value)) return fs.readFileSync(value, 'utf8').trim();
-  return value.trim();
-};
-
 // =============================================
-// 1. RÉCUPÉRATION DES SECRETS DOCKER
+// 1. RÉCUPÉRATION DE LA CONNEXION (DEPUIS HASHI VAULT / ENTRYPOINT)
 // =============================================
-const dbUser = readSecret(process.env.DB_USER) ?? readSecret(process.env.DB_USER_FILE);
-const dbName = readSecret(process.env.DB_NAME) ?? readSecret(process.env.DB_NAME_FILE);
-const dbPassword = readSecret(process.env.DB_PASSWORD) ?? readSecret(process.env.DB_PASSWORD_FILE);
+const connectionString = process.env.DATABASE_URL;
 
-if (!dbUser || !dbName || !dbPassword) {
-  throw new Error('Impossible de construire la connexion : secrets DB_USER, DB_NAME ou DB_PASSWORD manquants.');
+if (!connectionString) {
+  throw new Error('Impossible de lancer le seed : variable DATABASE_URL manquante (vérifier l\'initialisation Vault).');
 }
 
 // =============================================
 // 2. INITIALISATION PRISMA 7 (DRIVERS NATIVE)
 // =============================================
-const computedUrl = `postgresql://${dbUser}:${dbPassword}@db:5432/${dbName}?schema=public`;
-const pool = new Pool({ connectionString: computedUrl });
+const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
@@ -40,6 +30,7 @@ const users = [
     eloRating: 780,
     avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg?seed=alice',
     bio: 'Joue les ouvertures agressives et les blitz du soir.',
+    isAdmin: true, // Passer en Admin
   },
   {
     email: 'bob@example.com',
@@ -48,6 +39,7 @@ const users = [
     eloRating: 845,
     avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg?seed=bob',
     bio: 'Privilégie les finales propres et les parties longues.',
+    isAdmin: true, // Passer en Admin
   },
   {
     email: 'carla@example.com',
@@ -56,6 +48,7 @@ const users = [
     eloRating: 910,
     avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg?seed=carla',
     bio: 'Toujours prête pour une revanche.',
+    isAdmin: false,
   },
   {
     email: 'david@example.com',
@@ -64,6 +57,7 @@ const users = [
     eloRating: 690,
     avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg?seed=david',
     bio: 'Apprend en jouant et adore les parties rapides.',
+    isAdmin: false,
   },
 ];
 
@@ -71,7 +65,7 @@ const users = [
 // 4. LOGIQUE PRINCIPALE DU SEED
 // =============================================
 async function main() {
-  console.log("🌱 Début du seeding...");
+  console.log("🌱 Début du seeding avec support HashiCorp Vault...");
 
   // Nettoyage de la base de données (Ordre des clés étrangères respecté)
   await prisma.$transaction([
@@ -97,6 +91,7 @@ async function main() {
         eloRating: user.eloRating,
         avatarUrl: user.avatarUrl,
         bio: user.bio,
+        isAdmin: user.isAdmin, // Injecté ici
       },
     });
 

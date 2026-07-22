@@ -70,7 +70,6 @@ unset JWT_SECRET
 # =============================================
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@chessguard-db:5432/${DB_NAME}?schema=public"
 echo "[+] [Auth] DATABASE_URL configured."
-echo "[+] DATABASE_URL=$DATABASE_URL"
 
 # =============================================
 # Wait for the database (with timeout)
