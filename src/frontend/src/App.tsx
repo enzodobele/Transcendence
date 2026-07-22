@@ -112,8 +112,10 @@ export default function App() {
         }}
       />
 
-      {/* Rendu principal */}
-      {isInActiveGame ? (
+      {/* Rendu principal : GameView et LobbyView restent tous les deux montés en
+          permanence pour éviter de recréer leurs contextes WebGL (Canvas 3D) à
+          chaque aller-retour lobby/partie ; seule la visibilité CSS bascule. */}
+      <div style={{ display: isInActiveGame ? "contents" : "none" }}>
         <GameView
           game={game} board={board} selected={selected} lastMove={lastMove}
           dragPiece={dragPiece} animatingPiece={animatingPiece} capturedPieces={capturedPieces}
@@ -132,34 +134,36 @@ export default function App() {
           onOfferDraw={handleOfferDraw}
           onDrawAccept={handleDrawAccept}
           onDrawRefuse={handleDrawRefuse}
+          active={isInActiveGame}
         />
-      ) : (
-        <>
-          <LobbyView
-            isAuthenticated={isAuthenticated}
-            game={game} 
-            board={board} 
-            selected={selected}
-            capturedPieces={capturedPieces} 
-            pendingPromotion={pendingPromotion}
-            resetGame={handleResetGame} 
-            handlePromotionChoice={handlePromotionChoice}
-            handleSquareClick={handleSquareClick}
-          /> 
+      </div>
 
-          <div className="lobby-actions">
-            {isAuthenticated && (
-              <>
-                {findGameError && <p className="lobby-error">{findGameError}</p>}
-                <PlayButton
-                  label={selectedMode.id === "matchmaking" ? t("findGame.findOpponent") : selectedMode.label}
-                  onClick={runSelectedMode}
-                />
-              </>
-            )}
-          </div>
-        </>
-      )}
+      <div style={{ display: isInActiveGame ? "none" : "contents" }}>
+        <LobbyView
+          isAuthenticated={isAuthenticated}
+          game={game}
+          board={board}
+          selected={selected}
+          capturedPieces={capturedPieces}
+          pendingPromotion={pendingPromotion}
+          resetGame={handleResetGame}
+          handlePromotionChoice={handlePromotionChoice}
+          handleSquareClick={handleSquareClick}
+          active={!isInActiveGame}
+        />
+
+        <div className="lobby-actions">
+          {isAuthenticated && (
+            <>
+              {findGameError && <p className="lobby-error">{findGameError}</p>}
+              <PlayButton
+                label={selectedMode.id === "matchmaking" ? t("findGame.findOpponent") : selectedMode.label}
+                onClick={runSelectedMode}
+              />
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Éléments Flottants & Overlays de déconnexion */}
       <FloatingPiece dragPiece={dragPiece} game={game} />

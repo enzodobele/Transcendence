@@ -12,6 +12,7 @@ interface LobbyViewProps {
   resetGame: () => void;
   handlePromotionChoice: (piece: string) => void;
   handleSquareClick: (square: string, isLobby?: boolean) => void;
+  active?: boolean;
 }
 
 export const LobbyView: React.FC<LobbyViewProps> = ({
@@ -24,6 +25,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   resetGame,
   handlePromotionChoice,
   handleSquareClick,
+  active = true,
 }) => {
   const { t } = useTranslation();
   const [isDemoMode, setIsDemoMode] = useState(true);
@@ -58,6 +60,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
           onResetGame={resetGame}
           onPromotionChoice={handlePromotionChoice}
           isDemoMode={isDemoMode}
+          active={active}
         />
       </div>
 

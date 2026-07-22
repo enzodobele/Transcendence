@@ -62,6 +62,13 @@ export function handleGameConnection(
 ): Room {
   const room = getOrCreateRoom(gameId, dbGame);
 
+  // Une connexion précédente existe déjà pour ce joueur (ex: un autre onglet) :
+  // on la ferme pour n'avoir jamais qu'une seule socket active par joueur/partie.
+  const existingSocket = room.players[userId];
+  if (existingSocket && existingSocket !== socket && existingSocket.readyState === WebSocket.OPEN) {
+    existingSocket.close(4001, "Replaced by a new connection");
+  }
+
   // Ajout du joueur actif
   room.players[userId] = socket;
   return room;
@@ -81,14 +88,19 @@ export function handleSpectatorConnection(
 }
 
 /**
- * Supprime un joueur de la room à la déconnexion.
+ * Supprime un joueur de la room à la déconnexion, uniquement si la socket qui se
+ * ferme est bien celle actuellement enregistrée (sinon c'est une ancienne connexion
+ * déjà remplacée par une reconnexion plus récente, ex: un autre onglet).
+ * Retourne true si le joueur a effectivement été retiré.
  */
-export function removePlayerFromRoom(gameId: number, userId: number): void {
+export function removePlayerFromRoom(gameId: number, userId: number, socket: WebSocket): boolean {
   const room = activeRooms.get(gameId);
-  if (room && room.players[userId]) {
+  if (room && room.players[userId] === socket) {
     delete room.players[userId];
     // Optionnel : Si room.players est vide, tu pourrais activeRooms.delete(gameId) pour libérer la RAM
+    return true;
   }
+  return false;
 }
 
 /**
