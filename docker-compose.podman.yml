@@ -1,0 +1,15 @@
+services:
+
+  monitoring-cadvisor:
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /dev/disk/:/dev/disk:ro
+      - /run/podman/podman.sock:/var/run/docker.sock:ro
+
+  monitoring-prometheus:
+    depends_on: []
+
+  monitoring-grafana:
+    depends_on: []
+

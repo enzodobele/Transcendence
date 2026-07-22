@@ -1,4 +1,4 @@
-FROM dpage/pgadmin4:9.15.0
+FROM docker.io/dpage/pgadmin4:9.15.0
 
 # Copie le script de provisionnement
 COPY provision.sh /provision.sh

@@ -69,7 +69,7 @@ export JWT_SECRET
 # =============================================
 # DATABASE_URL
 # =============================================
-export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
+export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@chessguard-db:5432/${DB_NAME}?schema=public"
 echo "[+] [Game] DATABASE_URL configured."
 
 # =============================================
@@ -80,7 +80,7 @@ MAX_RETRIES=30
 RETRY_INTERVAL=1
 
 for i in $(seq 1 $MAX_RETRIES); do
-  if pg_isready -h db -p 5432 -U "$DB_USER" -d "$DB_NAME" >/dev/null 2>&1; then
+  if pg_isready -h chessguard-db -p 5432 -U "$DB_USER" -d "$DB_NAME" >/dev/null 2>&1; then
     echo "[+] [Game] Database is ready after $i attempts."
     break
   fi

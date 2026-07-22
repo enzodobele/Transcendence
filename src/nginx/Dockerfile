@@ -1,5 +1,5 @@
 # Nginx gateway with ModSecurity v3 + OWASP CRS baked in.
-FROM owasp/modsecurity-crs:nginx-alpine
+FROM docker.io/owasp/modsecurity-crs:nginx-alpine
 
 # Build as root (apk + cert generation need it); the runtime drops back to the
 # image's unprivileged 'nginx' user (see USER nginx below) — rootless-friendly.

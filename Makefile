@@ -3,13 +3,29 @@
 # =========================================================================
 
 NAME = chessguard
-# Overridable for Podman clusters: make up DOCKER_COMPOSE="podman compose"
-DOCKER_COMPOSE ?= docker compose
+
+ifeq ($(shell command -v podman >/dev/null 2>&1 && echo yes),yes)
+	DOCKER := podman
+	DOCKER_COMPOSE := podman compose
+	COMPOSE_OVERRIDE := -f docker-compose.podman.yml
+
+else ifeq ($(shell docker compose version >/dev/null 2>&1 && echo yes),yes)
+	DOCKER := docker
+	DOCKER_COMPOSE := docker compose
+	COMPOSE_OVERRIDE :=
+
+else ifeq ($(shell command -v docker-compose >/dev/null 2>&1 && echo yes),yes)
+	DOCKER := docker
+	DOCKER_COMPOSE := docker-compose
+	COMPOSE_OVERRIDE :=
+
+else
+$(error Aucun moteur compatible trouvé)
+endif
 
 # 📂 Fichiers de configuration Docker Compose
-COMPOSE_DEV  = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)_dev
-COMPOSE_PROD = $(DOCKER_COMPOSE) -f docker-compose.prod.yml -p $(NAME)_prod
-MONITORING_SERVICES = prometheus grafana node-exporter cadvisor
+COMPOSE_DEV  = $(DOCKER_COMPOSE) -f docker-compose.yml $(COMPOSE_OVERRIDE) -p $(NAME)_dev
+COMPOSE_PROD = $(DOCKER_COMPOSE) -f docker-compose.prod.yml $(COMPOSE_OVERRIDE) -p $(NAME)_prod
 
 SERVICE ?=
 
@@ -173,10 +189,8 @@ clean:
 	@$(COMPOSE_DEV) down --remove-orphans
 
 fclean:
-	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
-	@sleep 5
-	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
-	@rm -rf .vault/prod
+	@$(COMPOSE_DEV) down -v --rmi all --remove-orphans
+	@rm -rf .vault/dev
 
 hclean:
 	@echo "🚨 Arrêt des conteneurs et suppression des volumes de DEV..."

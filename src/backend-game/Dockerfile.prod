@@ -1,7 +1,7 @@
 # =========================================================================
 # 🏗️ STAGE 1: Build (Compilation TypeScript)
 # =========================================================================
-FROM node:22-alpine AS builder
+FROM docker.io/node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ RUN npm prune --production
 # =========================================================================
 # 🚀 STAGE 2: Runtime (Image finale légère pour le Game Engine)
 # =========================================================================
-FROM node:22-alpine
+FROM docker.io/node:22-alpine
 
 # Installe uniquement les binaires requis (wget pour les healthchecks, psql au cas où)
 RUN apk add --no-cache wget postgresql-client curl jq

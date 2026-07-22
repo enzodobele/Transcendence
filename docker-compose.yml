@@ -32,7 +32,7 @@ services:
     container_name: nginx
     ports:
       # Host 443 -> container 8443 (nginx runs non-root on an unprivileged port).
-      - "443:8443"
+      - "8443:8443"
     environment:
       # DetectionOnly in dev: log would-be blocks without breaking the workflow.
       MODSEC_RULE_ENGINE: DetectionOnly
@@ -44,7 +44,7 @@ services:
     depends_on:
       frontend:
         condition: service_healthy
-      db:
+      chessguard-db:
         condition: service_healthy
       ai:
         condition: service_healthy
@@ -83,7 +83,7 @@ services:
       VAULT_ADDR: http://vault:8200
       PORT: 3000
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       vault-bootstrap:
         condition: service_completed_successfully
@@ -112,7 +112,7 @@ services:
       PORT: 3003
       VAULT_ADDR: http://vault:8200
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       vault-bootstrap:
         condition: service_completed_successfully
@@ -141,7 +141,7 @@ services:
       VAULT_ADDR: http://vault:8200
       PORT: 3002
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       vault-bootstrap:
         condition: service_completed_successfully
@@ -170,7 +170,7 @@ services:
       VAULT_ADDR: http://vault:8200
       GAME_SERVICE_URL: http://backend-game:3002
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       backend-game:
         condition: service_healthy
@@ -203,7 +203,7 @@ services:
       VAULT_ADDR: http://vault:8200
       PORT: 3004
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       vault-bootstrap:
         condition: service_completed_successfully
@@ -215,7 +215,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 8
-      start_period: 60s
+      start_period: 30s
     restart: unless-stopped
 
   # =============================================
@@ -242,7 +242,7 @@ services:
   # 🔐 VAULT (secrets management)
   # =============================================
   vault:
-    image: hashicorp/vault:1.20
+    image: docker.io/hashicorp/vault:1.20
     container_name: vault
     command: ["vault", "server", "-config=/vault/config/vault.hcl"]
     environment:
@@ -266,7 +266,7 @@ services:
     restart: unless-stopped
 
   vault-bootstrap:
-    image: hashicorp/vault:1.20
+    image: docker.io/hashicorp/vault:1.20
     container_name: vault-bootstrap
     entrypoint: ["/bin/sh", "/vault/bootstrap.sh"]
     environment:
@@ -289,7 +289,7 @@ services:
     restart: "no"
 
   vault-agent-db:
-    image: hashicorp/vault:1.20
+    image: docker.io/hashicorp/vault:1.20
     container_name: vault-agent-db
     # Bypass the image's privilege-dropping entrypoint and run as root, so the
     # agent can read the 0400/uid-1001 AppRole creds and write the rendered volume.
@@ -313,7 +313,7 @@ services:
     restart: unless-stopped
 
   vault-agent-tools:
-    image: hashicorp/vault:1.20
+    image: docker.io/hashicorp/vault:1.20
     container_name: vault-agent-tools
     # Bypass the image's privilege-dropping entrypoint and run as root, so the
     # agent can read the 0400/uid-1001 AppRole creds and write the rendered volume.
@@ -339,8 +339,8 @@ services:
   # =============================================
   # 🗃️ DATABASE (PostgreSQL)
   # =============================================
-  db:
-    image: postgres:16
+  chessguard-db:
+    image: docker.io/postgres:16
     container_name: chessguard-db
     expose:
       - "5432"
@@ -366,20 +366,20 @@ services:
   # =============================================
   # 🔧 OUTILS (Optionnels)
   # =============================================
-  portainer:
-    image: portainer/portainer-ce:2.39.1
-    container_name: portainer
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-      - tools_secrets:/vault/secrets:ro
-    command: --admin-password-file=/vault/secrets/portainer_password
-    depends_on:
-      vault-agent-tools:
-        condition: service_healthy
-    networks:
-      - chessguard_network
-    restart: unless-stopped
+  # portainer:
+  #   image: docker.io/portainer/portainer-ce:2.39.1
+  #   container_name: portainer
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - portainer_data:/data
+  #     - tools_secrets:/vault/secrets:ro
+  #   command: --admin-password-file=/vault/secrets/portainer_password
+  #   depends_on:
+  #     vault-agent-tools:
+  #       condition: service_healthy
+  #   networks:
+  #     - chessguard_network
+  #   restart: unless-stopped
 
   pgadmin:
     build: ./src/pgadmin
@@ -396,7 +396,7 @@ services:
     networks:
       - chessguard_network
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       vault-agent-tools:
         condition: service_healthy
@@ -409,7 +409,7 @@ services:
     restart: unless-stopped
 
   mailpit:
-    image: axllent/mailpit:latest
+    image: docker.io/axllent/mailpit:latest
     container_name: mailpit
     environment:
       MP_BASE_URL: /mailpit
@@ -422,8 +422,8 @@ services:
   # =============================================
   # 📈 MONITORING (Prometheus + Grafana)
   # =============================================
-  prometheus:
-    image: prom/prometheus:v2.54.1
+  monitoring-prometheus:
+    image: docker.io/prom/prometheus:v2.54.1
     container_name: monitoring-prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -440,8 +440,8 @@ services:
       - chessguard_network
     restart: unless-stopped
 
-  grafana:
-    image: grafana/grafana:11.2.2
+  monitoring-grafana:
+    image: docker.io/grafana/grafana:11.2.2
     container_name: monitoring-grafana
     environment:
       GF_SECURITY_ADMIN_USER: admin
@@ -455,13 +455,13 @@ services:
     expose:
       - "3000"
     depends_on:
-      - prometheus
+      - monitoring-prometheus
     networks:
       - chessguard_network
     restart: unless-stopped
 
-  node-exporter:
-    image: prom/node-exporter:v1.8.2
+  monitoring-node-exporter:
+    image: docker.io/prom/node-exporter:v1.8.2
     container_name: monitoring-node-exporter
     command:
       - --path.rootfs=/host
@@ -473,7 +473,7 @@ services:
       - chessguard_network
     restart: unless-stopped
 
-  cadvisor:
+  monitoring-cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: monitoring-cadvisor
     privileged: true
