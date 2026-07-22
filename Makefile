@@ -15,7 +15,8 @@ SERVICE ?=
 .PHONY: up down rebuild restart logs ps exec db-seed db-migrate format backup restore \
         prod prod-down prod-rebuild prod-logs prod-ps prod-exec prod-db-seed \
         clean fclean prod-clean prod-fclean check-types \
-        vault-status vault-unseal vault-logs prod-vault-status prod-vault-unseal prod-vault-logs
+        vault-status vault-unseal vault-logs prod-vault-status prod-vault-unseal prod-vault-logs \
+        waf-logs waf-audit prod-waf-logs
 
 # =========================================================================
 # 🛠️ ENVIRONNEMENT DE DÉVELOPPEMENT (Local)
@@ -129,6 +130,21 @@ prod-vault-logs:
 	@$(COMPOSE_PROD) logs -f vault vault-bootstrap
 
 # =========================================================================
+# 🛡️ WAF (ModSecurity audit log)
+# =========================================================================
+
+# Follow the ModSecurity audit log (one JSON record per matched request).
+waf-logs:
+	@$(COMPOSE_DEV) exec nginx tail -f /var/log/modsecurity/audit.log
+
+# Summary of the CRS rules that fired most
+waf-audit:
+	@$(COMPOSE_DEV) exec nginx sh -c 'grep -oE "\"ruleId\":\"[0-9]+\"" /var/log/modsecurity/audit.log | sort | uniq -c | sort -rn | head -20'
+
+prod-waf-logs:
+	@$(COMPOSE_PROD) exec nginx tail -f /var/log/modsecurity/audit.log
+
+# =========================================================================
 # 🧹 NETTOYAGE & MAINTENANCE (DÉVELOPPEMENT)
 # =========================================================================
 
@@ -153,20 +169,20 @@ hclean:
 	else \
 		echo "Aucune image Chessguard à supprimer."; \
 	fi
-	
+
 	@echo "🧹 Purge du cache de build Docker (BuildKit)..."
 	docker builder prune -a -f
-	
+
 	@echo "🧼 Nettoyage du système Docker global (réseaux, conteneurs éteints)..."
 	docker system prune -f
-	
+
 	@echo "📦 Suppression des node_modules et builds locaux de chaque service..."
 	rm -rf node_modules dist build .next
 	rm -rf src/backend-auth/node_modules src/backend-auth/dist src/backend-auth/.prisma
 	rm -rf src/backend-game/node_modules src/backend-game/dist
 	rm -rf src/backend-matchmaking/node_modules src/backend-matchmaking/dist
 	rm -rf src/frontend/node_modules src/frontend/.next
-	
+
 	@echo "✨ Environnement de DEV 100% purifié !"
 
 # =========================================================================
@@ -196,20 +212,20 @@ prod-hclean:
 	else \
 		echo "Aucune image Chessguard à supprimer."; \
 	fi
-	
+
 	@echo "🧹 Purge du cache de build Docker (BuildKit)..."
 	docker builder prune -a -f
-	
+
 	@echo "🧼 Nettoyage du système Docker global (réseaux, conteneurs éteints)..."
 	docker system prune -f
-	
+
 	@echo "📦 Suppression des dossiers de build locaux..."
 	rm -rf node_modules dist build .next
 	rm -rf src/backend-auth/node_modules src/backend-auth/dist src/backend-auth/.prisma
 	rm -rf src/backend-game/node_modules src/backend-game/dist
 	rm -rf src/backend-matchmaking/node_modules src/backend-matchmaking/dist
 	rm -rf src/frontend/node_modules src/frontend/.next
-	
+
 	@echo "✨ Infrastructure de PRODUCTION 100% purifiée !"
 
 check-types:
