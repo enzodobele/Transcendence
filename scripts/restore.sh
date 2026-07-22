@@ -13,17 +13,18 @@ if [ ! -f "$INPUT_FILE" ]; then
 fi
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-SECRETS_DIR="$ROOT_DIR/src/secrets"
 DB_CONTAINER="${DB_CONTAINER:-chessguard-db}"
-
-DB_USER=$(tr -d '\n' < "$SECRETS_DIR/db_user.txt")
-DB_PASSWORD=$(tr -d '\n' < "$SECRETS_DIR/db_password.txt")
-DB_NAME=$(tr -d '\n' < "$SECRETS_DIR/db_name.txt")
 
 if ! docker ps --format '{{.Names}}' | grep -qx "$DB_CONTAINER"; then
   echo "[restore] Database container '$DB_CONTAINER' is not running"
   exit 1
 fi
+
+# DB creds come from the Vault-Agent-rendered files inside the db container:
+# no host-side secret files or Vault tokens needed.
+DB_USER=$(docker exec "$DB_CONTAINER" cat /vault/secrets/db_user)
+DB_PASSWORD=$(docker exec "$DB_CONTAINER" cat /vault/secrets/db_password)
+DB_NAME=$(docker exec "$DB_CONTAINER" cat /vault/secrets/db_name)
 
 echo "[restore] Resetting database schema..."
 docker exec -i -e PGPASSWORD="$DB_PASSWORD" "$DB_CONTAINER" \

@@ -2,30 +2,26 @@
 set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-SECRETS_DIR="$ROOT_DIR/src/secrets"
 BACKUP_DIR="$ROOT_DIR/backups"
 STATUS_FILE="$ROOT_DIR/src/nginx/html/backup-status.json"
 DB_CONTAINER="${DB_CONTAINER:-chessguard-db}"
 
-if [ ! -f "$SECRETS_DIR/db_user.txt" ] || [ ! -f "$SECRETS_DIR/db_password.txt" ] || [ ! -f "$SECRETS_DIR/db_name.txt" ]; then
-  echo "[backup] Missing DB secret files in $SECRETS_DIR"
+if ! docker ps --format '{{.Names}}' | grep -qx "$DB_CONTAINER"; then
+  echo "[backup] Database container '$DB_CONTAINER' is not running"
   exit 1
 fi
 
-DB_USER=$(tr -d '\n' < "$SECRETS_DIR/db_user.txt")
-DB_PASSWORD=$(tr -d '\n' < "$SECRETS_DIR/db_password.txt")
-DB_NAME=$(tr -d '\n' < "$SECRETS_DIR/db_name.txt")
+# DB creds come from the Vault-Agent-rendered files inside the db container:
+# no host-side secret files or Vault tokens needed.
+DB_USER=$(docker exec "$DB_CONTAINER" cat /vault/secrets/db_user)
+DB_PASSWORD=$(docker exec "$DB_CONTAINER" cat /vault/secrets/db_password)
+DB_NAME=$(docker exec "$DB_CONTAINER" cat /vault/secrets/db_name)
 
 mkdir -p "$BACKUP_DIR"
 
 TIMESTAMP=$(date -u +"%Y%m%d_%H%M%S")
 FILE_NAME="${DB_NAME}_${TIMESTAMP}.sql.gz"
 OUTPUT_FILE="$BACKUP_DIR/$FILE_NAME"
-
-if ! docker ps --format '{{.Names}}' | grep -qx "$DB_CONTAINER"; then
-  echo "[backup] Database container '$DB_CONTAINER' is not running"
-  exit 1
-fi
 
 docker exec -e PGPASSWORD="$DB_PASSWORD" "$DB_CONTAINER" \
   pg_dump -U "$DB_USER" "$DB_NAME" | gzip -c > "$OUTPUT_FILE"

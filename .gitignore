@@ -1,5 +1,7 @@
 .env
 node_modules/
-secrets/
+.vault/
 dist/
 .vite/
+# ModSecurity runtime collection state (written into the nginx html mount)
+src/nginx/html/modsec-shared-collections*

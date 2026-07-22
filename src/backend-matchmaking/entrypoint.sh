@@ -2,49 +2,77 @@
 set -e
 
 # =============================================
-# Fonction utilitaire pour lire un secret
+# Vault settings (AppRole creds mounted read-only)
 # =============================================
-read_secret_strict() {
-  local secret_name="$1"
-  local secret_path="/run/secrets/$secret_name"
+VAULT_ADDR="${VAULT_ADDR:-http://vault:8200}"
+CREDS_DIR="${VAULT_CREDS_DIR:-/vault/creds}"
 
-  if [ ! -s "$secret_path" ]; then
-    echo "[-] CRITICAL ERROR: Secret '$secret_name' is missing or empty at $secret_path" >&2
+# =============================================
+# Wait for Vault (health endpoint returns 200 only when unsealed+active)
+# =============================================
+echo "[+] [Matchmaking] Waiting for Vault..."
+MAX_RETRIES=30
+for i in $(seq 1 $MAX_RETRIES); do
+  if curl -sf "$VAULT_ADDR/v1/sys/health" >/dev/null 2>&1; then
+    echo "[+] [Matchmaking] Vault is ready after $i attempts."
+    break
+  fi
+  if [ "$i" -eq "$MAX_RETRIES" ]; then
+    echo "[-] [Matchmaking] ERROR: Vault did not become ready in time." >&2
     exit 1
   fi
+  sleep 2
+done
 
-  cat "$secret_path" | tr -d '\n'
+# =============================================
+# AppRole login
+# =============================================
+ROLE_ID=$(cat "$CREDS_DIR/role_id")
+SECRET_ID=$(cat "$CREDS_DIR/secret_id")
+VAULT_TOKEN=$(curl -sf -X POST \
+  -d "{\"role_id\":\"$ROLE_ID\",\"secret_id\":\"$SECRET_ID\"}" \
+  "$VAULT_ADDR/v1/auth/approle/login" | jq -r '.auth.client_token')
+if [ -z "$VAULT_TOKEN" ] || [ "$VAULT_TOKEN" = "null" ]; then
+  echo "[-] [Matchmaking] CRITICAL ERROR: AppRole login failed." >&2
+  exit 1
+fi
+unset ROLE_ID SECRET_ID
+
+# =============================================
+# Fetch secrets from KV v2
+# =============================================
+kv_field() {
+  curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
+    "$VAULT_ADDR/v1/secret/data/chessguard/$1" | jq -er ".data.data.$2"
 }
 
-# =============================================
-# Lecture des secrets (Pas besoin de JWT_SECRET ici)
-# =============================================
-echo "[+] [Matchmaking] Loading secrets..."
-export DB_USER=$(read_secret_strict "db_user")
-export DB_NAME=$(read_secret_strict "db_name")
-export DB_PASSWORD=$(read_secret_strict "db_password")
+echo "[+] [Matchmaking] Fetching secrets from Vault..."
+DB_USER=$(kv_field db user)
+DB_NAME=$(kv_field db name)
+DB_PASSWORD=$(kv_field db password)
+JWT_SECRET=$(kv_field jwt secret)
+unset VAULT_TOKEN
 
 # =============================================
-# Secrets copy for the 'nodejs' user
+# JWT file for the app (same UID: no chown needed)
 # =============================================
-# /run/secrets is readable only by root (0600 on the host); the app runs as
-# 'nodejs' and reads JWT_SECRET_FILE, so it gets a dedicated readable copy.
 APP_SECRETS_DIR="/tmp/app-secrets"
 mkdir -p "$APP_SECRETS_DIR"
-cp /run/secrets/* "$APP_SECRETS_DIR/"
-chown -R nodejs:nodejs "$APP_SECRETS_DIR"
 chmod 700 "$APP_SECRETS_DIR"
-chmod 400 "$APP_SECRETS_DIR"/*
+rm -f "$APP_SECRETS_DIR/jwt_secret"
+printf '%s' "$JWT_SECRET" > "$APP_SECRETS_DIR/jwt_secret"
+chmod 400 "$APP_SECRETS_DIR/jwt_secret"
 export JWT_SECRET_FILE="$APP_SECRETS_DIR/jwt_secret"
+unset JWT_SECRET
 
 # =============================================
-# Construction de DATABASE_URL
+# DATABASE_URL
 # =============================================
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
-echo "[+] [Matchmaking] DATABASE_URL: $DATABASE_URL"
+echo "[+] [Matchmaking] DATABASE_URL configured."
 
 # =============================================
-# Attente de la base de données
+# Wait for the database (with timeout)
 # =============================================
 echo "[+] [Matchmaking] Waiting for database to be ready..."
 MAX_RETRIES=30
@@ -57,17 +85,15 @@ for i in $(seq 1 $MAX_RETRIES); do
   fi
 
   if [ $i -eq $MAX_RETRIES ]; then
-    echo "[-] ERROR: Database did not start in time." >&2
+    echo "[-] [Matchmaking] ERROR: Database did not start in time." >&2
     exit 1
   fi
 
+  echo "[+] [Matchmaking] Retrying in $RETRY_INTERVAL second(s)..."
   sleep $RETRY_INTERVAL
 done
 
-# 💡 Note : On saute 'migrate deploy' et 'db seed' car le service principal s'en charge.
+# Note: migrate/seed are skipped here; the auth service owns them.
 
-# =============================================
-# Démarrage du microservice Matchmaking
-# =============================================
 echo "[+] Starting backend-matchmaking..."
-exec su-exec nodejs "$@"
+exec "$@"
