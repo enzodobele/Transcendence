@@ -4,45 +4,44 @@
 
 NAME = chessguard
 
-ifeq ($(shell command -v podman >/dev/null 2>&1 && echo yes),yes)
-	DOCKER := podman
-	DOCKER_COMPOSE := podman compose
-	COMPOSE_OVERRIDE := -f docker-compose.podman.yml
+# Fichiers de configuration Docker/Podman Compose 
+
+ifeq ($(shell systemctl is-active podman >/dev/null 2>&1 && echo yes),yes)
+    DOCKER := podman
+    DOCKER_COMPOSE := podman compose
+    COMPOSE_OVERRIDE := -f docker-compose.podman.yml
 
 else ifeq ($(shell docker compose version >/dev/null 2>&1 && echo yes),yes)
-	DOCKER := docker
-	DOCKER_COMPOSE := docker compose
-	COMPOSE_OVERRIDE :=
+    DOCKER := docker
+    DOCKER_COMPOSE := docker compose
+    COMPOSE_OVERRIDE :=
 
 else ifeq ($(shell command -v docker-compose >/dev/null 2>&1 && echo yes),yes)
-	DOCKER := docker
-	DOCKER_COMPOSE := docker-compose
-	COMPOSE_OVERRIDE :=
+    DOCKER := docker
+    DOCKER_COMPOSE := docker-compose
+    COMPOSE_OVERRIDE :=
 
 else
 $(error Aucun moteur compatible trouvé)
 endif
 
-# 📂 Fichiers de configuration Docker Compose
 COMPOSE_DEV  = $(DOCKER_COMPOSE) -f docker-compose.yml $(COMPOSE_OVERRIDE) -p $(NAME)_dev
 COMPOSE_PROD = $(DOCKER_COMPOSE) -f docker-compose.prod.yml $(COMPOSE_OVERRIDE) -p $(NAME)_prod
+
 
 SERVICE ?=
 
 .PHONY: up down rebuild restart logs ps exec db-seed db-migrate format backup restore \
         prod prod-down prod-rebuild prod-logs prod-ps prod-exec prod-db-seed \
-	clean fclean prod-clean prod-fclean check-types \
-	monitoring-up monitoring-down monitoring-logs monitoring-ps \
+		clean fclean hclean prod-clean prod-fclean prod-hclean check-types \
+		monitoring-up monitoring-down monitoring-logs monitoring-ps \
         vault-status vault-unseal vault-logs prod-vault-status prod-vault-unseal prod-vault-logs \
-        waf-logs waf-audit prod-waf-logs
+        waf-logs waf-audit prod-waf-logs install-local npm-audit
 
-# =========================================================================
-# 🛠️ ENVIRONNEMENT DE DÉVELOPPEMENT (Local)
-# =========================================================================
-
+# ENVIRONNEMENT DE DÉVELOPPEMENT
 up:
 	@mkdir -p .vault/dev
-	@echo "[+] Lancement de l'environnement de DEV..."
+	@echo "[+] Lancement de l'environnement de DEV avec $(DOCKER)..."
 	@$(COMPOSE_DEV) up -d --build $(SERVICE)
 
 down:
@@ -58,8 +57,7 @@ logs:
 	@$(COMPOSE_DEV) logs -f $(SERVICE)
 
 ps:
-	@$(COMPOSE_DEV) ps --format 'table {{.Name}}\t{{.State}}\t{{.Status}}\t{{.Ports}}'
-
+	@$(COMPOSE_DEV) ps --format 'table {{.Name}}\t{{.State}}\t{{.Health}}\t{{.Status}}\t{{.Ports}}'
 exec:
 	@$(COMPOSE_DEV) exec $(SERVICE) sh
 
@@ -83,6 +81,8 @@ format:
 	@$(COMPOSE_DEV) exec backend-game npm run format || true
 	@$(COMPOSE_DEV) exec backend-auth npm run format || true
 	@$(COMPOSE_DEV) exec backend-matchmaking npm run format || true
+	@$(COMPOSE_DEV) exec backend-status npm run format || true
+	@$(COMPOSE_DEV) exec backend-friends npm run format || true
 	@$(COMPOSE_DEV) exec frontend npm run format || true
 
 backup:
@@ -94,31 +94,10 @@ restore:
 	@echo "[+] Restauration de la sauvegarde $(FILE)..."
 	@./scripts/restore.sh "$(FILE)"
 
-# =========================================================================
-# 📈 MONITORING (Prometheus + Grafana)
-# =========================================================================
-
-monitoring-up:
-	@echo "[+] Lancement de la stack monitoring..."
-	@$(COMPOSE_DEV) up -d --build $(MONITORING_SERVICES)
-
-monitoring-down:
-	@echo "[-] Arrêt de la stack monitoring..."
-	@$(COMPOSE_DEV) stop $(MONITORING_SERVICES)
-
-monitoring-logs:
-	@$(COMPOSE_DEV) logs -f $(if $(SERVICE),$(SERVICE),$(MONITORING_SERVICES))
-
-monitoring-ps:
-	@$(COMPOSE_DEV) ps $(MONITORING_SERVICES) --format 'table {{.Name}}\t{{.State}}\t{{.Status}}\t{{.Ports}}'
-
-# =========================================================================
-# 🚀 ENVIRONNEMENT DE PRODUCTION (VPS / Serveur)
-# =========================================================================
-
+# ENVIRONNEMENT DE PRODUCTION
 prod:
 	@mkdir -p .vault/prod
-	@echo "[+] Lancement de l'environnement de PRODUCTION..."
+	@echo "[+] Lancement de l'environnement de PRODUCTION avec $(DOCKER)..."
 	@$(COMPOSE_PROD) up -d --build $(SERVICE)
 	@echo "[+] Infrastructure de production opérationnelle !"
 
@@ -141,10 +120,7 @@ prod-db-seed:
 	@echo "[!] ATTENTION : Seeding de la DB de PRODUCTION..."
 	@$(COMPOSE_PROD) exec backend-auth npx prisma db seed
 
-# =========================================================================
-# 🔐 VAULT OPERATIONS
-# =========================================================================
-
+# VAULT OPERATIONS
 vault-status:
 	@$(COMPOSE_DEV) exec vault vault status
 
@@ -165,25 +141,17 @@ prod-vault-unseal:
 prod-vault-logs:
 	@$(COMPOSE_PROD) logs -f vault vault-bootstrap
 
-# =========================================================================
-# 🛡️ WAF (ModSecurity audit log)
-# =========================================================================
-
-# Follow the ModSecurity audit log (one JSON record per matched request).
+# WAF (ModSecurity audit log)
 waf-logs:
 	@$(COMPOSE_DEV) exec nginx tail -f /var/log/modsecurity/audit.log
 
-# Summary of the CRS rules that fired most
 waf-audit:
 	@$(COMPOSE_DEV) exec nginx sh -c 'grep -oE "\"ruleId\":\"[0-9]+\"" /var/log/modsecurity/audit.log | sort | uniq -c | sort -rn | head -20'
 
 prod-waf-logs:
 	@$(COMPOSE_PROD) exec nginx tail -f /var/log/modsecurity/audit.log
 
-# =========================================================================
-# 🧹 NETTOYAGE & MAINTENANCE (DÉVELOPPEMENT)
-# =========================================================================
-
+# NETTOYAGE & MAINTENANCE (Dev)
 clean:
 	@echo "[-] Nettoyage des conteneurs de Dev..."
 	@$(COMPOSE_DEV) down --remove-orphans
@@ -193,74 +161,49 @@ fclean:
 	@rm -rf .vault/dev
 
 hclean:
-	@echo "🚨 Arrêt des conteneurs et suppression des volumes de DEV..."
 	@$(COMPOSE_DEV) down -v --remove-orphans
 	@rm -rf .vault/dev
-
-	@echo "🗑️ Suppression de toutes les images du projet Chessguard..."
-	@if [ $$(docker images 'chessguard*' -q | wc -l) -gt 0 ]; then \
-		docker rmi $$(docker images 'chessguard*' -q) --force; \
+	@if [ $$($(DOCKER) images 'chessguard*' -q | wc -l) -gt 0 ]; then \
+		$(DOCKER) rmi $$($(DOCKER) images 'chessguard*' -q) --force; \
 	else \
 		echo "Aucune image Chessguard à supprimer."; \
 	fi
-
-	@echo "🧹 Purge du cache de build Docker (BuildKit)..."
-	docker builder prune -a -f
-
-	@echo "🧼 Nettoyage du système Docker global (réseaux, conteneurs éteints)..."
-	docker system prune -f
-
-	@echo "📦 Suppression des node_modules et builds locaux de chaque service..."
+	$(DOCKER) builder prune -a -f
+	$(DOCKER) system prune -f
 	rm -rf node_modules dist build .next
 	rm -rf src/backend-auth/node_modules src/backend-auth/dist src/backend-auth/.prisma
 	rm -rf src/backend-game/node_modules src/backend-game/dist
 	rm -rf src/backend-matchmaking/node_modules src/backend-matchmaking/dist
 	rm -rf src/frontend/node_modules src/frontend/.next
+	@echo "Environnement de DEV nettoyé avec $(DOCKER)!"
 
-	@echo "✨ Environnement de DEV 100% purifié !"
-
-# =========================================================================
-# 🚨 NETTOYAGE & MAINTENANCE (PRODUCTION)
-# =========================================================================
-
+# NETTOYAGE & MAINTENANCE (PRODUCTION)
 prod-clean:
 	@echo "[-] Arrêt et nettoyage des conteneurs de PRODUCTION..."
 	@$(COMPOSE_PROD) down --remove-orphans
 
 prod-fclean:
-	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
+	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes... Ctrl C pour annuler"
 	@sleep 5
 	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
 	@rm -rf .vault/prod
 
 prod-hclean:
-	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
+	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes... Ctrl C pour annuler"
 	@sleep 5
-	@echo "🚨 Arrêt des conteneurs et suppression des volumes de PRODUCTION..."
 	@$(COMPOSE_PROD) down -v --remove-orphans
 	@rm -rf .vault/prod
-
-	@echo "🗑️ Suppression de toutes les images du projet Chessguard..."
-	@if [ $$(docker images 'chessguard*' -q | wc -l) -gt 0 ]; then \
-		docker rmi $$(docker images 'chessguard*' -q) --force; \
+	@if [ $$($(DOCKER) images 'chessguard*' -q | wc -l) -gt 0 ]; then \
+		$(DOCKER) rmi $$($(DOCKER) images 'chessguard*' -q) --force; \
 	else \
 		echo "Aucune image Chessguard à supprimer."; \
 	fi
-
-	@echo "🧹 Purge du cache de build Docker (BuildKit)..."
-	docker builder prune -a -f
-
-	@echo "🧼 Nettoyage du système Docker global (réseaux, conteneurs éteints)..."
-	docker system prune -f
-
-	@echo "📦 Suppression des dossiers de build locaux..."
+	$(DOCKER) builder prune -a -f
+	$(DOCKER) system prune -f
 	rm -rf node_modules dist build .next
 	rm -rf src/backend-auth/node_modules src/backend-auth/dist src/backend-auth/.prisma
 	rm -rf src/backend-game/node_modules src/backend-game/dist
-	rm -rf src/backend-matchmaking/node_modules src/backend-matchmaking/dist
-	rm -rf src/frontend/node_modules src/frontend/.next
-
-	@echo "✨ Infrastructure de PRODUCTION 100% purifiée !"
+	@echo "Infrastructure de PRODUCTION nettoyée avec $(DOCKER)!"
 
 check-types:
 	@echo "🔍 [Vérification] Analyse du dossier Matchmaking..."
@@ -283,12 +226,11 @@ install-local:
 		src/backend-status \
 		src/frontend; \
 		do \
-		echo "📦 Installation dans $$dir..."; \
+		echo "Installation dans $$dir..."; \
 		(cd $$dir && npm install); \
 	done
-	@echo "[+] Génération du client Prisma local pour l'autocomplétion..."
 	@cd src/backend-auth && npx prisma generate
-	@echo "✨ Toutes les dépendances locales sont installées !"
+	@echo "Toutes les dépendances locales sont installées !"
 
 npm-audit:
 	@echo "[+] Audit npm pour chaque microservice..."
@@ -300,7 +242,6 @@ npm-audit:
 		src/backend-status \
 		src/frontend; \
 		do \
-		echo "📦 Audit de $$dir..."; \
+		echo "Audit de $$dir..."; \
 		(cd $$dir && npm audit); \
 	done
-	@echo "✨ Audits réalisés !"

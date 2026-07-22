@@ -3,7 +3,7 @@ import sys
 import random
 import chess
 import torch
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from pydantic import BaseModel
 
 sys.path.append("/app/src")
@@ -116,5 +116,9 @@ def predict(req: PredictRequest):
 
 
 @app.get("/health")
-def health():
-    return {"status": "ok", "model_loaded": model_loaded}
+def health(response: Response):
+    if not model_loaded:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {"status": "loading", "model_loaded": False}
+        
+    return {"status": "ok", "model_loaded": True}
