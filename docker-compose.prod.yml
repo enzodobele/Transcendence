@@ -253,6 +253,73 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  # =========================================================================
+  # 📈 MONITORING (Prometheus + Grafana)
+  # =========================================================================
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.external-url=https://localhost/monitoring/prometheus/
+      - --web.route-prefix=/
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_prod_data:/prometheus
+    expose:
+      - "9090"
+    networks:
+      - chessguard_prod_network
+    restart: always
+
+  grafana:
+    image: grafana/grafana:11.2.2
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SERVER_ROOT_URL: https://localhost/monitoring/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    volumes:
+      - grafana_prod_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    expose:
+      - "3000"
+    depends_on:
+      - prometheus
+    networks:
+      - chessguard_prod_network
+    restart: always
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    command:
+      - --path.rootfs=/host
+    volumes:
+      - /:/host:ro
+    expose:
+      - "9100"
+    networks:
+      - chessguard_prod_network
+    restart: always
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    expose:
+      - "8080"
+    networks:
+      - chessguard_prod_network
+    restart: always
+
 # =========================================================================
 # 💾 VOLUMES PERSISTANTS
 # =========================================================================
@@ -261,6 +328,10 @@ volumes:
     name: chessguard_prod_db_data
   avatar_uploads:
     name: chessguard_prod_avatar_uploads
+  prometheus_prod_data:
+    name: chessguard_prod_prometheus_data
+  grafana_prod_data:
+    name: chessguard_prod_grafana_data
   waf_logs:
   vault_data:
   pg_secrets:

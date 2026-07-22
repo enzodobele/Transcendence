@@ -9,12 +9,14 @@ DOCKER_COMPOSE ?= docker compose
 # 📂 Fichiers de configuration Docker Compose
 COMPOSE_DEV  = $(DOCKER_COMPOSE) -f docker-compose.yml -p $(NAME)_dev
 COMPOSE_PROD = $(DOCKER_COMPOSE) -f docker-compose.prod.yml -p $(NAME)_prod
+MONITORING_SERVICES = prometheus grafana node-exporter cadvisor
 
 SERVICE ?=
 
 .PHONY: up down rebuild restart logs ps exec db-seed db-migrate format backup restore \
         prod prod-down prod-rebuild prod-logs prod-ps prod-exec prod-db-seed \
-        clean fclean prod-clean prod-fclean check-types \
+	clean fclean prod-clean prod-fclean check-types \
+	monitoring-up monitoring-down monitoring-logs monitoring-ps \
         vault-status vault-unseal vault-logs prod-vault-status prod-vault-unseal prod-vault-logs \
         waf-logs waf-audit prod-waf-logs
 
@@ -75,6 +77,24 @@ restore:
 	@if [ -z "$(FILE)" ]; then echo "Usage: make restore FILE=backups/<dump.sql.gz>"; exit 1; fi
 	@echo "[+] Restauration de la sauvegarde $(FILE)..."
 	@./scripts/restore.sh "$(FILE)"
+
+# =========================================================================
+# 📈 MONITORING (Prometheus + Grafana)
+# =========================================================================
+
+monitoring-up:
+	@echo "[+] Lancement de la stack monitoring..."
+	@$(COMPOSE_DEV) up -d --build $(MONITORING_SERVICES)
+
+monitoring-down:
+	@echo "[-] Arrêt de la stack monitoring..."
+	@$(COMPOSE_DEV) stop $(MONITORING_SERVICES)
+
+monitoring-logs:
+	@$(COMPOSE_DEV) logs -f $(if $(SERVICE),$(SERVICE),$(MONITORING_SERVICES))
+
+monitoring-ps:
+	@$(COMPOSE_DEV) ps $(MONITORING_SERVICES) --format 'table {{.Name}}\t{{.State}}\t{{.Status}}\t{{.Ports}}'
 
 # =========================================================================
 # 🚀 ENVIRONNEMENT DE PRODUCTION (VPS / Serveur)

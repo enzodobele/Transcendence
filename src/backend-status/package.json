@@ -10,7 +10,12 @@
   "dependencies": {
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.3",
+<<<<<<< HEAD
     "node-cron": "^4.6.0"
+=======
+    "node-cron": "^3.0.3",
+    "prom-client": "^15.1.3"
+>>>>>>> origin/Arthur-monitoring
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

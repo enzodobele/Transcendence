@@ -1,0 +1,41 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["prometheus:9090"]
+
+  - job_name: node-exporter
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  - job_name: cadvisor
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  - job_name: backend-auth
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend-auth:3000"]
+
+  - job_name: backend-game
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend-game:3002"]
+
+  - job_name: backend-matchmaking
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend-matchmaking:3001"]
+
+  - job_name: backend-friends
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend-friends:3003"]
+
+  - job_name: backend-status
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend-status:3004"]
