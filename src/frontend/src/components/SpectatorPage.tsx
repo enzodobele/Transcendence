@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { GameView } from "./Board/GameView";
 import { useChessGame } from "../hooks/chess/useChessGame";
 import { getFriends } from "../services/auth";
@@ -36,6 +37,7 @@ function getGameIdFromUrl(): number | undefined {
 }
 
 export function SpectatorPage() {
+  const { t } = useTranslation();
   const gameId = useMemo(() => getGameIdFromUrl(), []);
   const [customGameOver, setCustomGameOver] = useState<string | null>(null);
   const [friends, setFriends] = useState<FriendSummary[]>([]);
@@ -89,29 +91,29 @@ export function SpectatorPage() {
 
     if (whiteIsFriend && blackIsFriend) {
       return [
-        `Votre amie ${gameInfo.player1Username} joue les blancs.`,
-        `Votre ami ${gameInfo.player2Username} joue les noirs.`,
+        t("spectator.friendPlaysWhite", { name: gameInfo.player1Username }),
+        t("spectator.friendPlaysBlack", { name: gameInfo.player2Username }),
       ];
     }
 
     if (whiteIsFriend) {
-      return [`Votre ami ${gameInfo.player1Username} joue les blancs.`];
+      return [t("spectator.friendPlaysWhite", { name: gameInfo.player1Username })];
     }
 
     if (blackIsFriend) {
-      return [`Votre ami ${gameInfo.player2Username} joue les noirs.`];
+      return [t("spectator.friendPlaysBlack", { name: gameInfo.player2Username })];
     }
 
     return [
-      `${gameInfo.player1Username} joue les blancs.`,
-      `${gameInfo.player2Username} joue les noirs.`,
+      t("spectator.playerPlaysWhite", { name: gameInfo.player1Username }),
+      t("spectator.playerPlaysBlack", { name: gameInfo.player2Username }),
     ];
-  }, [friends, gameInfo]);
+  }, [friends, gameInfo, t]);
 
   if (!gameId) {
     return (
       <div className="app-loading">
-        <div className="spinner">Missing gameId in URL. Use /spectate?gameId=123</div>
+        <div className="spinner">{t("spectator.missingGameId")}</div>
       </div>
     );
   }
@@ -119,7 +121,7 @@ export function SpectatorPage() {
   return (
     <div className="app">
       <div style={{ position: "absolute", top: 16, left: 16, color: "white" }}>
-        Spectator mode {isConnected ? "online" : "connecting..."}
+        {t("spectator.mode")} {isConnected ? t("spectator.online") : t("spectator.connecting")}
       </div>
 
       {spectatorLabels.length > 0 && (
@@ -161,7 +163,7 @@ export function SpectatorPage() {
           fontWeight: 600,
         }}
       >
-        Quitter le mode spectateur
+        {t("spectator.quit")}
       </button>
 
       <GameView
