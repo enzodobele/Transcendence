@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   getToken,
   isAdminToken,
@@ -9,14 +10,6 @@ import {
 } from "../services/status";
 import "../styles/status.css";
 
-const SERVICE_LABELS: Record<string, string> = {
-  auth: "Auth",
-  game: "Game Engine",
-  matchmaking: "Matchmaking",
-  friends: "Friends",
-  ai: "IA",
-};
-
 function serviceClass(status: ServiceStatus["status"]): string
 {
   if (status === "online") return "ok";
@@ -24,21 +17,27 @@ function serviceClass(status: ServiceStatus["status"]): string
   return "ko";
 }
 
-function serviceLabel(status: ServiceStatus["status"]): string
+function serviceStateKey(status: ServiceStatus["status"]): string
 {
-  if (status === "online") return "Online";
-  if (status === "degraded") return "Degraded";
-  return "Offline";
+  if (status === "online") return "status.state.online";
+  if (status === "degraded") return "status.state.degraded";
+  return "status.state.offline";
+}
+
+interface BackupMessage {
+  text: string;
+  isError: boolean;
 }
 
 export function StatusPage()
 {
+  const { t } = useTranslation();
   const token = useMemo(() => getToken(), []);
   const isAdmin = useMemo(() => isAdminToken(token), [token]);
 
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [backupMsg, setBackupMsg] = useState<string | null>(null);
+  const [backupMsg, setBackupMsg] = useState<BackupMessage | null>(null);
   const [isBacking, setIsBacking] = useState(false);
 
   const load = async (showLoader = false) =>
@@ -65,12 +64,12 @@ export function StatusPage()
     try
     {
       await triggerBackup(token);
-      setBackupMsg("Backup effectué avec succès !");
+      setBackupMsg({ text: t("status.backupSuccess"), isError: false });
       void load();
     }
     catch
     {
-      setBackupMsg("Erreur lors du backup.");
+      setBackupMsg({ text: t("status.backupError"), isError: true });
     }
     finally
     {
@@ -89,8 +88,8 @@ export function StatusPage()
     return (
       <main className="status-page">
         <section className="status-panel">
-          <h1>ChessGuard Status</h1>
-          <p className="subtitle">Accès réservé aux administrateurs.</p>
+          <h1>{t("status.title")}</h1>
+          <p className="subtitle">{t("status.adminOnly")}</p>
         </section>
       </main>
     );
@@ -99,40 +98,40 @@ export function StatusPage()
   return (
     <main className="status-page">
       <section className="status-panel">
-        <h1>ChessGuard Status</h1>
-        <p className="subtitle">État en temps réel des microservices</p>
+        <h1>{t("status.title")}</h1>
+        <p className="subtitle">{t("status.subtitle")}</p>
 
         {isLoading && !status ? (
-          <p>Chargement du statut...</p>
+          <p>{t("status.loading")}</p>
         ) : (
           <>
             <ul className="status-list">
               {status?.services.map((svc) => (
                 <li key={svc.name} className={serviceClass(svc.status)}>
-                  <span>{SERVICE_LABELS[svc.name] ?? svc.name}</span>
-                  <strong>{serviceLabel(svc.status)}</strong>
+                  <span>{t(`status.services.${svc.name}`, { defaultValue: svc.name })}</span>
+                  <strong>{t(serviceStateKey(svc.status))}</strong>
                 </li>
               ))}
             </ul>
 
             <div className="meta">
               <p>
-                Last backup:{" "}
+                {t("status.lastBackup")}{" "}
                 <strong>
                   {status?.backup.lastBackup
                     ? new Date(status.backup.lastBackup).toLocaleString()
-                    : "Jamais"}
+                    : t("status.never")}
                 </strong>
               </p>
               {status?.backup.file && (
-                <p>Fichier: <strong>{status.backup.file}</strong></p>
+                <p>{t("status.file")} <strong>{status.backup.file}</strong></p>
               )}
-              <p>Last check: <strong>{checkedAt}</strong></p>
+              <p>{t("status.lastCheck")} <strong>{checkedAt}</strong></p>
             </div>
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button type="button" onClick={() => void load()} className="refresh-btn">
-                Refresh
+                {t("status.refresh")}
               </button>
               <button
                 type="button"
@@ -140,13 +139,13 @@ export function StatusPage()
                 className="refresh-btn"
                 disabled={isBacking}
               >
-                {isBacking ? "Backup en cours..." : "Lancer un backup"}
+                {isBacking ? t("status.backupInProgress") : t("status.runBackup")}
               </button>
             </div>
 
             {backupMsg && (
-              <p style={{ marginTop: 8, color: backupMsg.includes("Erreur") ? "#e55" : "#5e5" }}>
-                {backupMsg}
+              <p style={{ marginTop: 8, color: backupMsg.isError ? "#e55" : "#5e5" }}>
+                {backupMsg.text}
               </p>
             )}
           </>

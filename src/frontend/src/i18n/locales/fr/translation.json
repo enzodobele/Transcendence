@@ -281,5 +281,43 @@
         }
       ]
     }
+  },
+  "status": {
+    "title": "Statut ChessGuard",
+    "subtitle": "État en temps réel des microservices",
+    "adminOnly": "Accès réservé aux administrateurs.",
+    "loading": "Chargement du statut...",
+    "lastBackup": "Dernière sauvegarde :",
+    "never": "Jamais",
+    "file": "Fichier :",
+    "lastCheck": "Dernière vérification :",
+    "refresh": "Rafraîchir",
+    "runBackup": "Lancer une sauvegarde",
+    "backupInProgress": "Sauvegarde en cours...",
+    "backupSuccess": "Sauvegarde effectuée avec succès !",
+    "backupError": "Erreur lors de la sauvegarde.",
+    "state": {
+      "online": "En ligne",
+      "degraded": "Dégradé",
+      "offline": "Hors ligne"
+    },
+    "services": {
+      "auth": "Auth",
+      "game": "Moteur de jeu",
+      "matchmaking": "Matchmaking",
+      "friends": "Amis",
+      "ai": "IA"
+    }
+  },
+  "spectator": {
+    "missingGameId": "gameId manquant dans l'URL. Utilisez /spectate?gameId=123",
+    "mode": "Mode spectateur",
+    "online": "en ligne",
+    "connecting": "connexion...",
+    "quit": "Quitter le mode spectateur",
+    "friendPlaysWhite": "Votre ami {{name}} joue les blancs.",
+    "friendPlaysBlack": "Votre ami {{name}} joue les noirs.",
+    "playerPlaysWhite": "{{name}} joue les blancs.",
+    "playerPlaysBlack": "{{name}} joue les noirs."
   }
 }

@@ -281,5 +281,43 @@
         }
       ]
     }
+  },
+  "status": {
+    "title": "ChessGuard Durumu",
+    "subtitle": "Mikroservislerin gerçek zamanlı durumu",
+    "adminOnly": "Erişim yalnızca yöneticilere açıktır.",
+    "loading": "Durum yükleniyor...",
+    "lastBackup": "Son yedekleme:",
+    "never": "Hiçbir zaman",
+    "file": "Dosya:",
+    "lastCheck": "Son kontrol:",
+    "refresh": "Yenile",
+    "runBackup": "Yedekleme başlat",
+    "backupInProgress": "Yedekleme sürüyor...",
+    "backupSuccess": "Yedekleme başarıyla tamamlandı!",
+    "backupError": "Yedekleme sırasında hata oluştu.",
+    "state": {
+      "online": "Çevrimiçi",
+      "degraded": "Sınırlı",
+      "offline": "Çevrimdışı"
+    },
+    "services": {
+      "auth": "Kimlik",
+      "game": "Oyun Motoru",
+      "matchmaking": "Eşleştirme",
+      "friends": "Arkadaşlar",
+      "ai": "YZ"
+    }
+  },
+  "spectator": {
+    "missingGameId": "URL'de gameId eksik. /spectate?gameId=123 kullanın",
+    "mode": "İzleyici modu",
+    "online": "çevrimiçi",
+    "connecting": "bağlanıyor...",
+    "quit": "İzleyici modundan çık",
+    "friendPlaysWhite": "Arkadaşın {{name}} beyazları oynuyor.",
+    "friendPlaysBlack": "Arkadaşın {{name}} siyahları oynuyor.",
+    "playerPlaysWhite": "{{name}} beyazları oynuyor.",
+    "playerPlaysBlack": "{{name}} siyahları oynuyor."
   }
 }
