@@ -33,6 +33,7 @@ interface GameViewProps {
   onDrawAccept: () => void;
   onDrawRefuse: () => void;
   isSpectator?: boolean;
+  active?: boolean;
 }
 
 function getGameOverMessage(game: any, t: (key: string) => string): string | null {
@@ -69,6 +70,7 @@ export function GameView({
   onDrawAccept,
   onDrawRefuse,
   isSpectator = false,
+  active = true,
 }: GameViewProps) {
   const { t } = useTranslation();
   const gameOverMessage = customGameOver ?? getGameOverMessage(game, t);
@@ -77,7 +79,10 @@ export function GameView({
     <div className="game-layout">
       <div className="game-container">
         <div className="chessboard-wrapper">
-          {is3D ? (
+          {/* Les deux vues restent montées en permanence pour éviter de recréer
+              le contexte WebGL du Canvas 3D à chaque toggle 2D/3D ; seule la
+              visibilité CSS bascule. */}
+          <div style={{ display: is3D ? "block" : "none", width: "100%", height: "100%" }}>
             <ChessGame3D
               game={game}
               board={board}
@@ -87,8 +92,11 @@ export function GameView({
               onSquareClick={onSquareClick}
               onResetGame={onResetGame}
               onPromotionChoice={onPromotionChoice}
+              playerColor={playerColor}
+              active={is3D && active}
             />
-          ) : (
+          </div>
+          <div style={{ display: is3D ? "none" : "block", width: "100%", height: "100%" }}>
             <ChessGame2D
               game={game}
               board={board}
@@ -102,7 +110,7 @@ export function GameView({
               onPromotionChoice={onPromotionChoice}
               playerColor={playerColor}
             />
-          )}
+          </div>
         </div>
       </div>
 

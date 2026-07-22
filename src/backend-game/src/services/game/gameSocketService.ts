@@ -132,10 +132,16 @@ export const initGameWebSocket = (server: http.Server) => {
 
 socket.on("close", () => {
   console.log(`[WS Close] Déconnexion détectée pour l'user ${userId} (Game ${gameId}).`);
-  
-  // 1. On retire le joueur de la room mémoire
-  removePlayerFromRoom(gameId, userId);
-  
+
+  // 1. On retire le joueur de la room mémoire (seulement si cette socket est bien
+  //    la connexion actuellement active pour ce joueur — sinon il s'agit d'une
+  //    ancienne connexion déjà remplacée par une reconnexion, ex: un autre onglet).
+  const wasActiveConnection = removePlayerFromRoom(gameId, userId, socket);
+  if (!wasActiveConnection) {
+    console.log(`[WS Close] Socket obsolète pour l'user ${userId} (Game ${gameId}), déjà remplacée. Ignoré.`);
+    return;
+  }
+
   // 2. On vérifie si la partie est déjà finie (soit via notre flag manuel, soit via chess.js)
   const isFinished = room.isGameOver || (room.game && room.game.isGameOver());
 

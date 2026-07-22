@@ -78,7 +78,7 @@ export const useChessGame = (
         const fromRect = fromEl?.getBoundingClientRect();
         const toRect = toEl?.getBoundingClientRect();
 
-        if (fromRect && toRect) {
+        if (fromRect && toRect && fromRect.width > 0 && toRect.width > 0) {
           setAnimatingPiece({
             pieceKey: `${piece.color}${piece.type.toUpperCase()}`,
             toSquare: to,
