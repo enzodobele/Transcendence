@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import LogoutIcon from "../../assets/Logo/logout.svg?react";
-import ProfileIcon from "../../assets/Logo/profile.svg?react";
 import defaultAvatarUrl from "../../assets/Logo/default-avatar.svg";
 import { ProfileEditOverlay } from "./ProfileEditOverlay";
 import {
