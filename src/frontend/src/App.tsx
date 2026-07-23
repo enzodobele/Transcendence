@@ -18,7 +18,6 @@ import { FindGameButton } from "./components/FindGame/FindGameButton";
 import { FindGameOverlay, type SelectedGameMode } from "./components/FindGame/FindGameOverlay";
 import { PlayButton } from "./components/Play/PlayButton";
 import { Switch3DButton } from "./components/Board/Switch3DButton";
-import { LanguageSwitcher } from "./components/LanguageSwitcher/LanguageSwitcher";
 import { LegalLinks } from "./components/Legal/LegalLinks";
 
 export default function App() {
@@ -155,10 +154,14 @@ export default function App() {
           {isAuthenticated && (
             <>
               {findGameError && <p className="lobby-error">{findGameError}</p>}
-              <PlayButton
-                label={selectedMode.id === "matchmaking" ? t("findGame.findOpponent") : selectedMode.label}
-                onClick={runSelectedMode}
-              />
+				<PlayButton
+				label={
+					selectedMode.id === "matchmaking" 
+					? t("findGame.findOpponent") 
+					: t(`findGame.modes.${selectedMode.id}.title`)
+				}
+				onClick={runSelectedMode}
+				/>
               <LegalLinks />
             </>
           )}

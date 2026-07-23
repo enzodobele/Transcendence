@@ -154,6 +154,7 @@
       "stalemate": "Stalemate — Draw!",
       "gameOver": "Game over"
     }
+	
   },
   "errors": {
     "GENERIC": "An error occurred",
