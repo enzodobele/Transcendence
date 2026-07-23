@@ -187,6 +187,9 @@
     "privacyTab": "Privacy Policy",
     "termsTab": "Terms of Service",
     "close": "Close",
+    "privacyTitle": "Privacy Policy",
+    "termsTitle": "Terms of Service",
+    "lastUpdated": "Last updated: July 2026",
     "privacyDoc": {
       "title": "Privacy Policy",
       "updated": "Last updated: July 2026",

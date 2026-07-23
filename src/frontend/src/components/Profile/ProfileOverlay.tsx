@@ -119,8 +119,7 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
           <p className="profile-value">{user.email || (user as any).mail || t("profile.notProvided")}</p>
         </div>
 
-        <button className="profile-edit-button" onClick={() => setShowEdit(true)}>
-          <ProfileIcon className="profile-icon" />
+        <button className="profile-logout-button" onClick={() => setShowEdit(true)}>
           <span>{t("profile.editProfile")}</span>
         </button>
 

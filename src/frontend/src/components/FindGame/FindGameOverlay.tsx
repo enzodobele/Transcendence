@@ -95,17 +95,17 @@ export function FindGameOverlay({
       },
       icon: Globe,
     },
-    {
-      id: "duel",
-      title: t("findGame.modes.duel.title"),
-      description: t("findGame.modes.duel.description"),
-      direction: "up" as const,
-      action: () => {
-        onModeSelected({ id: "duel", label: t("findGame.modes.duel.title") });
-        onClose();
-      },
-      icon: UserPlus,
-    }
+    // {
+    //   id: "duel",
+    //   title: t("findGame.modes.duel.title"),
+    //   description: t("findGame.modes.duel.description"),
+    //   direction: "up" as const,
+    //   action: () => {
+    //     onModeSelected({ id: "duel", label: t("findGame.modes.duel.title") });
+    //     onClose();
+    //   },
+    //   icon: UserPlus,
+    // }
   ];
 
   return (
