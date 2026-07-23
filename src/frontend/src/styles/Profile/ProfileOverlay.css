@@ -1,6 +1,3 @@
-/* ==========================================================================
-   1. OVERLAY TRANSPARENT GLOBAL (SENSITIVE AUX CLICS SUR TOUT L'ÉCRAN)
-   ========================================================================== */
 .profile-overlay {
   position: fixed;
   inset: 0;
@@ -11,9 +8,6 @@
   overflow: visible;
 }
 
-/* ==========================================================================
-   2. PANNEAU DE PROFIL ANCRÉ EN HAUT À GAUCHE
-   ========================================================================== */
 .profile-content {
   position: absolute;
   top: clamp(4rem, 0.8vw, 0.6rem);
@@ -30,9 +24,6 @@
   text-align: left;
 }
 
-/* ==========================================================================
-   3. ÉLÉMENTS INTERNES DU PROFIL (CONVERTIS EN REM / NETTOYÉS)
-   ========================================================================== */
 .profile-close-button {
   position: absolute;
   top: 0.8rem;
@@ -96,9 +87,6 @@
   fill: currentColor;
 }
 
-/* ==========================================================================
-   4. SECTION AMIS
-   ========================================================================== */
 .profile-friends-section {
   margin-bottom: 1rem;
   border-top: 0.0625rem solid rgba(30, 25, 18, 0.1);

@@ -18,13 +18,13 @@ import { FindGameButton } from "./components/FindGame/FindGameButton";
 import { FindGameOverlay, type SelectedGameMode } from "./components/FindGame/FindGameOverlay";
 import { PlayButton } from "./components/Play/PlayButton";
 import { Switch3DButton } from "./components/Board/Switch3DButton";
-import { LanguageSwitcher } from "./components/LanguageSwitcher/LanguageSwitcher";
+import { LegalLinks } from "./components/Legal/LegalLinks";
 
 export default function App() {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading, user, token, refreshUserStatus } = useAuth();
 
-  // 1. Logique unifiée du jeu d'échecs
+  
   const {
     isLocalGame, isAIGame, isAIvsAI, is3D, setIs3D,
     customGameOver, drawOfferPending, isInActiveGame, playerColor,
@@ -38,7 +38,7 @@ export default function App() {
     handleDrawRefuse, handleResetGame, sendClaimVictory
   } = useGameLogic({ user, token, refreshUserStatus });
 
-  // 2. Logique du Matchmaking & Sélection du Mode
+  
   const [isFindGameOpen, setIsFindGameOpen] = useState(false);
   const { isSearching, error: findGameError, startSearch, cancelSearch } = useFindGame();
   const [selectedMode, setSelectedMode] = useState<SelectedGameMode>({
@@ -46,7 +46,7 @@ export default function App() {
     label: t("findGame.modes.local.title"),
   });
 
-  // 3. Déclencheur du bouton d'action principal
+ 
   const runSelectedMode = () => {
     switch (selectedMode.id) {
       case "ai":
@@ -83,7 +83,6 @@ export default function App() {
 
   return (
     <div className={`app${is3D && isInActiveGame ? " app-3d" : ""}`}>
-      <LanguageSwitcher />
 
       {/* Profil / Connexion */}
       {isAuthenticated ? <ProfileButton /> : <LoginButton />}
@@ -160,6 +159,8 @@ export default function App() {
                 label={selectedMode.id === "matchmaking" ? t("findGame.findOpponent") : selectedMode.label}
                 onClick={runSelectedMode}
               />
+
+      <LegalLinks />
             </>
           )}
         </div>

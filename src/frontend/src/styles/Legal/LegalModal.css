@@ -19,7 +19,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  background: var(--color-overlay-background);
+  background: rgba(251, 248, 241, 0.97);
   color: #1f1c17;
   border: 1px solid rgba(30, 25, 18, 0.1);
   box-shadow: 0 24px 60px rgba(14, 16, 18, 0.25);
@@ -58,35 +58,38 @@
 
 .legal-body {
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding-right: 1rem;
+  scrollbar-gutter: stable;
   text-align: left;
 }
 
 .legal-title {
   margin: 0 0 0.1rem;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
+  color: #1f1c17;
 }
 
 .legal-updated {
-  margin: 0 0 0.75rem;
-  font-size: 0.78rem;
-  color: rgba(31, 28, 23, 0.55);
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  color: rgba(31, 28, 23, 0.6);
 }
 
 .legal-body h3 {
-  margin: 1rem 0 0.35rem;
-  font-size: 0.95rem;
+  margin: 1.1rem 0 0.4rem;
+  font-size: 1rem;
+  color: #1f1c17;
 }
 
 .legal-body p,
 .legal-body li {
-  margin: 0.2rem 0;
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: rgba(31, 28, 23, 0.85);
+  margin: 0.3rem 0;
+  font-size: 0.94rem;
+  line-height: 1.65;
+  color: #1f1c17;
 }
 
 .legal-body ul {
-  margin: 0.2rem 0;
-  padding-left: 1.2rem;
+  margin: 0.3rem 0;
+  padding-left: 1.3rem;
 }

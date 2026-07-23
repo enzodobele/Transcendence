@@ -32,7 +32,6 @@ export function FindGameOverlay({
 
   if (!isOpen) return null;
 
-  // Handlers for the difficulty sub-windows (Stockfish & AI vs AI)
   const handleTrainingStart = (difficulty: number) => {
     setIsTrainingOpen(false);
     onModeSelected({ id: "ai", label: t("findGame.modes.ai.title"), difficulty });
