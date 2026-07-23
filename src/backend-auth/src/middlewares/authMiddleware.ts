@@ -10,7 +10,7 @@ export const authenticate = (
   // 1. Récupère le token depuis les headers (format: "Bearer <token>")
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Token manquant." });
+    return res.status(401).json({ error: "TOKEN_INVALID" });
   }
 
   // 2. Extrait le token
@@ -19,7 +19,7 @@ export const authenticate = (
   // 3. Vérifie et décode le token
   const decoded = verifyToken(token);
   if (!decoded) {
-    return res.status(401).json({ error: "Token invalide ou expiré." });
+    return res.status(401).json({ error: "TOKEN_INVALID" });
   }
 
   // 4. Ajoute les infos de l'utilisateur à la requête

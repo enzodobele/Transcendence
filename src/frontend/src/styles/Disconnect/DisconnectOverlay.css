@@ -1,0 +1,179 @@
+/* Conteneur invisible sur tout l'écran (laisse passer les clics) */
+/* .disconnection-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.disconnection-content {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 260px;
+  background: var(--color-overlay-background, #18181b);
+  color: #ffffff;
+  border: 1px solid #ef4444;
+  padding: 12px;
+  border-radius: 8px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.disconnection-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.disconnection-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.disconnection-timer-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.disconnection-timer-countdown {
+  font-family: monospace;
+  font-weight: bold;
+  color: #ef4444;
+}
+
+.disconnection-claim-button {
+  width: 100%;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.disconnection-claim-button:hover {
+  background: #b91c1c;
+}
+
+.disconnection-wait-text {
+  font-size: 10px;
+  color: #71717a;
+  text-align: center;
+  font-style: italic;
+} */
+
+/* 🟢 Conteneur qui bloque et floute tout l'écran */
+.disconnection-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: auto; /* Intercepte désormais les clics pour bloquer le jeu */
+  
+  /* Centrage absolu du contenu */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Arrière-plan sombre transparent + effet de flou */
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px); /* Brouille l'arrière-plan */
+  -webkit-backdrop-filter: blur(4px); /* Compatibilité Safari */
+  
+  /* Animation d'apparition douce */
+  animation: fadeInOverlay 0.2s ease-out;
+}
+
+/* 🟢 La fenêtre pop-up au centre */
+.disconnection-content {
+  /* On retire le positionnement absolu top/right */
+  width: 320px; /* Légèrement élargie pour un look plus "modale" au centre */
+  background: var(--color-overlay-background, #18181b);
+  color: #ffffff;
+  border: 1px solid #ef4444;
+  padding: 20px; /* Plus d'espace interne */
+  border-radius: 12px; /* Coins plus arrondis */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Espacement plus aéré entre les éléments */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  
+  /* Animation de zoom léger à l'apparition */
+  animation: scaleInContent 0.2s ease-out;
+}
+
+/* En-tête */
+.disconnection-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center; /* Centre le titre */
+}
+
+.disconnection-title {
+  font-size: 16px; /* Légèrement plus grand */
+  font-weight: bold;
+  color: var(--color-secondary-dark);
+  margin: 0;
+}
+
+/* Timer */
+.disconnection-timer-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+.disconnection-timer-countdown {
+  font-family: monospace;
+  font-weight: bold;
+  color: #ef4444;
+}
+
+/* Bouton d'action */
+.disconnection-claim-button {
+  width: 100%;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.disconnection-claim-button:hover {
+  background: #b91c1c;
+}
+
+/* Texte d'attente */
+.disconnection-wait-text {
+  font-size: 11px;
+  text-align: center;
+  font-style: italic;
+}
+
+/* 🎬 Animations optionnelles pour rendre l'apparition fluide */
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleInContent {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

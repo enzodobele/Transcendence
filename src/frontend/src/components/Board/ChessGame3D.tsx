@@ -18,6 +18,8 @@ interface ChessGame3DProps {
   onResetGame: () => void;
   onPromotionChoice: (piece: string) => void;
   isDemoMode?: boolean;
+  playerColor?: "white" | "black";
+  active?: boolean;
 }
 
 export function ChessGame3D({
@@ -29,13 +31,20 @@ export function ChessGame3D({
   onSquareClick,
   onPromotionChoice,
   isDemoMode = false,
+  playerColor = "white",
+  active = true,
 }: ChessGame3DProps) {
+  const zSign = playerColor === "black" ? -1 : 1;
+
   return (
     <>
-      {/* 🚀 gl={{ alpha: true }} libère le fond opaque du Canvas pour le rendre transparent */}
-      <Canvas 
-        camera={{ position: isDemoMode ? [0, 8, 14] : [0, 10, 13], fov: 50 }}
+      {/* 🚀 gl={{ alpha: true }} libère le fond opaque du Canvas pour le rendre transparent.
+          frameloop="never" quand la vue 3D est masquée : le contexte WebGL reste vivant
+          (pas de remount) mais le rendu s'arrête pour ne pas gaspiller le GPU. */}
+      <Canvas
+        camera={{ position: isDemoMode ? [0, 8, 14] : [0, 10, 13 * zSign], fov: 50 }}
         gl={{ alpha: true }}
+        frameloop={active ? "always" : "never"}
       >
         <ambientLight intensity={0.5} />
         <directionalLight

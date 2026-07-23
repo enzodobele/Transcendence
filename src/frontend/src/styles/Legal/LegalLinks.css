@@ -1,0 +1,30 @@
+.legal-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(31, 28, 23, 0.1);
+}
+
+.legal-footer-link {
+  background: transparent;
+  border: none;
+  padding: 0.2rem 0.3rem;
+  font-size: 0.75rem;
+  color: rgba(31, 28, 23, 0.55);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.legal-footer-link:hover {
+  color: rgba(31, 28, 23, 0.9);
+  text-decoration: underline;
+}
+
+.legal-footer-separator {
+  color: rgba(31, 28, 23, 0.3);
+  font-size: 0.75rem;
+}

@@ -2,59 +2,97 @@
 set -e
 
 # =============================================
-# Fonction utilitaire pour lire un secret
+# Vault settings (AppRole creds mounted read-only)
 # =============================================
-read_secret_strict() {
-  local secret_name="$1"
-  local secret_path="/run/secrets/$secret_name"
+VAULT_ADDR="${VAULT_ADDR:-http://vault:8200}"
+CREDS_DIR="${VAULT_CREDS_DIR:-/vault/creds}"
 
-  if [ ! -s "$secret_path" ]; then
-    echo "[-] CRITICAL ERROR: Secret '$secret_name' is missing or empty at $secret_path" >&2
+# =============================================
+# Wait for Vault (health endpoint returns 200 only when unsealed+active)
+# =============================================
+echo "[+] [Game] Waiting for Vault..."
+MAX_RETRIES=30
+for i in $(seq 1 $MAX_RETRIES); do
+  if curl -sf "$VAULT_ADDR/v1/sys/health" >/dev/null 2>&1; then
+    echo "[+] [Game] Vault is ready after $i attempts."
+    break
+  fi
+  if [ "$i" -eq "$MAX_RETRIES" ]; then
+    echo "[-] [Game] ERROR: Vault did not become ready in time." >&2
     exit 1
   fi
+  sleep 2
+done
 
-  cat "$secret_path" | tr -d '\n'  # ✅ Supprime les sauts de ligne
+# =============================================
+# AppRole login
+# =============================================
+ROLE_ID=$(cat "$CREDS_DIR/role_id")
+SECRET_ID=$(cat "$CREDS_DIR/secret_id")
+VAULT_TOKEN=$(curl -sf -X POST \
+  -d "{\"role_id\":\"$ROLE_ID\",\"secret_id\":\"$SECRET_ID\"}" \
+  "$VAULT_ADDR/v1/auth/approle/login" | jq -r '.auth.client_token')
+if [ -z "$VAULT_TOKEN" ] || [ "$VAULT_TOKEN" = "null" ]; then
+  echo "[-] [Game] CRITICAL ERROR: AppRole login failed." >&2
+  exit 1
+fi
+unset ROLE_ID SECRET_ID
+
+# =============================================
+# Fetch secrets from KV v2
+# =============================================
+kv_field() {
+  curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
+    "$VAULT_ADDR/v1/secret/data/chessguard/$1" | jq -er ".data.data.$2"
 }
 
-# =============================================
-# Lecture des secrets
-# =============================================
-echo "[+] Loading secrets..."
-export DB_USER=$(read_secret_strict "db_user")
-export DB_NAME=$(read_secret_strict "db_name")
-export DB_PASSWORD=$(read_secret_strict "db_password")
-export JWT_SECRET=$(read_secret_strict "jwt_secret")
+echo "[+] [Game] Fetching secrets from Vault..."
+DB_USER=$(kv_field db user)
+DB_NAME=$(kv_field db name)
+DB_PASSWORD=$(kv_field db password)
+JWT_SECRET=$(kv_field jwt secret)
+unset VAULT_TOKEN
 
 # =============================================
-# Construction de DATABASE_URL
+# JWT file for the app (same UID: no chown needed)
+# =============================================
+APP_SECRETS_DIR="/tmp/app-secrets"
+mkdir -p "$APP_SECRETS_DIR"
+chmod 700 "$APP_SECRETS_DIR"
+rm -f "$APP_SECRETS_DIR/jwt_secret"
+printf '%s' "$JWT_SECRET" > "$APP_SECRETS_DIR/jwt_secret"
+chmod 400 "$APP_SECRETS_DIR/jwt_secret"
+export JWT_SECRET_FILE="$APP_SECRETS_DIR/jwt_secret"
+# Keep JWT_SECRET exported as an env var too (the app may read either).
+export JWT_SECRET
+
+# =============================================
+# DATABASE_URL
 # =============================================
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
-echo "[+] DATABASE_URL: $DATABASE_URL"
+echo "[+] [Game] DATABASE_URL configured."
 
 # =============================================
-# Attente de la base de données (avec timeout)
+# Wait for the database (with timeout)
 # =============================================
-echo "[+] Waiting for database to be ready..."
+echo "[+] [Game] Waiting for database to be ready..."
 MAX_RETRIES=30
 RETRY_INTERVAL=1
 
 for i in $(seq 1 $MAX_RETRIES); do
   if pg_isready -h db -p 5432 -U "$DB_USER" -d "$DB_NAME" >/dev/null 2>&1; then
-    echo "[+] Database is ready after $i attempts."
+    echo "[+] [Game] Database is ready after $i attempts."
     break
   fi
 
   if [ $i -eq $MAX_RETRIES ]; then
-    echo "[-] ERROR: Database did not start in time." >&2
+    echo "[-] [Game] ERROR: Database did not start in time." >&2
     exit 1
   fi
 
-  echo "[+] Retrying in $RETRY_INTERVAL second(s)..."
+  echo "[+] [Game] Retrying in $RETRY_INTERVAL second(s)..."
   sleep $RETRY_INTERVAL
 done
 
-# =============================================
-# Démarrage du backend
-# =============================================
 echo "[+] Starting backend-game..."
 exec "$@"

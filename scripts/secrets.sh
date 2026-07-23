@@ -28,8 +28,7 @@ echo -n "chessguard"				> "$SECRETS_DIR/db_name.txt"
 echo -n "p"							> "$SECRETS_DIR/db_password.txt"
 echo -n "my_super_secret_jwt_key"	> "$SECRETS_DIR/jwt_secret.txt"
 
-# Optionnel pour le dev (Portainer / PGAdmin)
-echo -n "admin"						> "$SECRETS_DIR/pgadmin_password.txt"
+# Optional for dev (Portainer; the PGAdmin password comes from .env)
 echo -n "admin123456789"			> "$SECRETS_DIR/portainer_password.txt"
 
 # =============================================
@@ -41,13 +40,11 @@ generate_password              > "$SECRETS_DIR/prod_db_password.txt"
 generate_password              > "$SECRETS_DIR/prod_jwt_secret.txt"
 
 # =============================================
-# 🔒 Permissions strictes
+# 🔒 Permissions
 # =============================================
-sudo chgrp 1001 "$SECRETS_DIR"/*.txt 2>/dev/null || chgrp 1001 "$SECRETS_DIR"/*.txt
-chmod 640 "$SECRETS_DIR"/*.txt
-chmod 750 "$SECRETS_DIR"
-
-sudo chgrp 0 "$SECRETS_DIR/pgadmin_password.txt"
-chmod 640 "$SECRETS_DIR/pgadmin_password.txt"
+# Owner-only: inside the containers, only the entrypoints (running as root)
+# read these files before dropping to 'nodejs'.
+chmod 600 "$SECRETS_DIR"/*.txt
+chmod 700 "$SECRETS_DIR"
 
 echo -e "${GREEN}✅ Done! All Dev & Prod secrets generated cleanly in: $SECRETS_DIR${NC}"

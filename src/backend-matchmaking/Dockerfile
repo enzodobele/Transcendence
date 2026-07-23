@@ -21,14 +21,10 @@ COPY --chown=nodejs:nodejs . .
 # =========================
 FROM node:22-alpine
 
-RUN apk add --no-cache wget postgresql-client
+RUN apk add --no-cache wget postgresql-client curl jq
 
 RUN addgroup -g 1001 -S nodejs && \
     adduser -u 1001 -S nodejs -G nodejs
-
-RUN mkdir -p /run/secrets && \
-    chmod 750 /run/secrets && \
-    chown nodejs:nodejs /run/secrets
 
 WORKDIR /app
 
@@ -42,6 +38,8 @@ RUN chmod +x /app/entrypoint.sh
 
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 
+# Fully non-root: the entrypoint fetches secrets from Vault over HTTP,
+# so nothing here ever needs root.
 USER nodejs
 
 # 🎯 Ajustement pour le Matchmaking

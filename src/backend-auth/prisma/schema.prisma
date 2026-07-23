@@ -20,7 +20,7 @@ model User {
   updatedAt      DateTime @updatedAt
   lastLogin      DateTime?
   lastSeen       DateTime?
-  isActive       Boolean @default(true)
+  isAdmin        Boolean @default(false)
   avatarUrl      String?
   bio            String?
   currentGameId  Int?
@@ -52,7 +52,6 @@ model Game {
   endTime      DateTime?
   status       String     @default("en_cours") // "en_cours" | "terminee" | "abandonnee" | "nulle"
   winnerId     Int?
-  timeControl  String     @default("5+0")
   isRated      Boolean    @default(true)
   fenString    String     // État actuel du plateau (FEN)
 
@@ -135,7 +134,6 @@ model FriendRequest {
 model waitlistEntry {
   id           Int      @id @default(autoincrement())
   userId       Int      @unique
-  timeControl  String   @default("5+0")
   createdAt    DateTime @default(now())
 
   // Relation avec User

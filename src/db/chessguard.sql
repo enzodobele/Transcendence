@@ -9,7 +9,6 @@ CREATE TABLE users (
     elo_rating INT DEFAULT 500,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME NULL,
-    is_active BOOLEAN DEFAULT TRUE,
     avatar_url VARCHAR(255) NULL,
     bio TEXT NULL
 );
@@ -25,7 +24,6 @@ CREATE TABLE games (
     end_time DATETIME NULL,
     status ENUM('en_cours', 'terminee', 'abandonnee', 'nulle') DEFAULT 'en_cours',
     winner_id INT NULL, -- NULL si match nul ou en cours
-    time_control VARCHAR(20) NOT NULL, -- Ex: "5+0" (5 min + 0 incrément)
     is_rated BOOLEAN DEFAULT TRUE, -- Partie notée pour le classement ELO
     FOREIGN KEY (player1_id) REFERENCES users(id),
     FOREIGN KEY (player2_id) REFERENCES users(id),

@@ -9,7 +9,15 @@ services:
       context: ./src/nginx
       dockerfile: Dockerfile.prod
     ports:
-      - "443:443"
+      # Host 443 -> container 8443 (nginx runs non-root on an unprivileged port).
+      - "443:8443"
+    environment:
+      # Strict blocking mode: this is the evaluated posture.
+      MODSEC_RULE_ENGINE: "On"
+      BLOCKING_PARANOIA: "1"
+      MODSEC_AUDIT_LOG: /var/log/modsecurity/audit.log
+    volumes:
+      - waf_logs:/var/log/modsecurity
     depends_on:
       frontend:
         condition: service_healthy
@@ -26,7 +34,7 @@ services:
     networks:
       - chessguard_prod_network
     healthcheck:
-      test: ["CMD", "wget", "--no-check-certificate", "-qO-", "https://127.0.0.1:443"]
+      test: ["CMD", "wget", "--no-check-certificate", "-qO-", "https://127.0.0.1:8443"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -56,24 +64,18 @@ services:
     build:
       context: ./src/backend-auth
       dockerfile: Dockerfile.prod
-    user: "nodejs"
     volumes:
       - avatar_uploads:/app/uploads
+      - vault_creds_auth:/vault/creds:ro
     environment:
-      DB_USER_FILE: /run/secrets/db_user
-      DB_NAME_FILE: /run/secrets/db_name
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      VAULT_ADDR: http://vault:8200
       NODE_ENV: production
       PORT: 3000
-    secrets:
-      - db_password
-      - db_user
-      - db_name
-      - jwt_secret
     depends_on:
       db:
         condition: service_healthy
+      vault-bootstrap:
+        condition: service_completed_successfully
     networks:
       - chessguard_prod_network
     healthcheck:
@@ -90,24 +92,18 @@ services:
     build:
       context: ./src/backend-matchmaking
       dockerfile: Dockerfile.prod
-    user: "nodejs"
+    volumes:
+      - vault_creds_matchmaking:/vault/creds:ro
     environment:
-      DB_USER_FILE: /run/secrets/db_user
-      DB_NAME_FILE: /run/secrets/db_name
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      VAULT_ADDR: http://vault:8200
       NODE_ENV: production
-      GAME_SERVICE_URL: https://backend-game:3002
-
+      GAME_SERVICE_URL: http://backend-game:3002
       PORT: 3001
-    secrets:
-      - db_password
-      - db_user
-      - db_name
-      - jwt_secret
     depends_on:
       db:
         condition: service_healthy
+      vault-bootstrap:
+        condition: service_completed_successfully
     networks:
       - chessguard_prod_network
     healthcheck:
@@ -124,22 +120,17 @@ services:
     build:
       context: ./src/backend-game
       dockerfile: Dockerfile.prod
-    user: "nodejs"
+    volumes:
+      - vault_creds_game:/vault/creds:ro
     environment:
-      DB_USER_FILE: /run/secrets/db_user
-      DB_NAME_FILE: /run/secrets/db_name
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      VAULT_ADDR: http://vault:8200
       NODE_ENV: production
       PORT: 3002
-    secrets:
-      - db_password
-      - db_user
-      - db_name
-      - jwt_secret
     depends_on:
       db:
         condition: service_healthy
+      vault-bootstrap:
+        condition: service_completed_successfully
     networks:
       - chessguard_prod_network
     healthcheck:
@@ -173,25 +164,94 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER_FILE: /run/secrets/db_user
-      POSTGRES_DB_FILE: /run/secrets/db_name
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
-    secrets:
-      - db_password
-      - db_user
-      - db_name
+      POSTGRES_USER_FILE: /vault/secrets/db_user
+      POSTGRES_DB_FILE: /vault/secrets/db_name
+      POSTGRES_PASSWORD_FILE: /vault/secrets/db_password
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
+      - pg_secrets:/vault/secrets:ro
+    depends_on:
+      vault-agent-db:
+        condition: service_healthy
     networks:
       chessguard_prod_network:
         aliases:
           - chessguard-db  # 🛡️ Permet à Prisma de trouver la DB avec son ancien nom
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/db_user) -d $$(cat /run/secrets/db_name)"]
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /vault/secrets/db_user) -d $$(cat /vault/secrets/db_name)"]
       interval: 5s
       timeout: 5s
       retries: 5
     restart: always
+
+  # =========================================================================
+  # 🔐 VAULT (secrets management)
+  # =========================================================================
+  vault:
+    image: hashicorp/vault:1.20
+    container_name: vault
+    command: ["vault", "server", "-config=/vault/config/vault.hcl"]
+    environment:
+      SKIP_SETCAP: "true"
+      # CLI/healthcheck target inside the container (listener is TLS-disabled).
+      VAULT_ADDR: http://127.0.0.1:8200
+    volumes:
+      - ./src/vault/vault.hcl:/vault/config/vault.hcl:ro,z
+      - vault_data:/vault/file
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      # vault status exits 0 unsealed, 2 sealed: both mean "server up".
+      test: ["CMD-SHELL", "vault status >/dev/null 2>&1; rc=$$?; [ $$rc -eq 0 ] || [ $$rc -eq 2 ]"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  vault-bootstrap:
+    image: hashicorp/vault:1.20
+    container_name: vault-bootstrap
+    entrypoint: ["/bin/sh", "/vault/bootstrap.sh"]
+    environment:
+      VAULT_ADDR: http://vault:8200
+    volumes:
+      - ./src/vault/bootstrap.sh:/vault/bootstrap.sh:ro,z
+      - ./.vault/prod:/vault/init:z
+      - vault_creds_auth:/creds/backend-auth
+      - vault_creds_game:/creds/backend-game
+      - vault_creds_matchmaking:/creds/backend-matchmaking
+      - vault_creds_agent_db:/creds/agent-db
+    depends_on:
+      vault:
+        condition: service_healthy
+    networks:
+      - chessguard_prod_network
+    restart: "no"
+
+  vault-agent-db:
+    image: hashicorp/vault:1.20
+    container_name: vault-agent-db
+    # Bypass the image's privilege-dropping entrypoint and run as root, so the
+    # agent can read the 0400/uid-1001 AppRole creds and write the rendered volume.
+    entrypoint: ["vault", "agent", "-config=/vault/agent.hcl"]
+    user: "root"
+    volumes:
+      - ./src/vault/agent-db.hcl:/vault/agent.hcl:ro,z
+      - vault_creds_agent_db:/vault/creds:ro
+      - pg_secrets:/vault/rendered
+    depends_on:
+      vault-bootstrap:
+        condition: service_completed_successfully
+    networks:
+      - chessguard_prod_network
+    healthcheck:
+      test: ["CMD-SHELL", "test -s /vault/rendered/db_password"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
 
 # =========================================================================
 # 💾 VOLUMES PERSISTANTS
@@ -201,6 +261,13 @@ volumes:
     name: chessguard_prod_db_data
   avatar_uploads:
     name: chessguard_prod_avatar_uploads
+  waf_logs:
+  vault_data:
+  pg_secrets:
+  vault_creds_auth:
+  vault_creds_game:
+  vault_creds_matchmaking:
+  vault_creds_agent_db:
 
 # =========================================================================
 # 🔌 RÉSEAUX ISOLÉS
@@ -209,16 +276,3 @@ networks:
   chessguard_prod_network:
     name: chessguard_prod_network
     driver: bridge
-
-# =========================================================================
-# 🔒 SECRETS DOCKER
-# =========================================================================
-secrets:
-  db_user:
-    file: ./src/secrets/prod_db_user.txt
-  db_name:
-    file: ./src/secrets/prod_db_name.txt
-  db_password:
-    file: ./src/secrets/prod_db_password.txt
-  jwt_secret:
-    file: ./src/secrets/prod_jwt_secret.txt

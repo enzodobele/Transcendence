@@ -1,38 +1,29 @@
-/* ==========================================================================
-   1. OVERLAY TRANSPARENT GLOBAL (SENSITIVE AUX CLICS SUR TOUT L'ÉCRAN)
-   ========================================================================== */
 .profile-overlay {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background-color: transparent; /* 🌟 Invisible pour capter les clics sur l'échiquier */
+  background-color: transparent;
   z-index: 100;
   overflow: visible;
 }
 
-/* ==========================================================================
-   2. PANNEAU DE PROFIL ANCRÉ EN HAUT À GAUCHE
-   ========================================================================== */
 .profile-content {
-  position: absolute; /* Se repère par rapport au coin supérieur gauche de l'overlay */
-  top: clamp(0.4rem, 0.8vw, 0.6rem);  /* Même alignement vertical que ton sélecteur de modes */
-  left: clamp(0.4rem, 0.8vw, 0.6rem); /* Calé à gauche */
+  position: absolute;
+  top: clamp(4rem, 0.8vw, 0.6rem);
+  left: clamp(0.4rem, 0.8vw, 0.6rem);
   
   min-width: 15.5rem;
   padding: 1.8rem;
   border-radius: 1rem;
   background: rgba(251, 248, 241, 0.97);
-  backdrop-filter: blur(0.625rem); /* Optionnel : léger flou sous la modale pour le style */
+  backdrop-filter: blur(0.625rem);
   color: #1f1c17;
   border: 0.0625rem solid rgba(30, 25, 18, 0.1);
   box-shadow: 0 1.375rem 3.125rem rgba(14, 16, 18, 0.3); /* Converti en rem */
   text-align: left;
 }
 
-/* ==========================================================================
-   3. ÉLÉMENTS INTERNES DU PROFIL (CONVERTIS EN REM / NETTOYÉS)
-   ========================================================================== */
 .profile-close-button {
   position: absolute;
   top: 0.8rem;
@@ -96,9 +87,6 @@
   fill: currentColor;
 }
 
-/* ==========================================================================
-   4. SECTION AMIS
-   ========================================================================== */
 .profile-friends-section {
   margin-bottom: 1rem;
   border-top: 0.0625rem solid rgba(30, 25, 18, 0.1);
@@ -249,3 +237,82 @@
 
 .profile-presence-dot.online  { background: #2ecc71; }
 .profile-presence-dot.offline { background: #aaa; }
+
+.profile-delete-account-button {
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  border-radius: 0.85rem;
+  background: transparent;
+  color: #c0392b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.profile-delete-account-button:hover {
+  background: rgba(192, 57, 43, 0.08);
+}
+
+.profile-delete-confirm {
+  margin-top: 0.6rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  border-radius: 0.85rem;
+  background: rgba(192, 57, 43, 0.06);
+}
+
+.profile-delete-confirm-text {
+  margin: 0 0 0.7rem;
+  font-size: 0.85rem;
+  color: #6b1a10;
+  line-height: 1.4;
+}
+
+.profile-delete-error {
+  margin: -0.3rem 0 0.7rem;
+  font-size: 0.78rem;
+  color: #c0392b;
+}
+
+.profile-delete-confirm-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.profile-delete-confirm-no,
+.profile-delete-confirm-yes {
+  flex: 1;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.7rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+}
+
+.profile-delete-confirm-no {
+  background: rgba(31, 28, 23, 0.08);
+  color: #1f1c17;
+}
+
+.profile-delete-confirm-no:hover {
+  background: rgba(31, 28, 23, 0.14);
+}
+
+.profile-delete-confirm-yes {
+  background: #c0392b;
+  color: #fff;
+}
+
+.profile-delete-confirm-yes:hover {
+  background: #a5311f;
+}
+
+.profile-delete-confirm-no:disabled,
+.profile-delete-confirm-yes:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

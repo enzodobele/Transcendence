@@ -1,0 +1,323 @@
+{
+  "common": {
+    "loading": "Chargement de ChessGuard...",
+    "playLocalOrOnline": "Jouez en local ou en ligne",
+    "loginToChallenge": "Connectez-vous pour défier des joueurs en ligne.",
+    "no": "Non",
+    "yes": "Oui"
+  },
+  "findGame": {
+    "play": "Jouer",
+    "searching": "Recherche d'un adversaire",
+    "searchingSubtitle": "Veuillez patienter pendant que nous vous trouvons un rival...",
+    "cancelSearch": "Annuler la recherche",
+    "inviteComingSoon": "Lien d'invitation bientôt dispo ! (En attente du backend)",
+    "modes": {
+      "local": {
+        "title": "Partie Libre",
+        "description": "Jouez tranquillement sur un échiquier local, sans pression."
+      },
+      "ai": {
+        "title": "Entraînement",
+        "description": "Affrontez Stockfish pour parfaire vos ouvertures."
+      },
+      "customAi": {
+        "title": "IA Maison",
+        "description": "Affrontez notre IA entraînée sur 1M de parties Lichess."
+      },
+      "aiVsAi": {
+        "title": "IA vs IA",
+        "description": "Regardez notre IA affronter Stockfish."
+      },
+      "matchmaking": {
+        "title": "Matchmaking Aléatoire",
+        "description": "Trouvez un adversaire à votre taille en ligne (Classement Elo)."
+      },
+      "duel": {
+        "title": "Duel d'amis",
+        "description": "Créez une salle privée et envoyez un lien de défi."
+      }
+    },
+    "findOpponent": "Trouver un adversaire",
+    "otherModes": "Autres modes de jeu"
+  },
+  "training": {
+    "title": "Entraînement",
+    "subtitle": "Choisissez votre niveau de difficulté",
+    "play": "Jouer",
+    "difficulty": {
+      "beginner": {
+        "label": "Débutant",
+        "description": "Pour apprendre les bases"
+      },
+      "easy": {
+        "label": "Facile",
+        "description": "Un adversaire indulgent"
+      },
+      "intermediate": {
+        "label": "Intermédiaire",
+        "description": "Un vrai défi équilibré"
+      },
+      "hard": {
+        "label": "Difficile",
+        "description": "Pour les joueurs confirmés"
+      },
+      "expert": {
+        "label": "Expert",
+        "description": "Bonne chance..."
+      }
+    },
+    "selectLevel": "Sélectionner ce niveau"
+  },
+  "disconnect": {
+    "title": "Adversaire déconnecté",
+    "timeRemaining": "Temps restant :",
+    "ready": "Prêt",
+    "claimVictory": "Gagner par forfait",
+    "waitRequired": "Attente requise avant victoire."
+  },
+  "login": {
+    "createAccount": "Créer un compte",
+    "welcomeBack": "Bon retour",
+    "subtitleRegister": "Créez un compte pour jouer en ligne",
+    "subtitleLogin": "Connectez-vous pour jouer en ligne",
+    "pseudo": "Pseudo",
+    "usernamePlaceholder": "JonDoe",
+    "email": "Email",
+    "emailPlaceholder": "vous@exemple.com",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "switchToLogin": "Déjà un compte ? Se connecter",
+    "switchToRegister": "Pas encore de compte ? S'inscrire",
+    "connexion": "Connexion",
+    "mustAcceptTerms": "Vous devez accepter les CGU et la politique de confidentialité.",
+    "acceptTerms": "J'accepte les <1>CGU</1> et la <3>politique de confidentialité</3>"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "subtitle": "Informations de votre compte",
+    "avatarAlt": "Avatar",
+    "pseudo": "Pseudo",
+    "email": "Email",
+    "notProvided": "Non renseigné",
+    "editProfile": "Modifier le profil",
+    "incomingRequests": "Demandes reçues ({{n}})",
+    "friends": "Amis ({{n}})",
+    "addFriendPlaceholder": "Nom d'utilisateur...",
+    "send": "Envoyer",
+    "loadingFriends": "Chargement...",
+    "noFriends": "Aucun ami pour l'instant.",
+    "logout": "Logout",
+    "editSubtitle": "Mettez à jour vos informations",
+    "currentAvatarAlt": "Avatar actuel",
+    "save": "Enregistrer",
+    "deleteAccount": "Supprimer mon compte",
+    "deleteConfirmText": "Voulez-vous vraiment supprimer votre compte ? Cette action est irréversible.",
+    "deleting": "Suppression..."
+  },
+  "game": {
+    "quitLocal": "Quitter la partie locale",
+    "resign": "Abandonner",
+    "offerDraw": "Proposer la nulle",
+    "drawOffered": "Nulle proposée",
+    "accept": "Accepter",
+    "refuse": "Refuser",
+    "replay": "Rejouer",
+    "mainMenu": "Menu principal",
+    "moveHistory": "Historique des coups",
+    "noMoves": "Aucun coup joué",
+    "player1": "Joueur 1",
+    "player2": "Joueur 2",
+    "playVsHuman": "Jouer vs Humain",
+    "playVsAI": "Jouer vs IA",
+    "difficulty": {
+      "beginner": "Débutant (~500 ELO)",
+      "easy": "Facile (~1000 ELO)",
+      "medium": "Moyen (~1500 ELO)",
+      "hard": "Difficile (~2000 ELO)",
+      "expert": "Expert (~3500 ELO)"
+    },
+    "promotion": {
+      "title": "Choisissez une pièce pour la promotion",
+      "queen": "Reine",
+      "rook": "Tour",
+      "bishop": "Fou",
+      "knight": "Cavalier"
+    },
+    "result": {
+      "whiteWins": "Les blancs gagnent !",
+      "blackWins": "Les noirs gagnent !",
+      "whiteWinsForfeit": "Victoire par forfait des blancs !",
+      "blackWinsForfeit": "Victoire par forfait des noirs !",
+      "draw": "Partie nulle !",
+      "drawRefused": "La nulle a été refusée.",
+      "stalemate": "Pat — Égalité !",
+      "gameOver": "Partie terminée"
+    }
+  },
+  "errors": {
+    "GENERIC": "Une erreur est survenue",
+    "UNAUTHORIZED": "Non autorisé",
+    "SERVER_ERROR": "Erreur serveur",
+    "TOKEN_INVALID": "Token invalide ou expiré.",
+    "INVALID_EMAIL": "Email invalide.",
+    "PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 6 caractères.",
+    "EMAIL_OR_USERNAME_TAKEN": "Email ou username déjà utilisé.",
+    "REGISTRATION_FAILED": "Erreur lors de l'inscription.",
+    "USER_NOT_FOUND": "Utilisateur introuvable",
+    "WRONG_PASSWORD": "Mot de passe incorrect",
+    "LOGIN_FAILED": "Erreur lors de la connexion",
+    "NO_FIELDS_TO_UPDATE": "Aucun champ à mettre à jour.",
+    "USERNAME_EMPTY": "Le pseudo ne peut pas être vide.",
+    "INVALID_ID": "ID invalide.",
+    "REQUEST_NOT_FOUND": "Demande introuvable.",
+    "CANNOT_ADD_SELF": "Vous ne pouvez pas vous ajouter vous-même.",
+    "ALREADY_FRIENDS": "Vous êtes déjà amis.",
+    "REQUEST_ALREADY_SENT": "Demande déjà envoyée.",
+    "FILE_TOO_LARGE": "Fichier trop volumineux.",
+    "MUST_BE_LOGGED_IN": "Vous devez être connecté pour jouer.",
+    "FRIEND_REQUEST_SENT": "Demande envoyée.",
+    "FRIEND_REQUEST_ACCEPTED": "Demande acceptée !",
+    "FRIEND_REQUEST_DELETED": "Demande supprimée."
+  },
+  "legal": {
+    "privacy": "Confidentialité",
+    "terms": "CGU",
+    "privacyTab": "Politique de confidentialité",
+    "termsTab": "Conditions d'utilisation",
+    "close": "Fermer",
+    "privacyDoc": {
+      "title": "Politique de confidentialité",
+      "updated": "Dernière mise à jour : Juillet 2026",
+      "sections": [
+        {
+          "heading": "1. Qui sommes-nous",
+          "paragraphs": [
+            "ChessGuard est un jeu d'échecs en ligne développé dans le cadre du cursus 42. Cette page décrit quelles données sont collectées lorsque vous utilisez l'application et pour quelles raisons."
+          ]
+        },
+        {
+          "heading": "2. Données collectées",
+          "list": [
+            "Votre adresse email et votre pseudo, fournis lors de l'inscription.",
+            "Votre mot de passe, stocké sous forme hachée et salée (jamais en clair).",
+            "L'historique de vos parties (coups joués, résultats, adversaires) nécessaire au fonctionnement du jeu et aux statistiques de votre profil.",
+            "Un jeton de session (token) conservé localement dans votre navigateur pour rester connecté."
+          ]
+        },
+        {
+          "heading": "3. Utilisation des données",
+          "paragraphs": [
+            "Ces données servent uniquement à faire fonctionner le service : authentification, mise en relation entre joueurs, sauvegarde de vos parties et affichage de votre profil. Elles ne sont ni vendues, ni partagées avec des tiers, ni utilisées à des fins publicitaires."
+          ]
+        },
+        {
+          "heading": "4. Conservation",
+          "paragraphs": [
+            "Vos données sont conservées tant que votre compte existe. Vous pouvez demander leur suppression à tout moment en supprimant votre compte ou en contactant l'équipe du projet."
+          ]
+        },
+        {
+          "heading": "5. Vos droits",
+          "paragraphs": [
+            "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles. Pour exercer ce droit, contactez l'équipe via le dépôt GitHub du projet."
+          ]
+        },
+        {
+          "heading": "6. Cookies et stockage local",
+          "paragraphs": [
+            "L'application utilise le stockage local du navigateur (localStorage) pour conserver votre jeton de connexion. Aucun cookie de tracking ou publicitaire n'est utilisé."
+          ]
+        }
+      ]
+    },
+    "termsDoc": {
+      "title": "Conditions d'utilisation",
+      "updated": "Dernière mise à jour : Juillet 2026",
+      "sections": [
+        {
+          "heading": "1. Objet",
+          "paragraphs": [
+            "Les présentes conditions régissent l'utilisation de ChessGuard, une plateforme de jeu d'échecs en ligne. En créant un compte, vous acceptez ces conditions dans leur intégralité."
+          ]
+        },
+        {
+          "heading": "2. Création de compte",
+          "paragraphs": [
+            "Vous devez fournir un email valide et un pseudo. Vous êtes responsable de la confidentialité de votre mot de passe et de toute activité effectuée depuis votre compte."
+          ]
+        },
+        {
+          "heading": "3. Bonne conduite",
+          "list": [
+            "Le fair-play est requis : l'utilisation d'outils d'aide externes pendant une partie en ligne est interdite.",
+            "Les pseudos et messages injurieux, discriminatoires ou illégaux ne sont pas tolérés.",
+            "Toute tentative de contournement de la sécurité de la plateforme entraîne la suspension du compte."
+          ]
+        },
+        {
+          "heading": "4. Fonctionnalités du jeu",
+          "paragraphs": [
+            "La plateforme propose des parties en local, en ligne et contre une intelligence artificielle. Les résultats et statistiques affichés reflètent les parties réellement jouées sur la plateforme."
+          ]
+        },
+        {
+          "heading": "5. Disponibilité du service",
+          "paragraphs": [
+            "ChessGuard est un projet étudiant fourni \"tel quel\", sans garantie de disponibilité continue. Le service peut être interrompu ou modifié à tout moment, notamment pour maintenance."
+          ]
+        },
+        {
+          "heading": "6. Suppression de compte",
+          "paragraphs": [
+            "Vous pouvez demander la suppression de votre compte à tout moment. Cela entraîne la suppression de vos données personnelles conformément à notre politique de confidentialité."
+          ]
+        },
+        {
+          "heading": "7. Contact",
+          "paragraphs": [
+            "Pour toute question relative à ces conditions, contactez l'équipe via le dépôt GitHub du projet."
+          ]
+        }
+      ]
+    }
+  },
+  "status": {
+    "title": "Statut ChessGuard",
+    "subtitle": "État en temps réel des microservices",
+    "adminOnly": "Accès réservé aux administrateurs.",
+    "loading": "Chargement du statut...",
+    "lastBackup": "Dernière sauvegarde :",
+    "never": "Jamais",
+    "file": "Fichier :",
+    "lastCheck": "Dernière vérification :",
+    "refresh": "Rafraîchir",
+    "runBackup": "Lancer une sauvegarde",
+    "backupInProgress": "Sauvegarde en cours...",
+    "backupSuccess": "Sauvegarde effectuée avec succès !",
+    "backupError": "Erreur lors de la sauvegarde.",
+    "state": {
+      "online": "En ligne",
+      "degraded": "Dégradé",
+      "offline": "Hors ligne"
+    },
+    "services": {
+      "auth": "Auth",
+      "game": "Moteur de jeu",
+      "matchmaking": "Matchmaking",
+      "friends": "Amis",
+      "ai": "IA"
+    }
+  },
+  "spectator": {
+    "missingGameId": "gameId manquant dans l'URL. Utilisez /spectate?gameId=123",
+    "mode": "Mode spectateur",
+    "online": "en ligne",
+    "connecting": "connexion...",
+    "quit": "Quitter le mode spectateur",
+    "friendPlaysWhite": "Votre ami {{name}} joue les blancs.",
+    "friendPlaysBlack": "Votre ami {{name}} joue les noirs.",
+    "playerPlaysWhite": "{{name}} joue les blancs.",
+    "playerPlaysBlack": "{{name}} joue les noirs."
+  }
+}
