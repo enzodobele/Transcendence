@@ -22,7 +22,7 @@ app.get("/health", (req: Request, res: Response) => {
 app.use("/lobby", authenticate, lobbyRoutes);
 
 // --- Activation du Serveur WebSocket ---
-initGameWebSocket(server); // Une seule ligne, propre !
+initGameWebSocket(server);
 
 // --- Middleware d'erreurs ---
 app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
