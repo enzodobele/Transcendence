@@ -71,7 +71,7 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   if (!userId) return res.status(401).json({ error: "UNAUTHORIZED" });
 
-  const requestId = parseInt(req.params.id);
+  const requestId = parseInt(req.params.id as string);
   if (isNaN(requestId)) return res.status(400).json({ error: "INVALID_ID" });
 
   try {
@@ -99,7 +99,7 @@ export const deleteFriendRequest = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   if (!userId) return res.status(401).json({ error: "UNAUTHORIZED" });
 
-  const requestId = parseInt(req.params.id);
+  const requestId = parseInt(req.params.id as string);
   if (isNaN(requestId)) return res.status(400).json({ error: "INVALID_ID" });
 
   try {
