@@ -38,7 +38,7 @@ export function ChessGame3D({
 
   return (
     <>
-      {/* 🚀 gl={{ alpha: true }} libère le fond opaque du Canvas pour le rendre transparent.
+      {/* gl={{ alpha: true }} libère le fond opaque du Canvas pour le rendre transparent.
           frameloop="never" quand la vue 3D est masquée : le contexte WebGL reste vivant
           (pas de remount) mais le rendu s'arrête pour ne pas gaspiller le GPU. */}
       <Canvas

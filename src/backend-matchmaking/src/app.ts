@@ -30,7 +30,6 @@ try {
 }
 
 console.log("✅ Configuration chargée avec succès. Lancement du service...");
-// =========================================================================
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });

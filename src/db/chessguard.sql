@@ -1,6 +1,6 @@
--- =============================================
+-- =================
 -- TABLE: users (Joueurs)
--- =============================================
+-- =================
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -13,9 +13,9 @@ CREATE TABLE users (
     bio TEXT NULL
 );
 
--- =============================================
+-- =================
 -- TABLE: games (Parties)
--- =============================================
+-- =================
 CREATE TABLE games (
     id INT AUTO_INCREMENT PRIMARY KEY,
     player1_id INT NOT NULL, -- Joueur blanc (par convention)
@@ -31,9 +31,9 @@ CREATE TABLE games (
     CHECK (player1_id != player2_id) -- Un joueur ne peut pas jouer contre lui-même
 );
 
--- =============================================
+-- =================
 -- TABLE: moves (Coups)
--- =============================================
+-- =================
 CREATE TABLE moves (
     id INT AUTO_INCREMENT PRIMARY KEY,
     game_id INT NOT NULL,
@@ -53,9 +53,9 @@ CREATE TABLE moves (
     INDEX (game_id, move_number) -- Pour reconstruire rapidement une partie
 );
 
--- =============================================
+-- =================
 -- TABLE: game_states (États du plateau)
--- =============================================
+-- =================
 CREATE TABLE game_states (
     id INT AUTO_INCREMENT PRIMARY KEY,
     game_id INT NOT NULL,
@@ -67,9 +67,9 @@ CREATE TABLE game_states (
     INDEX (game_id)
 );
 
--- =============================================
+-- =================
 -- TABLE: friends (Amis)
--- =============================================
+-- =================
 CREATE TABLE friends (
     user1_id INT NOT NULL,
     user2_id INT NOT NULL,
@@ -80,9 +80,9 @@ CREATE TABLE friends (
     CHECK (user1_id < user2_id) -- Évite les doublons (ex: (1,2) et (2,1))
 );
 
--- =============================================
+-- =================
 -- TABLE: chat_messages (Messages entre joueurs)
--- =============================================
+-- =================
 CREATE TABLE chat_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT NOT NULL,
@@ -94,9 +94,9 @@ CREATE TABLE chat_messages (
     FOREIGN KEY (receiver_id) REFERENCES users(id)
 );
 
--- =============================================
+-- =================
 -- TABLE: user_stats (Statistiques des joueurs)
--- =============================================
+-- =================
 CREATE TABLE user_stats (
     user_id INT PRIMARY KEY,
     total_games INT DEFAULT 0,

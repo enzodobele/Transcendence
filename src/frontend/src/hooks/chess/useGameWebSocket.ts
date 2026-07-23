@@ -7,7 +7,6 @@ interface UseGameWebSocketProps {
   isLocalGame: boolean;
   syncWithServerFen: (fen: string, history?: CustomMove[]) => void;
   makeMove: (from: string, to: string, promotion?: string, animate?: boolean, isExternal?: boolean) => void;
-  // 🎯 On étend les raisons de fin de partie à "abandon" pour gérer notre forfait
   onGameOver: (reason: "resign" | "draw" | "abandon", winnerColor?: "white" | "black") => void;
   onDrawOffer: () => void;
   onDrawRefused: () => void;

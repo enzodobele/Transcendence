@@ -24,7 +24,6 @@ try {
   console.error(`❌ CRITICAL ERROR [Auth Service]: Impossible de lire le secret JWT : ${err.message}`);
   process.exit(1);
 }
-// =========================================================================
 
 export const hashPassword = async (password: string): Promise<string> => {
   const saltRounds = 10;

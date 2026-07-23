@@ -10,9 +10,9 @@ const readSecret = (value?: string): string | undefined => {
   return value.trim();
 };
 
-// =============================================
+
 // 1. RÉCUPÉRATION DES SECRETS DOCKER
-// =============================================
+
 const dbUser = readSecret(process.env.DB_USER) ?? readSecret(process.env.DB_USER_FILE);
 const dbName = readSecret(process.env.DB_NAME) ?? readSecret(process.env.DB_NAME_FILE);
 const dbPassword = readSecret(process.env.DB_PASSWORD) ?? readSecret(process.env.DB_PASSWORD_FILE);
@@ -21,17 +21,17 @@ if (!dbUser || !dbName || !dbPassword) {
   throw new Error('Impossible de construire la connexion : secrets DB_USER, DB_NAME ou DB_PASSWORD manquants.');
 }
 
-// =============================================
+
 // 2. INITIALISATION PRISMA 7 (DRIVERS NATIVE)
-// =============================================
+
 const computedUrl = `postgresql://${dbUser}:${dbPassword}@db:5432/${dbName}?schema=public`;
 const pool = new Pool({ connectionString: computedUrl });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-// =============================================
+
 // 3. JEU DE DONNÉES
-// =============================================
+
 const users = [
   {
     email: 'alice@example.com',
@@ -67,9 +67,9 @@ const users = [
   },
 ];
 
-// =============================================
+
 // 4. LOGIQUE PRINCIPALE DU SEED
-// =============================================
+
 async function main() {
   console.log("🌱 Début du seeding...");
 
@@ -186,9 +186,9 @@ async function main() {
   console.log(`✅ Seed completed successfully with ${users.length} users.`);
 }
 
-// =============================================
+
 // 5. EXÉCUTION ET NETTOYAGE DES POOLS
-// =============================================
+
 main()
   .catch((error) => {
     console.error('❌ Seed failed:', error);

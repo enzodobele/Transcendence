@@ -7,9 +7,9 @@ datasource db {
   provider = "postgresql"
 }
 
-// =============================================
+
 // MODEL: User (Joueurs)
-// =============================================
+
 model User {
   id             Int      @id @default(autoincrement())
   username       String  @unique
@@ -41,9 +41,9 @@ model User {
   @@map("users")
 }
 
-// =============================================
+
 // MODEL: Game (Parties)
-// =============================================
+
 model Game {
   id           Int        @id @default(autoincrement())
   player1Id    Int        // Joueur blanc
@@ -65,9 +65,9 @@ model Game {
   @@map("games")
 }
 
-// =============================================
+
 // MODEL: Move (Coups)
-// =============================================
+
 model Move {
   id             Int        @id @default(autoincrement())
   gameId         Int
@@ -92,9 +92,9 @@ model Move {
   @@map("moves")
 }
 
-// =============================================
+
 // MODEL: Friend (Amis)
-// =============================================
+
 model Friend {
   user1Id    Int
   user2Id    Int
@@ -111,9 +111,9 @@ model Friend {
   @@map("friends")
 }
 
-// =============================================
+
 // MODEL: FriendRequest (Demandes d'amis)
-// =============================================
+
 model FriendRequest {
   id         Int      @id @default(autoincrement())
   senderId   Int
@@ -128,9 +128,9 @@ model FriendRequest {
   @@map("friend_requests")
 }
 
-// =============================================
+
 // MODEL: waitlistEntry (File d'attente)
-// =============================================
+
 model waitlistEntry {
   id           Int      @id @default(autoincrement())
   userId       Int      @unique
@@ -142,9 +142,9 @@ model waitlistEntry {
   @@map("waitlistEntry")
 }
 
-// =============================================
+
 // MODEL: UserStats (Statistiques)
-// =============================================
+
 model UserStats {
   userId        Int     @id @unique
   totalGames    Int     @default(0)
@@ -161,9 +161,9 @@ model UserStats {
 }
 
 
-// // =============================================
+// 
 // // MODEL: ChatMessage (Messages)
-// // =============================================
+// 
 // model ChatMessage {
 //   id          Int      @id @default(autoincrement())
 //   senderId    Int

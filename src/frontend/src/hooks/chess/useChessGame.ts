@@ -8,7 +8,7 @@ import type {
 } from "../../types/types";
 import { playMoveSound } from "./chessSoundService";
 import { extractCapturedPieces } from "./chessUtils";
-import { useChessDragAndDrop } from "./useChessDragAndDrop"; // 🚀 Import du sous-hook
+import { useChessDragAndDrop } from "./useChessDragAndDrop"; // Import du sous-hook
 
 export const useChessGame = (
   playerColor: "white" | "black" = "white",
@@ -93,7 +93,7 @@ export const useChessGame = (
     return move;
   };
 
-  // 🚀 Branchement de la mécanique Drag & Drop externe
+  // Branchement de la mécanique Drag & Drop externe
   const {
     dragPiece,
     dragEndedAt,

@@ -414,9 +414,7 @@ volumes:
   vault_creds_agent_db:
   vault_creds_agent_tools:
 
-# =============================================
-# 🌐 NETWORK
-# =============================================
+# NETWORK
 networks:
   chessguard_network:
     name: chessguard_network

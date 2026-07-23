@@ -5,9 +5,9 @@ import * as path from "path";
 import { execSync } from "child_process";
 import cron from "node-cron";
 
-// =========================================================================
+
 // Configuration secrets
-// =========================================================================
+
 function readSecretFile(envVar: string): string
 {
   const filePath = process.env[envVar];
@@ -35,9 +35,9 @@ const BACKUP_DIR = "/backups";
 const BACKUP_STATUS_FILE = path.join(BACKUP_DIR, "backup-status.json");
 const MAX_BACKUPS = 7;
 
-// =========================================================================
+
 // Services surveillés
-// =========================================================================
+
 const SERVICES = [
   { name: "auth",        url: "http://backend-auth:3000/health" },
   { name: "game",        url: "http://backend-game:3002/health" },
@@ -46,9 +46,9 @@ const SERVICES = [
   { name: "ai",          url: "http://ai:8000/health" },
 ];
 
-// =========================================================================
+
 // Middleware admin
-// =========================================================================
+
 function requireAdmin(req: Request, res: Response, next: NextFunction): void
 {
   const auth = req.headers.authorization;
@@ -74,9 +74,9 @@ function requireAdmin(req: Request, res: Response, next: NextFunction): void
   }
 }
 
-// =========================================================================
+
 // Backup
-// =========================================================================
+
 function runBackup(): void
 {
   if (!fs.existsSync(BACKUP_DIR))
@@ -107,9 +107,9 @@ function runBackup(): void
   console.log(`[backup] Terminé : ${filename}`);
 }
 
-// =========================================================================
+
 // Express
-// =========================================================================
+
 const app = express();
 app.use(express.json());
 
@@ -176,9 +176,9 @@ app.post("/backup", requireAdmin, (_req: Request, res: Response) =>
   }
 });
 
-// =========================================================================
+
 // Cron : backup automatique à 03h00
-// =========================================================================
+
 cron.schedule("0 3 * * *", () =>
 {
   console.log("[cron] Démarrage du backup planifié...");
@@ -195,5 +195,5 @@ cron.schedule("0 3 * * *", () =>
 const PORT = process.env.PORT ?? 3004;
 app.listen(PORT, () =>
 {
-  console.log(`📊 Status service démarré sur le port ${PORT}`);
+  console.log(`Status service démarré sur le port ${PORT}`);
 });

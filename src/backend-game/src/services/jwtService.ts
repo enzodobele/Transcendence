@@ -23,7 +23,6 @@ try {
   console.error(`❌ CRITICAL ERROR [JWT Service]: Impossible de lire le secret JWT : ${err.message}`);
   process.exit(1);
 }
-// =========================================================================
 
 export const generateToken = (userId: number, username: string): string => {
   return jwt.sign(

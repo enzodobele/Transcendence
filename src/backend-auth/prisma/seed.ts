@@ -3,25 +3,25 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
-// =============================================
+
 // 1. RÉCUPÉRATION DE LA CONNEXION (DEPUIS HASHI VAULT / ENTRYPOINT)
-// =============================================
+
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error('Impossible de lancer le seed : variable DATABASE_URL manquante (vérifier l\'initialisation Vault).');
 }
 
-// =============================================
+
 // 2. INITIALISATION PRISMA 7 (DRIVERS NATIVE)
-// =============================================
+
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-// =============================================
+
 // 3. JEU DE DONNÉES
-// =============================================
+
 const users = [
   {
     email: 'alice@example.com',
@@ -61,9 +61,9 @@ const users = [
   },
 ];
 
-// =============================================
+
 // 4. LOGIQUE PRINCIPALE DU SEED
-// =============================================
+
 async function main() {
   console.log("🌱 Début du seeding avec support HashiCorp Vault...");
 
@@ -181,9 +181,9 @@ async function main() {
   console.log(`✅ Seed completed successfully with ${users.length} users.`);
 }
 
-// =============================================
+
 // 5. EXÉCUTION ET NETTOYAGE DES POOLS
-// =============================================
+
 main()
   .catch((error) => {
     console.error('❌ Seed failed:', error);
