@@ -1,6 +1,4 @@
-# =========================
 # STAGE 1: Build
-# =========================
 FROM node:22-alpine AS builder
 
 RUN addgroup -g 1001 -S nodejs && \
@@ -13,9 +11,7 @@ RUN npm ci
 
 COPY --chown=nodejs:nodejs . .
 
-# =========================
 # STAGE 2: Runtime
-# =========================
 FROM node:22-alpine
 
 # postgresql-client pour pg_dump (backup)

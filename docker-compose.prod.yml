@@ -1,9 +1,7 @@
 name: chessguard_prod
 
 services:
-  # =========================================================================
-  # 🌐 NGINX GATEWAY (Le seul point d'entrée public)
-  # =========================================================================
+# NGINX GATEWAY (Le seul point d'entrée public)
   nginx:
     build:
       context: ./src/nginx
@@ -41,9 +39,7 @@ services:
       start_period: 10s
     restart: always
 
-  # =========================================================================
-  # 🖥️ FRONTEND (Serveur d'assets statiques React)
-  # =========================================================================
+  # FRONTEND (Serveur d'assets statiques React)
   frontend:
     build:
       context: ./src/frontend
@@ -57,9 +53,7 @@ services:
       retries: 3
     restart: always
 
-  # =========================================================================
-  # 🔐 MICROSERVICE : Auth (Port 3000)
-  # =========================================================================
+  # MICROSERVICE : Auth (Port 3000)
   backend-auth:
     build:
       context: ./src/backend-auth
@@ -85,9 +79,7 @@ services:
       retries: 3
     restart: always
 
-  # =========================================================================
-  # 🚀 MICROSERVICE : Matchmaking (Port 3001)
-  # =========================================================================
+  # MICROSERVICE : Matchmaking (Port 3001)
   backend-matchmaking:
     build:
       context: ./src/backend-matchmaking
@@ -113,9 +105,7 @@ services:
       retries: 3
     restart: always
 
-  # =========================================================================
-  # ♟️ MICROSERVICE : Game (Port 3002)
-  # =========================================================================
+  # MICROSERVICE : Game (Port 3002)
   backend-game:
     build:
       context: ./src/backend-game
@@ -140,9 +130,7 @@ services:
       retries: 3
     restart: always
 
-# =========================================================================
-  # 🤖 MICROSERVICE : IA Maison (FastAPI + PyTorch)
-  # =========================================================================
+  # MICROSERVICE : IA Maison (FastAPI + PyTorch)
   ai:
     build:
       context: ./src/ai
@@ -158,9 +146,7 @@ services:
       start_period: 15s
     restart: always
 
-  # =========================================================================
-  # 🗃️ DATABASE (PostgreSQL)
-  # =========================================================================
+  # DATABASE (PostgreSQL)
   db:
     image: postgres:16-alpine
     environment:
@@ -176,7 +162,7 @@ services:
     networks:
       chessguard_prod_network:
         aliases:
-          - chessguard-db  # 🛡️ Permet à Prisma de trouver la DB avec son ancien nom
+          - chessguard-db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$(cat /vault/secrets/db_user) -d $$(cat /vault/secrets/db_name)"]
       interval: 5s
@@ -184,9 +170,7 @@ services:
       retries: 5
     restart: always
 
-  # =========================================================================
-  # 🔐 VAULT (secrets management)
-  # =========================================================================
+  # VAULT (secrets management)
   vault:
     image: hashicorp/vault:1.20
     container_name: vault
@@ -253,9 +237,7 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-# =========================================================================
-# 💾 VOLUMES PERSISTANTS
-# =========================================================================
+# VOLUMES PERSISTANTS
 volumes:
   postgres_prod_data:
     name: chessguard_prod_db_data
@@ -269,9 +251,7 @@ volumes:
   vault_creds_matchmaking:
   vault_creds_agent_db:
 
-# =========================================================================
-# 🔌 RÉSEAUX ISOLÉS
-# =========================================================================
+# RÉSEAUX ISOLÉS
 networks:
   chessguard_prod_network:
     name: chessguard_prod_network

@@ -8,9 +8,7 @@ import fs from "fs";
 const app = express();
 app.use(express.json());
 
-// =========================================================================
-// 🚨 VÉRIFICATION STRICTE DE LA CONFIGURATION
-// =========================================================================
+// VÉRIFICATION STRICTE DE LA CONFIGURATION
 if (!process.env.GAME_SERVICE_URL) {
   console.error("❌ CRITICAL ERROR: La variable d'environnement GAME_SERVICE_URL est manquante.");
   process.exit(1);
@@ -47,7 +45,7 @@ app.post("/matchmaking/join", async (req: Request, res: Response) => {
   const token = authHeader.split(" ")[1];
   let userId: number;
 
-  // 1. 🛡️ ÉTAPE 1 : Validation stricte du JWT
+  // 1. ÉTAPE 1 : Validation stricte du JWT
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string | number };
     userId = Number(decoded.userId);
@@ -56,7 +54,7 @@ app.post("/matchmaking/join", async (req: Request, res: Response) => {
     return res.status(401).json({ error: "TOKEN_INVALID" });
   }
 
-  // 2. ♟️ ÉTAPE 2 : Logique de Matchmaking
+  // 2. ÉTAPE 2 : Logique de Matchmaking
   try {
     // Ajout à la waitlist sécurisé (gère le fait d'y être déjà de manière transparente)
     await addToWaitlist(userId);

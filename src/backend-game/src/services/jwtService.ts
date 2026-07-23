@@ -1,9 +1,7 @@
 import jwt from "jsonwebtoken";
 import * as fs from "fs";
 
-// =========================================================================
-// 🚨 VÉRIFICATION STRICTE DU SECRET (FAIL-FAST)
-// =========================================================================
+// VÉRIFICATION STRICTE DU SECRET (FAIL-FAST)
 if (!process.env.JWT_SECRET_FILE) {
   console.error("❌ CRITICAL ERROR [JWT Service]: La variable JWT_SECRET_FILE n'est pas définie.");
   process.exit(1);

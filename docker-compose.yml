@@ -1,9 +1,7 @@
 name: chessguard_dev
 
 services:
-  # =============================================
-  # 🖥️ FRONTEND (React + Vite + Nginx)
-  # =============================================
+  # FRONTEND (React + Vite + Nginx)
   frontend:
     build: ./src/frontend
     container_name: frontend
@@ -24,9 +22,7 @@ services:
       start_period: 30s
     restart: always
 
-  # =============================================
-  # 🌐 NGINX (Reverse Proxy)
-  # =============================================
+  # NGINX (Reverse Proxy)
   nginx:
     build: ./src/nginx
     container_name: nginx
@@ -68,9 +64,7 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # =========================================================================
-  # 🔐 MICROSERVICE AUTH (Gère l'inscription, connexion, profils)
-  # =========================================================================
+  # MICROSERVICE AUTH (Gère l'inscription, connexion, profils)
   backend-auth:
     build: ./src/backend-auth
     container_name: backend-auth
@@ -98,9 +92,7 @@ services:
       start_period: 60s
     restart: unless-stopped
 
-  # =========================================================================
-  # 👥 MICROSERVICE FRIENDS (Gestion des amis)
-  # =========================================================================
+  # MICROSERVICE FRIENDS (Gestion des amis)
   backend-friends:
     build: ./src/backend-friends
     container_name: backend-friends
@@ -127,9 +119,7 @@ services:
       start_period: 60s
     restart: unless-stopped
 
-  # =========================================================================
-  # ♟️ GAME ENGINE (Ancien gros backend épuré - Sockets & Validations)
-  # =========================================================================
+  # GAME ENGINE (Ancien gros backend épuré - Sockets & Validations)
   backend-game:
     build: ./src/backend-game
     container_name: backend-game
@@ -156,9 +146,7 @@ services:
       start_period: 60s
     restart: unless-stopped
 
-  # =============================================
-  # 🚀 MATCHMAKING MICROSERVICE (Node + Express + Prisma)
-  # =============================================
+# MATCHMAKING MICROSERVICE (Node + Express + Prisma)
   backend-matchmaking:
     build: ./src/backend-matchmaking
     container_name: backend-matchmaking
@@ -187,9 +175,7 @@ services:
       start_period: 60s
     restart: unless-stopped
 
-  # =========================================================================
-  # 📊 MICROSERVICE STATUS (Health aggregator + Backup cron)
-  # =========================================================================
+  # MICROSERVICE STATUS (Health aggregator + Backup cron)
   backend-status:
     build: ./src/backend-status
     container_name: backend-status
@@ -218,9 +204,7 @@ services:
       start_period: 60s
     restart: unless-stopped
 
-  # =============================================
-  # 🤖 IA MAISON (FastAPI + PyTorch)
-  # =============================================
+  # IA MAISON (FastAPI + PyTorch)
   ai:
     build: ./src/ai
     container_name: ai
@@ -238,9 +222,7 @@ services:
       start_period: 30s
     restart: unless-stopped
 
-  # =============================================
-  # 🔐 VAULT (secrets management)
-  # =============================================
+  # VAULT (secrets management)
   vault:
     image: hashicorp/vault:1.20
     container_name: vault
@@ -336,9 +318,7 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # =============================================
-  # 🗃️ DATABASE (PostgreSQL)
-  # =============================================
+  # DATABASE (PostgreSQL)
   db:
     image: postgres:16
     container_name: chessguard-db
@@ -363,9 +343,7 @@ services:
       - chessguard_network
     restart: unless-stopped
 
-  # =============================================
-  # 🔧 OUTILS (Optionnels)
-  # =============================================
+  # OUTILS (Optionnels)
   portainer:
     image: portainer/portainer-ce:2.39.1
     container_name: portainer
@@ -419,9 +397,7 @@ services:
       - chessguard_network
     restart: unless-stopped
 
-# =============================================
-# 💾 VOLUMES
-# =============================================
+# VOLUMES
 volumes:
   postgres_data:
   portainer_data:

@@ -25,7 +25,6 @@ export function useGameWebSocket({
 }: UseGameWebSocketProps) {
   const wsRef = useRef<WebSocket | null>(null);
 
-  // ⏱️ NOUVEAUX ÉTATS POUR LA GESTION DE LA DÉCONNEXION
   const [isOpponentDisconnected, setIsOpponentDisconnected] = useState(false);
   const [disconnectTimeout, setDisconnectTimeout] = useState(120); // 120s par défaut (2 min)
 
@@ -55,7 +54,6 @@ export function useGameWebSocket({
       wsRef.current.send(JSON.stringify({ type: "draw_refuse" }));
   };
 
-  // 🚀 NOUVELLE MÉTHODE : Envoyer l'ordre de réclamation au serveur
   const sendClaimVictory = () => {
     if (isLocalGame) return;
     wsRef.current?.readyState === WebSocket.OPEN &&
@@ -85,7 +83,6 @@ export function useGameWebSocket({
             makeMove(message.move.from, message.move.to, message.move.promotion, true, true);
             break;
           case "game_over":
-            // Ferme l'overlay de déconnexion si la partie est terminée
             setIsOpponentDisconnected(false);
             onGameOver(message.reason, message.winnerColor);
             break;
@@ -96,7 +93,6 @@ export function useGameWebSocket({
             onDrawRefused();
             break;
           
-          // 🚨 NOUVEAUX CAS POUR LES TIMERS DE RECONNEXION
           case "opponent_disconnected":
             console.warn(`[ChessGuard WS] Adversaire déconnecté. Timer : ${message.timeoutMs}ms`);
             setDisconnectTimeout(Math.floor(message.timeoutMs / 1000));
@@ -110,7 +106,6 @@ export function useGameWebSocket({
 
           case "claim_victory_available":
             console.log("[ChessGuard WS] Autorisation de forcer la victoire reçue du serveur.");
-            // Force le timer à 0 pour débloquer le bouton instantanément côté client
             setDisconnectTimeout(0);
             break;
 

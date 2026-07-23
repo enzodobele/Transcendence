@@ -1,6 +1,4 @@
-# =========================
 # STAGE 1: Build
-# =========================
 FROM node:22-alpine AS builder
 
 # Crée un utilisateur avec UID/GID 1001 (pour éviter les problèmes de permissions)
@@ -22,9 +20,7 @@ RUN npx prisma generate
 # Copie du reste du code
 COPY --chown=nodejs:nodejs . .
 
-# =========================
 # STAGE 2: Runtime
-# =========================
 FROM node:22-alpine
 
 # Installe les dépendances nécessaires

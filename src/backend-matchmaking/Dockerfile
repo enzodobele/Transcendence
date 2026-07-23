@@ -1,6 +1,4 @@
-# =========================
 # STAGE 1: Build
-# =========================
 FROM node:22-alpine AS builder
 
 RUN addgroup -g 1001 -S nodejs && \
@@ -16,9 +14,7 @@ RUN npx prisma generate
 
 COPY --chown=nodejs:nodejs . .
 
-# =========================
 # STAGE 2: Runtime
-# =========================
 FROM node:22-alpine
 
 RUN apk add --no-cache wget postgresql-client curl jq
@@ -42,7 +38,7 @@ ENV NPM_CONFIG_CACHE=/tmp/.npm
 # so nothing here ever needs root.
 USER nodejs
 
-# 🎯 Ajustement pour le Matchmaking
+# Ajustement pour le Matchmaking
 EXPOSE 3001
 
 ENTRYPOINT ["/app/entrypoint.sh"]

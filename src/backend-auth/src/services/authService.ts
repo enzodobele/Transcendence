@@ -2,9 +2,7 @@ import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import * as fs from "fs"; // 👈 Obligatoire pour lire le secret Docker
 
-// =========================================================================
-// 🚨 VÉRIFICATION STRICTE DU SECRET (FAIL-FAST)
-// =========================================================================
+// VÉRIFICATION STRICTE DU SECRET (FAIL-FAST)
 if (!process.env.JWT_SECRET_FILE) {
   console.error("❌ CRITICAL ERROR [Auth Service]: La variable JWT_SECRET_FILE n'est pas définie.");
   process.exit(1);

@@ -18,7 +18,6 @@ export async function handleResign(userId: number, gameId: number, room: Room, d
   const winnerId = userId === dbGame.player1Id ? dbGame.player2Id : dbGame.player1Id;
   const winnerColor = winnerId === dbGame.player1Id ? "white" : "black";
   
-  // 🚨 ON MARQUE LA ROOM COMME TERMINÉE
   room.isGameOver = true; 
 
   clearTimer(gameId, userId);
@@ -36,7 +35,6 @@ export async function handleDrawAccept(userId: number, gameId: number, room: Roo
   if (room.pendingDrawOfferId === undefined || room.pendingDrawOfferId === userId) return;
   room.pendingDrawOfferId = undefined;
   
-  // 🚨 ON MARQUE LA ROOM COMME TERMINÉE
   room.isGameOver = true;
 
   clearTimer(gameId, dbGame.player1Id);
@@ -58,7 +56,6 @@ export async function handleClaimVictory(userId: number, gameId: number, room: R
   const isOpponentOnline = !!room.players[opponentId];
 
   if (isVictoryClaimable(gameId, opponentId, isOpponentOnline)) {
-    // 🚨 ON MARQUE LA ROOM COMME TERMINÉE
     room.isGameOver = true;
 
     clearTimer(gameId, opponentId);

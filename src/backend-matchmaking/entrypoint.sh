@@ -1,15 +1,11 @@
 #!/bin/sh
 set -e
 
-# =============================================
 # Vault settings (AppRole creds mounted read-only)
-# =============================================
 VAULT_ADDR="${VAULT_ADDR:-http://vault:8200}"
 CREDS_DIR="${VAULT_CREDS_DIR:-/vault/creds}"
 
-# =============================================
 # Wait for Vault (health endpoint returns 200 only when unsealed+active)
-# =============================================
 echo "[+] [Matchmaking] Waiting for Vault..."
 MAX_RETRIES=30
 for i in $(seq 1 $MAX_RETRIES); do
@@ -24,9 +20,7 @@ for i in $(seq 1 $MAX_RETRIES); do
   sleep 2
 done
 
-# =============================================
 # AppRole login
-# =============================================
 ROLE_ID=$(cat "$CREDS_DIR/role_id")
 SECRET_ID=$(cat "$CREDS_DIR/secret_id")
 VAULT_TOKEN=$(curl -sf -X POST \
@@ -38,9 +32,7 @@ if [ -z "$VAULT_TOKEN" ] || [ "$VAULT_TOKEN" = "null" ]; then
 fi
 unset ROLE_ID SECRET_ID
 
-# =============================================
 # Fetch secrets from KV v2
-# =============================================
 kv_field() {
   curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
     "$VAULT_ADDR/v1/secret/data/chessguard/$1" | jq -er ".data.data.$2"
@@ -53,9 +45,7 @@ DB_PASSWORD=$(kv_field db password)
 JWT_SECRET=$(kv_field jwt secret)
 unset VAULT_TOKEN
 
-# =============================================
 # JWT file for the app (same UID: no chown needed)
-# =============================================
 APP_SECRETS_DIR="/tmp/app-secrets"
 mkdir -p "$APP_SECRETS_DIR"
 chmod 700 "$APP_SECRETS_DIR"
@@ -65,15 +55,11 @@ chmod 400 "$APP_SECRETS_DIR/jwt_secret"
 export JWT_SECRET_FILE="$APP_SECRETS_DIR/jwt_secret"
 unset JWT_SECRET
 
-# =============================================
 # DATABASE_URL
-# =============================================
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
 echo "[+] [Matchmaking] DATABASE_URL configured."
 
-# =============================================
 # Wait for the database (with timeout)
-# =============================================
 echo "[+] [Matchmaking] Waiting for database to be ready..."
 MAX_RETRIES=30
 RETRY_INTERVAL=1
