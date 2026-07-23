@@ -4,11 +4,10 @@ NAME = chessguard
 
 # Fichiers de configuration Docker/Podman Compose 
 
-ifeq ($(shell systemctl is-active podman.socket >/dev/null 2>&1 && echo yes),yes)
+ifeq ($(shell systemctl is-active podman >/dev/null 2>&1 && echo yes),yes)
     DOCKER := podman
     DOCKER_COMPOSE := podman compose
-    COMPOSE_OVERRIDE :=
-#     COMPOSE_OVERRIDE := -f docker-compose.podman.yml
+    COMPOSE_OVERRIDE := -f docker-compose.podman.yml
 
 else ifeq ($(shell docker compose version >/dev/null 2>&1 && echo yes),yes)
     DOCKER := docker

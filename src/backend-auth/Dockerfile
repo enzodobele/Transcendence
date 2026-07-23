@@ -1,5 +1,6 @@
 # STAGE 1: Build
-FROM node:22-alpine AS builder
+# =========================
+FROM docker.io/node:22-alpine AS builder
 
 # Crée un utilisateur avec UID/GID 1001 (pour éviter les problèmes de permissions)
 RUN addgroup -g 1001 -S nodejs && \
@@ -21,7 +22,8 @@ RUN npx prisma generate
 COPY --chown=nodejs:nodejs . .
 
 # STAGE 2: Runtime
-FROM node:22-alpine
+# =========================
+FROM docker.io/node:22-alpine
 
 # Installe les dépendances nécessaires
 RUN apk add --no-cache wget postgresql-client curl jq

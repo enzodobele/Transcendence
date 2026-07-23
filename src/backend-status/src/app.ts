@@ -4,6 +4,12 @@ import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
 import cron from "node-cron";
+import {
+  Counter,
+  Histogram,
+  Registry,
+  collectDefaultMetrics,
+} from "prom-client";
 
 
 // Configuration secrets
@@ -112,6 +118,45 @@ function runBackup(): void
 
 const app = express();
 app.use(express.json());
+
+const metricsRegistry = new Registry();
+collectDefaultMetrics({ register: metricsRegistry, prefix: "status_" });
+
+const httpRequestsTotal = new Counter({
+  name: "status_http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status_code"],
+  registers: [metricsRegistry],
+});
+
+const httpRequestDuration = new Histogram({
+  name: "status_http_request_duration_seconds",
+  help: "HTTP request duration in seconds",
+  labelNames: ["method", "route", "status_code"],
+  buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
+  registers: [metricsRegistry],
+});
+
+app.use((req: Request, res: Response, next: NextFunction) =>
+{
+  const start = process.hrtime.bigint();
+  res.on("finish", () =>
+  {
+    const route = req.route?.path || req.path;
+    const statusCode = String(res.statusCode);
+    const durationSeconds = Number(process.hrtime.bigint() - start) / 1e9;
+
+    httpRequestsTotal.inc({ method: req.method, route, status_code: statusCode });
+    httpRequestDuration.observe({ method: req.method, route, status_code: statusCode }, durationSeconds);
+  });
+  next();
+});
+
+app.get("/metrics", async (_req: Request, res: Response) =>
+{
+  res.set("Content-Type", metricsRegistry.contentType);
+  res.send(await metricsRegistry.metrics());
+});
 
 // Public — Docker healthcheck
 app.get("/health", (_req: Request, res: Response) =>

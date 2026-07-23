@@ -98,7 +98,7 @@ UPDATE "users" SET "isAdmin" = true WHERE username = 'ton_username';
 ```bash
 docker exec -it chessguard-db psql -U $(cat src/secrets/db_user.txt) -d $(cat src/secrets/db_name.txt) \
   -c "UPDATE \"users\" SET \"isAdmin\" = true WHERE username = 'bob';"
-
+```
 
 ## 4 Commandes utiles
 

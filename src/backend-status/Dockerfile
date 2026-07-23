@@ -1,5 +1,5 @@
 # STAGE 1: Build
-FROM node:22-alpine AS builder
+FROM docker.io/node:22-alpine AS builder
 
 RUN addgroup -g 1001 -S nodejs && \
     adduser -u 1001 -S nodejs -G nodejs
@@ -12,7 +12,7 @@ RUN npm ci
 COPY --chown=nodejs:nodejs . .
 
 # STAGE 2: Runtime
-FROM node:22-alpine
+FROM docker.io/node:22-alpine
 
 # postgresql-client pour pg_dump (backup)
 RUN apk add --no-cache wget postgresql-client curl jq
