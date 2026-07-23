@@ -237,9 +237,7 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # =========================================================================
-  # 📈 MONITORING (Prometheus + Grafana)
-  # =========================================================================
+  # MONITORING (Prometheus + Grafana)
   prometheus:
     image: prom/prometheus:v2.54.1
     command:
@@ -304,9 +302,7 @@ services:
       - chessguard_prod_network
     restart: always
 
-# =========================================================================
-# 💾 VOLUMES PERSISTANTS
-# =========================================================================
+# VOLUMES PERSISTANTS
 volumes:
   postgres_prod_data:
     name: chessguard_prod_db_data

@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by edobele, , ArthurBauu, Batu, nefadli.*
+*This project has been created as part of the 42 curriculum by edobele, mzimeris, arboudau, bergun, nefadli.*
 
 # ChessGuard
 
@@ -17,8 +17,8 @@ Key features:
 |---|---|---|
 | mzimeris | Tech / infra lead | Docker, deployment flow, health services, backups, secrets, and overall service orchestration. |
 | edobele | Frontend lead | React UI integration, layout, visual polish, and Vite-based frontend workflow. |
-| ArthurBauu | Game / realtime lead | Game flow, WebSocket synchronization, lobby logic, and remote gameplay. |
-| Batu | Backend / data lead | Auth, user management, Prisma schemas, and database-backed services. |
+| arboudau | Game / realtime lead | Game flow, WebSocket synchronization, lobby logic, and remote gameplay. |
+| bergun | Backend / data lead | Auth, user management, Prisma schemas, and database-backed services. |
 | nefadli | Product / social features | Friends, matchmaking, chat, spectator-related features, and documentation support. |
 
 ## Project Management
@@ -103,7 +103,7 @@ erDiagram
 
 ## Instructions
 ### Prerequisites
-- Docker and Docker Compose v2.
+- Docker and Docker Compose v2 or Podman
 - Make.
 - Git.
 - Optional for direct service work: Node.js for the frontend and backend services, Python 3.11+ for the AI service.
@@ -140,14 +140,14 @@ erDiagram
 ## Features List
 | Feature | Main contributors | Description |
 |---|---|---|
-| Authentication and profile management | Batu, mzimeris | Register, login, JWT-based session handling, avatars, and profile data. |
-| Real-time chess game engine | ArthurBauu | Live board synchronization, move validation, turn handling, and game state updates. |
-| Remote multiplayer | ArthurBauu, nefadli | Real-time games between two remote players with disconnection handling in progress. |
-| Matchmaking | nefadli, ArthurBauu | Queue-based opponent search and game creation flow. |
+| Authentication and profile management | bergun, mzimeris | Register, login, JWT-based session handling, avatars, and profile data. |
+| Real-time chess game engine | arboudau | Live board synchronization, move validation, turn handling, and game state updates. |
+| Remote multiplayer | arboudau, nefadli | Real-time games between two remote players with disconnection handling in progress. |
+| Matchmaking | nefadli, arboudau | Queue-based opponent search and game creation flow. |
 | AI opponent | edobele | AI game mode with Stockfish-backed analysis and custom AI behavior. |
 | 3D board mode | edobele | Immersive 3D rendering for the board and piece interactions. |
-| Friends system | Batu, nefadli | Friend requests and social graph management. |
-| Spectator mode | ArthurBauu, nefadli | Observe active games without interacting with the board. |
+| Friends system | bergun, nefadli | Friend requests and social graph management. |
+| Spectator mode | arboudau, nefadli | Observe active games without interacting with the board. |
 | Design system and UI components | edobele | Reusable components, visuals, icons, and gameplay controls. |
 | Health, backup, and status services | mzimeris | Service health checks, database health validation, and backup flow. |
 
@@ -158,28 +158,31 @@ Point values: Major = 2 pts, Minor = 1 pt.
 |---|---|---:|---|---|
 | Use a frontend framework | Minor | 1 | React SPA with Vite build tooling. | all |
 | Use a backend framework | Minor | 1 | Express-based microservices for auth, game, friends, matchmaking, and status. | all |
-| Real-time features using WebSockets | Major | 2 | Live move sync, disconnections, and message broadcasting over sockets. | ArthurBauu |
+| Real-time features using WebSockets | Major | 2 | Live move sync, disconnections, and message broadcasting over sockets. | arboudau |
 | ORM for the database | Minor | 1 | Prisma schemas and client generation for typed persistence. | mzimeris |
 | Custom-made design system | Minor | 1 | Reusable UI components, icons, board controls, and gameplay actions. | all |
 | |
-| Support for multiple langages | Minor | 1 | French, English and Turkish. | Batu, nefadli |
+| Support for multiple langages | Minor | 1 | French, English and Turkish. | bergun, nefadli |
 | |
 | Standard User management and auth. | Major | 2 | Profiles, avatars, auth, and account lifecycle. | edobele, mzimeris |
 | |
 | AI opponent | Major | 2 | FastAPI service exposing prediction endpoints for computer play. | edobele |
 | |
 | Complete web-based game | Major | 2 | Full chess gameplay with clear win/loss/draw conditions and live matches. | all |
-| Remote players | Major | 2 | Two players can play the same game from separate clients in real time. | ArthurBauu, nefadli |
+| Remote players | Major | 2 | Two players can play the same game from separate clients in real time. | arboudau, nefadli |
 | Advanced 3D graphics | Major | 2 | 3D board mode built with Three.js via react-three-fiber/drei. | edobele |
-| Spectator mode | Minor | 1 | Allow users to watch friends games | ArthurBauu |
+| Spectator mode | Minor | 1 | Allow users to watch friends games | arboudau |
 | |
 | Backend as microservices | Major | 2 | Split into auth, friends, game, matchmaking, and status services. | all |
-| Healthcheck & status page | Minor | 1 | with automated backups and disaster recovery procedures. | ArthurBauu |
+| Healthcheck & status page | Minor | 1 | with automated backups and disaster recovery procedures. | arboudau |
+| Monitoring system | Major | Major | 2 | Prometheus and Grafana. | arboudau |
 | |
+| CyberSecurity | Major | 2 | WAF/ModSecurity (hardened) + HashiCorp Vault | bergun |
+||
 | Custom module: homemade AI | Major | 2 | Project-specific AI logic beyond the standard framework choice. | edobele |
 
 
-Total: 23 points.
+Total: 27 points.
 
 ## Individual Contributions
 ### mzimeris
@@ -194,12 +197,12 @@ Total: 23 points.
 - Helped shape the design system and gameplay controls.
 - Main challenge: keeping the interface readable across multiple game modes; solved through reusable components and animation discipline.
 
-### ArthurBauu
+### arboudau
 - Implemented the realtime game flow, socket synchronization, and remote match behavior.
 - Contributed to matchmaking, spectator behavior, and core chess interactions.
 - Main challenge: keeping board state, socket events, and UI state aligned; solved by centralizing game logic and event handling.
 
-### Batu
+### bergun
 - Worked on authentication, user management, Prisma schemas, and data persistence.
 - Contributed to the social and profile-oriented backend features.
 - Main challenge: keeping auth, database, and microservice boundaries type-safe; solved by using Prisma and strict service contracts.

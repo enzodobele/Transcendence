@@ -1,11 +1,16 @@
 .legal-footer {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
+  
   display: flex;
   justify-content: center;
   align-items: center;
+  
   gap: 0.4rem;
-  width: 100%;
-  margin-top: 0.9rem;
-  padding-top: 0.9rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
   border-top: 1px solid rgba(31, 28, 23, 0.1);
 }
 

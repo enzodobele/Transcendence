@@ -16,8 +16,6 @@ import {
 } from "../../services/auth";
 import "../../styles/Profile/ProfileOverlay.css";
 import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
-import { LegalLinks } from "../Legal/LegalLinks";
-
 
 interface Friend {
   id: number;
@@ -252,8 +250,6 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
             </div>
           </div>
         )}
-        <LegalLinks />
-
       </div>
 
       <ProfileEditOverlay isOpen={showEdit} onClose={() => setShowEdit(false)} />

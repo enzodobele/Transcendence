@@ -1,5 +1,9 @@
 button.button-play-main {
-  position: relative;
+  position: fixed;
+  bottom: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
