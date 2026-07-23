@@ -18,10 +18,10 @@
   - `docker compose -f docker-compose.yml up -d --build nginx`
 
 ## Liens d'accès
-- Prometheus (HTTPS via Nginx) : `https://localhost/monitoring/prometheus/`
-  - Vérification santé : `https://localhost/monitoring/prometheus/-/ready`
-  - Targets : `https://localhost/monitoring/prometheus/targets`
-- Grafana (HTTPS via Nginx) : `https://localhost/monitoring/grafana/`
+- Prometheus (HTTPS via Nginx) : `https://localhost:8443/monitoring/prometheus/`
+  - Vérification santé : `https://localhost:8443/monitoring/prometheus/-/ready`
+  - Targets : `https://localhost:8443/monitoring/prometheus/targets`
+- Grafana (HTTPS via Nginx) : `https://localhost:8443/monitoring/grafana/`
   - utilisateur : `admin`
   - mot de passe : `admin`
 

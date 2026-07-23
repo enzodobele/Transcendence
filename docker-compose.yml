@@ -449,6 +449,7 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_SERVER_ROOT_URL: https://localhost/monitoring/grafana/
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_METRICS_ENABLED: "true"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
