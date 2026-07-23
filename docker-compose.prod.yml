@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       # Host 443 -> container 8443 (nginx runs non-root on an unprivileged port).
-      - "443:8443"
+      - "8443:8443"
     environment:
       # Strict blocking mode: this is the evaluated posture.
       MODSEC_RULE_ENGINE: "On"
@@ -27,7 +27,7 @@ services:
         condition: service_healthy
       ai:
         condition: service_healthy
-      db:
+      chessguard-db:
         condition: service_healthy
     networks:
       - chessguard_prod_network
@@ -66,7 +66,7 @@ services:
       NODE_ENV: production
       PORT: 3000
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       vault-bootstrap:
         condition: service_completed_successfully
@@ -92,7 +92,7 @@ services:
       GAME_SERVICE_URL: http://backend-game:3002
       PORT: 3001
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       vault-bootstrap:
         condition: service_completed_successfully
@@ -117,7 +117,7 @@ services:
       NODE_ENV: production
       PORT: 3002
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
       vault-bootstrap:
         condition: service_completed_successfully
@@ -147,7 +147,7 @@ services:
     restart: always
 
   # DATABASE (PostgreSQL)
-  db:
+  chessguard-db:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER_FILE: /vault/secrets/db_user
@@ -238,7 +238,7 @@ services:
     restart: unless-stopped
 
   # MONITORING (Prometheus + Grafana)
-  prometheus:
+  monitoring-prometheus:
     image: prom/prometheus:v2.54.1
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -255,7 +255,7 @@ services:
       - chessguard_prod_network
     restart: always
 
-  grafana:
+  monitoring-grafana:
     image: grafana/grafana:11.2.2
     environment:
       GF_SECURITY_ADMIN_USER: admin
@@ -269,12 +269,12 @@ services:
     expose:
       - "3000"
     depends_on:
-      - prometheus
+      - monitoring-prometheus
     networks:
       - chessguard_prod_network
     restart: always
 
-  node-exporter:
+  monitoring-node-exporter:
     image: prom/node-exporter:v1.8.2
     command:
       - --path.rootfs=/host
@@ -286,7 +286,7 @@ services:
       - chessguard_prod_network
     restart: always
 
-  cadvisor:
+  monitoring-cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     privileged: true
     devices:
