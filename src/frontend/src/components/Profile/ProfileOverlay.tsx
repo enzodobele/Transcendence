@@ -15,6 +15,7 @@ import {
   type FriendRequest,
 } from "../../services/auth";
 import "../../styles/Profile/ProfileOverlay.css";
+import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
 import { LegalLinks } from "../Legal/LegalLinks";
 
 
@@ -125,6 +126,14 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
           <span>{t("profile.editProfile")}</span>
         </button>
 
+        {/* ── Langue ── */}
+        <div className="profile-language-section">
+          <span className="profile-label" style={{ display: "block", marginBottom: "0.5rem" }}>
+            {t("profile.language", { defaultValue: "Langue" })}
+          </span>
+          <LanguageSwitcher />
+        </div>
+
         {/* ── Demandes reçues ── */}
         {requests.length > 0 && (
           <div className="profile-friends-section">
@@ -203,11 +212,11 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
         </div>
 
         <button className="profile-logout-button"
-		onClick={() => {
-			logout();
-			onClose();
-			window.location.replace("/");
-		}}>
+                onClick={() => {
+                        logout();
+                        onClose();
+                        window.location.replace("/");
+                }}>
           <LogoutIcon className="logout-icon" />
           <span>{t("profile.logout")}</span>
         </button>
@@ -243,7 +252,7 @@ export function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps) {
             </div>
           </div>
         )}
-      <LegalLinks />
+        <LegalLinks />
 
       </div>
 

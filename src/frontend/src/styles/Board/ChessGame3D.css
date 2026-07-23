@@ -1,5 +1,3 @@
-/* ── Mode 3D plein écran ── */
-
 .app.app-3d .game-layout {
   position: fixed;
   inset: 0;
@@ -27,7 +25,6 @@
   display: block;
 }
 
-/* Bouton "Quitter la partie" positionné en bas au centre */
 .app.app-3d .game-actions {
   position: fixed;
   bottom: 2rem;

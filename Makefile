@@ -153,10 +153,8 @@ clean:
 	@$(COMPOSE_DEV) down --remove-orphans
 
 fclean:
-	@echo "[!] ⚠️ DANGER : Purge complète de la PRODUCTION dans 5 secondes..."
-	@sleep 5
-	@$(COMPOSE_PROD) down -v --rmi all --remove-orphans
-	@rm -rf .vault/prod
+	@$(COMPOSE_DEV) down -v --rmi all --remove-orphans
+	@rm -rf .vault/dev
 
 hclean:
 	@echo "🚨 Arrêt des conteneurs et suppression des volumes de DEV..."

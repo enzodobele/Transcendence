@@ -32,7 +32,7 @@ services:
     container_name: nginx
     ports:
       # Host 443 -> container 8443 (nginx runs non-root on an unprivileged port).
-      - "443:8443"
+      - "8443:8443"
     environment:
       # DetectionOnly in dev: log would-be blocks without breaking the workflow.
       MODSEC_RULE_ENGINE: DetectionOnly
@@ -231,7 +231,7 @@ services:
     networks:
       - chessguard_network
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test: ["CMD", "python", "-m", "urllib.request", "http://127.0.0.1:8000/health"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { ProfileOverlay } from "./ProfileOverlay";
-// import ProfileIcon from "../../assets/Logo/profile.svg?react";
 import ProfileIcon from "../../assets/Logo/profile-pawn.svg?react";
 import "../../styles/Profile/ProfileButton.css";
 

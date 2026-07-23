@@ -1,5 +1,4 @@
-/* src/frontend/src/styles/Login/LoginButton.css */
-button.login-button {
+.login-button {
   position: absolute;
   top: clamp(0.4rem, 0.8vw, 0.6rem);
   left: clamp(0.4rem, 0.8vw, 0.6rem);
