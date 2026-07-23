@@ -1,6 +1,4 @@
-/* ==================
-   1. LE MOULE UNIQUE & L'EFFET POCHOIR (Identique pour TOUS les boutons)
-   ================== */
+/* LE MOULE UNIQUE & L'EFFET POCHOIR (plus si unique que ça dans le feu de l'action) */
 .login-button,
 .reset-board,
 .button-find-game,
@@ -37,9 +35,7 @@
     color 0.18s ease;
 }
 
-/* ==================
-   2. ÉTATS UNIQUES (Survol & Accessibilité)
-   ================== */
+/* 2. ÉTATS UNIQUES (Survol & Accessibilité) */
 
 /* Effet au survol identique pour tout le monde */
 .login-button:hover,
@@ -68,14 +64,7 @@
   outline-offset: 3px;
 }
 
-/* ==================
-   3. UNIQUEMENT LE POSITIONNEMENT & LES CONTENANTS
-   ================== */
-
-/* --- Connexion (En haut à gauche) --- */
-
-
-
+/* 3. UNIQUEMENT LE POSITIONNEMENT & LES CONTENANTS */
 
 .login-submit-button {
   margin-top: 0.75rem;
@@ -93,9 +82,7 @@
   padding: 0.4rem 0;
 }
 
-/* ==================
-   4. RESPONSIVE
-   ================== */
+/* 4. RESPONSIVE */
 @media (max-width: 700px) {
   .game-actions {
     display: flex;
@@ -112,10 +99,6 @@
     flex: 1;
     padding: 0.75rem 0.8rem;
   }
-
-  /* .connexion-label {
-    display: none;
-  } */
 
   .login-button {
     width: 2rem;

@@ -57,7 +57,6 @@ unset JWT_SECRET
 
 
 # DATABASE_URL
-# =============================================
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@chessguard-db:5432/${DB_NAME}?schema=public"
 echo "[+] [Friends] DATABASE_URL configured."
 

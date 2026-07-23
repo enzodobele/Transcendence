@@ -1,5 +1,5 @@
 # STAGE 1: Build
-# =========================
+
 FROM docker.io/node:22-alpine AS builder
 
 # Crée un utilisateur avec UID/GID 1001 (pour éviter les problèmes de permissions)
@@ -22,7 +22,7 @@ RUN npx prisma generate
 COPY --chown=nodejs:nodejs . .
 
 # STAGE 2: Runtime
-# =========================
+
 FROM docker.io/node:22-alpine
 
 # Installe les dépendances nécessaires
