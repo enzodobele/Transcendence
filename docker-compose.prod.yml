@@ -238,7 +238,7 @@ services:
     restart: unless-stopped
 
   # MONITORING (Prometheus + Grafana)
-  prometheus:
+  monitoring-prometheus:
     image: prom/prometheus:v2.54.1
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -255,7 +255,7 @@ services:
       - chessguard_prod_network
     restart: always
 
-  grafana:
+  monitoring-grafana:
     image: grafana/grafana:11.2.2
     environment:
       GF_SECURITY_ADMIN_USER: admin
@@ -269,12 +269,12 @@ services:
     expose:
       - "3000"
     depends_on:
-      - prometheus
+      - monitoring-prometheus
     networks:
       - chessguard_prod_network
     restart: always
 
-  node-exporter:
+  monitoring-node-exporter:
     image: prom/node-exporter:v1.8.2
     command:
       - --path.rootfs=/host
@@ -286,7 +286,7 @@ services:
       - chessguard_prod_network
     restart: always
 
-  cadvisor:
+  monitoring-cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     privileged: true
     devices:
