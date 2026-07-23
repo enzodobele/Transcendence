@@ -46,7 +46,7 @@ up:
 
 down:
 	@echo "[-] Arrêt de l'environnement de DEV..."
-	@$(COMPOSE_DEV) down $(SERVICE)
+	@$(COMPOSE_DEV) down $(SERVICE) --remove-orphans
 
 rebuild: down up
 
@@ -103,7 +103,7 @@ prod:
 
 prod-down:
 	@echo "[-] Arrêt de l'environnement de PRODUCTION..."
-	@$(COMPOSE_PROD) down $(SERVICE)
+	@$(COMPOSE_PROD) down $(SERVICE) --remove-orphans
 
 prod-rebuild: prod-down prod
 
