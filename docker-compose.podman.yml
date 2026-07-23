@@ -5,7 +5,7 @@ services:
       - /:/rootfs:ro
       - /sys:/sys:ro
       - /dev/disk/:/dev/disk:ro
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+      - /run/podman/podman.sock:/var/run/docker.sock:ro
 
   monitoring-prometheus:
     depends_on: []

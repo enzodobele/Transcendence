@@ -61,6 +61,8 @@ Why: Express keeps each service lightweight and easy to split by responsibility,
 
 Why: FastAPI is simple to expose and fits a lightweight inference service well. Keeping AI outside the Node.js services makes the system easier to maintain.
 
+See [src/ai/README.md](src/ai/README.md) for the dedicated documentation of this service: model architecture, data pipeline, API contract, and how to run or retrain it.
+
 ### Database and Infrastructure
 - PostgreSQL as the main database.
 - Prisma as ORM and migration tool.
@@ -183,6 +185,15 @@ Point values: Major = 2 pts, Minor = 1 pt.
 
 
 Total: 27 points.
+
+### Custom module justification: homemade AI
+
+The custom module is a from-scratch neural network chess engine (**ChessNet**), served by the dedicated `ai` microservice. Full technical documentation lives in [src/ai/README.md](src/ai/README.md); the justification below summarizes why it counts as a valid extra module.
+
+- **Fully functional**: `ChessNet` (PyTorch, policy + value heads) is trained end to end on real Lichess games and exposed via a FastAPI service (`/predict`, `/health`) wired into `docker-compose.yml`/`docker-compose.prod.yml` and reachable through nginx at `/ai/predict`. The frontend's AI game mode calls it directly.
+- **Meets the module requirements**: it is a complete, self-contained addition to the project's architecture — its own data pipeline (PGN filtering/parsing, tensor encoding, chunked preprocessing), its own training loop, and its own inference service — not a thin wrapper around an existing framework feature.
+- **Real value added**: unlike the standard AI opponent (Stockfish, used for the Training mode), this engine's playing style is directly shaped by real human games rather than a hand-crafted evaluation function. It is deployed as an independent, isolated/scalable microservice, and demonstrates an end-to-end ML workflow (data collection → training → production inference) integrated into the broader microservices architecture.
+- **Technical challenges addressed**: large-scale PGN parsing/cleaning, FEN → tensor board encoding, designing and training a combined policy/value network, and integrating its predictions into a minimax search with alpha-beta pruning to keep inference fast enough to be playable in real time.
 
 ## Individual Contributions
 ### mzimeris

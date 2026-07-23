@@ -343,7 +343,63 @@ services:
       - chessguard_network
     restart: unless-stopped
 
-  # MONITORING (Prometheus + Grafana)
+  # OUTILS (Optionnels)
+  # portainer:
+  #   image: docker.io/portainer/portainer-ce:2.39.1
+  #   container_name: portainer
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - portainer_data:/data
+  #     - tools_secrets:/vault/secrets:ro
+  #   command: --admin-password-file=/vault/secrets/portainer_password
+  #   depends_on:
+  #     vault-agent-tools:
+  #       condition: service_healthy
+  #   networks:
+  #     - chessguard_network
+  #   restart: unless-stopped
+
+  pgadmin:
+    build: ./src/pgadmin
+    container_name: pgadmin
+    environment:
+      # Non-secret login identity; defaults so the stack runs without a .env.
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      # Password is Vault-managed (rendered by vault-agent-tools).
+      PGADMIN_DEFAULT_PASSWORD_FILE: /vault/secrets/pgadmin_password
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+    volumes:
+      - ./src/pgadmin/servers.json:/pgadmin4/servers.json:ro,z
+      - tools_secrets:/vault/secrets:ro
+    networks:
+      - chessguard_network
+    depends_on:
+      chessguard-db:
+        condition: service_healthy
+      vault-agent-tools:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  # mailpit:
+  #   image: docker.io/axllent/mailpit:latest
+  #   container_name: mailpit
+  #   environment:
+  #     MP_BASE_URL: /mailpit
+  #   ports:
+  #     - "8025:8025"
+  #   networks:
+  #     - chessguard_network
+  #   restart: unless-stopped
+
+  # =============================================
+  # 📈 MONITORING (Prometheus + Grafana)
+  # =============================================
   monitoring-prometheus:
     image: docker.io/prom/prometheus:v2.54.1
     container_name: monitoring-prometheus
