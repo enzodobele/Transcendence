@@ -1,6 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
-import { Users, Bot, Brain, Cpu, Globe, UserPlus } from "lucide-react";
+import { Users, Bot, Brain, Cpu, Globe } from "lucide-react";
 import "../../styles/FindGame/FindGameOverlay.css";
 import { ModeCard } from "./ModeCard";
 import { TrainingOverlay } from "../Training/TrainingOverlay";
