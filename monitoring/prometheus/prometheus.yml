@@ -39,3 +39,9 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ["backend-status:3004"]
+
+  - job_name: grafana
+    metrics_path: /monitoring/grafana/metrics
+    scheme: http
+    static_configs:
+      - targets: ["monitoring-grafana:3000"]

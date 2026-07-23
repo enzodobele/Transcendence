@@ -1,0 +1,55 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: Container Monitoring
+    folder: Monitoring
+    interval: 30s
+
+    rules:
+      - uid: container-down
+        title: Container Down
+        condition: B
+
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: prometheus-main
+            model:
+              expr: up{job=~"backend-auth|backend-game|backend-friends|backend-status|backend-matchmaking"}
+              instant: true
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - 1
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    type: last
+                  type: query
+              refId: B
+
+        noDataState: OK
+        execErrState: Error
+
+        for: 30s
+
+        annotations:
+          summary: "Container down: {{ $labels.job }}"
+          description: "{{ $labels.instance }} ne répond plus."
+
+        labels:
+          severity: critical
