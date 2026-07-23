@@ -159,7 +159,6 @@ export default function App() {
                 label={selectedMode.id === "matchmaking" ? t("findGame.findOpponent") : selectedMode.label}
                 onClick={runSelectedMode}
               />
-              <LanguageSwitcher />
               <LegalLinks />
             </>
           )}
