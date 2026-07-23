@@ -10,8 +10,6 @@ const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error('Impossible de lancer le seed : variable DATABASE_URL manquante (vérifier l\'initialisation Vault).');
-if (!connectionString) {
-  throw new Error('Impossible de lancer le seed : variable DATABASE_URL manquante (vérifier l\'initialisation Vault).');
 }
 
 
@@ -33,7 +31,6 @@ const users = [
     avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg?seed=alice',
     bio: 'Joue les ouvertures agressives et les blitz du soir.',
     isAdmin: true, // Passer en Admin
-    isAdmin: true, // Passer en Admin
   },
   {
     email: 'bob@example.com',
@@ -42,7 +39,6 @@ const users = [
     eloRating: 845,
     avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg?seed=bob',
     bio: 'Privilégie les finales propres et les parties longues.',
-    isAdmin: true, // Passer en Admin
     isAdmin: true, // Passer en Admin
   },
   {
@@ -53,7 +49,6 @@ const users = [
     avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg?seed=carla',
     bio: 'Toujours prête pour une revanche.',
     isAdmin: false,
-    isAdmin: false,
   },
   {
     email: 'david@example.com',
@@ -62,7 +57,6 @@ const users = [
     eloRating: 690,
     avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg?seed=david',
     bio: 'Apprend en jouant et adore les parties rapides.',
-    isAdmin: false,
     isAdmin: false,
   },
 ];
@@ -98,7 +92,6 @@ async function main() {
         eloRating: user.eloRating,
         avatarUrl: user.avatarUrl,
         bio: user.bio,
-        isAdmin: user.isAdmin, // Injecté ici
         isAdmin: user.isAdmin, // Injecté ici
       },
     });

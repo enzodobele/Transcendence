@@ -91,23 +91,19 @@ export function useGameWebSocket({
           case "draw_refused":
             onDrawRefused();
             break;
-          
           case "opponent_disconnected":
             console.warn(`[ChessGuard WS] Adversaire déconnecté. Timer : ${message.timeoutMs}ms`);
             setDisconnectTimeout(Math.floor(message.timeoutMs / 1000));
             setIsOpponentDisconnected(true);
             break;
-
           case "opponent_reconnected":
             console.log("[ChessGuard WS] L'adversaire est revenu en jeu !");
             setIsOpponentDisconnected(false);
             break;
-
           case "claim_victory_available":
             console.log("[ChessGuard WS] Autorisation de forcer la victoire reçue du serveur.");
             setDisconnectTimeout(0);
             break;
-
           case "error":
             console.error("[ChessGuard WS] Erreur Backend :", message.message);
             break;
