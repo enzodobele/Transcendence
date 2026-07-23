@@ -182,9 +182,7 @@ async function main() {
   console.log(`✅ Seed completed successfully with ${users.length} users.`);
 }
 
-
 // 5. EXÉCUTION ET NETTOYAGE DES POOLS
-
 main()
   .catch((error) => {
     console.error('❌ Seed failed:', error);
