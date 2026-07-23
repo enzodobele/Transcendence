@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       # Host 443 -> container 8443 (nginx runs non-root on an unprivileged port).
-      - "443:8443"
+      - "8443:8443"
     environment:
       # Strict blocking mode: this is the evaluated posture.
       MODSEC_RULE_ENGINE: "On"
