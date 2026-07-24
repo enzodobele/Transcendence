@@ -1,8 +1,7 @@
 button.button-play-main {
   position: fixed;
   bottom: 4rem;
-  left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-1%);
 
   display: inline-flex;
   align-items: center;
