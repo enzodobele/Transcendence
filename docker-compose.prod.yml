@@ -25,9 +25,13 @@ services:
         condition: service_healthy
       backend-game:
         condition: service_healthy
+      backend-friends:
+        condition: service_healthy
+      backend-status:
+        condition: service_healthy
       ai:
         condition: service_healthy
-      db:
+      chessguard-db:
         condition: service_healthy
     networks:
       - chessguard_prod_network
@@ -66,9 +70,9 @@ services:
       NODE_ENV: production
       PORT: 3000
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
-      vault-bootstrap:
+      image: docker.io/tstrap:
         condition: service_completed_successfully
     networks:
       - chessguard_prod_network
@@ -92,9 +96,9 @@ services:
       GAME_SERVICE_URL: http://backend-game:3002
       PORT: 3001
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
-      vault-bootstrap:
+      image: docker.io/tstrap:
         condition: service_completed_successfully
     networks:
       - chessguard_prod_network
@@ -117,9 +121,9 @@ services:
       NODE_ENV: production
       PORT: 3002
     depends_on:
-      db:
+      chessguard-db:
         condition: service_healthy
-      vault-bootstrap:
+      image: docker.io/tstrap:
         condition: service_completed_successfully
     networks:
       - chessguard_prod_network
@@ -129,6 +133,62 @@ services:
       timeout: 5s
       retries: 3
     restart: always
+
+      # MICROSERVICE FRIENDS (Gestion des amis)
+  backend-friends:
+    build: ./src/backend-friends
+    container_name: backend-friends
+    volumes:
+      - ./src/backend-friends:/app
+      - /app/node_modules
+      - vault_creds_friends:/vault/creds:ro
+    environment:
+      PORT: 3003
+      VAULT_ADDR: http://vault:8200
+    depends_on:
+      chessguard-db:
+        condition: service_healthy
+      image: docker.io/tstrap:
+        condition: service_completed_successfully
+    networks:
+      - chessguard_prod_network
+    command: npm run dev
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3003/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
+    restart: unless-stopped
+
+  # MICROSERVICE STATUS (Health aggregator + Backup cron)
+  backend-status:
+    build: ./src/backend-status
+    container_name: backend-status
+    user: "nodejs"
+    volumes:
+      - ./src/backend-status:/app
+      - /app/node_modules
+      - ./backups:/backups
+      - vault_creds_status:/vault/creds:ro
+    environment:
+      VAULT_ADDR: http://vault:8200
+      PORT: 3004
+    depends_on:
+      chessguard-db:
+        condition: service_healthy
+      image: docker.io/tstrap:
+        condition: service_completed_successfully
+    networks:
+      - chessguard_prod_network
+    command: npm run dev
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3004/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+    restart: unless-stopped
 
   # MICROSERVICE : IA Maison (FastAPI + PyTorch)
   ai:
@@ -147,8 +207,8 @@ services:
     restart: always
 
   # DATABASE (PostgreSQL)
-  db:
-    image: postgres:16-alpine
+  chessguard-db:
+    image: docker.io/postgres:16-alpine
     environment:
       POSTGRES_USER_FILE: /vault/secrets/db_user
       POSTGRES_DB_FILE: /vault/secrets/db_name
@@ -172,7 +232,7 @@ services:
 
   # VAULT (secrets management)
   vault:
-    image: hashicorp/vault:1.20
+    image: docker.io/hashicorp/vault:1.20
     container_name: vault
     command: ["vault", "server", "-config=/vault/config/vault.hcl"]
     environment:
@@ -193,19 +253,22 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  vault-bootstrap:
-    image: hashicorp/vault:1.20
-    container_name: vault-bootstrap
+  image: docker.io/tstrap:
+    image: docker.io/hashicorp/vault:1.20
+    container_name: image: docker.io/tstrap
     entrypoint: ["/bin/sh", "/vault/bootstrap.sh"]
     environment:
       VAULT_ADDR: http://vault:8200
     volumes:
       - ./src/vault/bootstrap.sh:/vault/bootstrap.sh:ro,z
-      - ./.vault/prod:/vault/init:z
+      - ./.vault/dev:/vault/init:z
       - vault_creds_auth:/creds/backend-auth
+      - vault_creds_friends:/creds/backend-friends
       - vault_creds_game:/creds/backend-game
       - vault_creds_matchmaking:/creds/backend-matchmaking
+      - vault_creds_status:/creds/backend-status
       - vault_creds_agent_db:/creds/agent-db
+      - vault_creds_agent_tools:/creds/agent-tools
     depends_on:
       vault:
         condition: service_healthy
@@ -214,7 +277,7 @@ services:
     restart: "no"
 
   vault-agent-db:
-    image: hashicorp/vault:1.20
+    image: docker.io/hashicorp/vault:1.20
     container_name: vault-agent-db
     # Bypass the image's privilege-dropping entrypoint and run as root, so the
     # agent can read the 0400/uid-1001 AppRole creds and write the rendered volume.
@@ -225,7 +288,7 @@ services:
       - vault_creds_agent_db:/vault/creds:ro
       - pg_secrets:/vault/rendered
     depends_on:
-      vault-bootstrap:
+      image: docker.io/tstrap:
         condition: service_completed_successfully
     networks:
       - chessguard_prod_network
@@ -238,87 +301,88 @@ services:
     restart: unless-stopped
 
   # MONITORING (Prometheus + Grafana)
-  monitoring-prometheus:
-    image: prom/prometheus:v2.54.1
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.path=/prometheus
-      - --storage.tsdb.retention.time=15d
-      - --web.external-url=https://localhost/monitoring/prometheus/
-      - --web.route-prefix=/
-    volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_prod_data:/prometheus
-    expose:
-      - "9090"
-    networks:
-      - chessguard_prod_network
-    restart: always
+  # monitoring-prometheus:
+  #   image: docker.io/prom/prometheus:v2.54.1
+  #   command:
+  #     - --config.file=/etc/prometheus/prometheus.yml
+  #     - --storage.tsdb.path=/prometheus
+  #     - --storage.tsdb.retention.time=15d
+  #     - --web.external-url=https://localhost/monitoring/prometheus/
+  #     - --web.route-prefix=/
+  #   volumes:
+  #     - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #     - prometheus_prod_data:/prometheus
+  #   expose:
+  #     - "9090"
+  #   networks:
+  #     - chessguard_prod_network
+  #   restart: always
 
-  monitoring-grafana:
-    image: grafana/grafana:11.2.2
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_SERVER_ROOT_URL: https://localhost/monitoring/grafana/
-      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
-    volumes:
-      - grafana_prod_data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
-    expose:
-      - "3000"
-    depends_on:
-      - monitoring-prometheus
-    networks:
-      - chessguard_prod_network
-    restart: always
+  # monitoring-grafana:
+  #   image: docker.io/grafana/grafana:11.2.2
+  #   environment:
+  #     GF_SECURITY_ADMIN_USER: admin
+  #     GF_SECURITY_ADMIN_PASSWORD: admin
+  #     GF_SERVER_ROOT_URL: https://localhost/monitoring/grafana/
+  #     GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+  #   volumes:
+  #     - grafana_prod_data:/var/lib/grafana
+  #     - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+  #     - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+  #   expose:
+  #     - "3000"
+  #   depends_on:
+  #     - monitoring-prometheus
+  #   networks:
+  #     - chessguard_prod_network
+  #   restart: always
 
-  monitoring-node-exporter:
-    image: prom/node-exporter:v1.8.2
-    command:
-      - --path.rootfs=/host
-    volumes:
-      - /:/host:ro
-    expose:
-      - "9100"
-    networks:
-      - chessguard_prod_network
-    restart: always
+  # monitoring-node-exporter:
+  #   image: docker.io/prom/node-exporter:v1.8.2
+  #   command:
+  #     - --path.rootfs=/host
+  #   volumes:
+  #     - /:/host:ro
+  #   expose:
+  #     - "9100"
+  #   networks:
+  #     - chessguard_prod_network
+  #   restart: always
 
-  monitoring-cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
-    privileged: true
-    devices:
-      - /dev/kmsg
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-    expose:
-      - "8080"
-    networks:
-      - chessguard_prod_network
-    restart: always
+  # monitoring-cadvisor:
+  #   image: docker.io/gcr.io/cadvisor/cadvisor:v0.49.1
+  #   privileged: true
+  #   devices:
+  #     - /dev/kmsg
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker:/var/lib/docker:ro
+  #   expose:
+  #     - "8080"
+  #   networks:
+  #     - chessguard_prod_network
+  #   restart: always
 
 # VOLUMES PERSISTANTS
 volumes:
   postgres_prod_data:
-    name: chessguard_prod_db_data
+  portainer_data:
   avatar_uploads:
-    name: chessguard_prod_avatar_uploads
-  prometheus_prod_data:
-    name: chessguard_prod_prometheus_data
-  grafana_prod_data:
-    name: chessguard_prod_grafana_data
+  # prometheus_data:
+  # grafana_data:
   waf_logs:
   vault_data:
   pg_secrets:
+  tools_secrets:
   vault_creds_auth:
+  vault_creds_friends:
   vault_creds_game:
   vault_creds_matchmaking:
+  vault_creds_status:
   vault_creds_agent_db:
+  vault_creds_agent_tools:
 
 # RÉSEAUX ISOLÉS
 networks:
