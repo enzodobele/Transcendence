@@ -4,7 +4,9 @@ NAME = chessguard
 
 # Fichiers de configuration Docker/Podman Compose 
 
-ifeq ($(shell systemctl is-active podman >/dev/null 2>&1 && echo yes),yes)
+# `podman info` also succeeds for rootless Podman, where there is no active
+# system-level podman.service/.socket for `systemctl is-active` to detect.
+ifeq ($(shell podman info >/dev/null 2>&1 && echo yes),yes)
     DOCKER := podman
     DOCKER_COMPOSE := podman compose
     COMPOSE_OVERRIDE := -f docker-compose.podman.yml
@@ -30,6 +32,7 @@ COMPOSE_PROD = $(DOCKER_COMPOSE) -f docker-compose.prod.yml $(COMPOSE_OVERRIDE) 
 SERVICE ?=
 
 .PHONY: up down rebuild restart logs ps exec db-seed db-migrate format backup restore \
+        prod-backup prod-restore \
         prod prod-down prod-rebuild prod-logs prod-ps prod-exec prod-db-seed \
 		clean fclean hclean prod-clean prod-fclean prod-hclean check-types \
 		monitoring-up monitoring-down monitoring-logs monitoring-ps \
@@ -84,13 +87,22 @@ format:
 	@$(COMPOSE_DEV) exec frontend npm run format || true
 
 backup:
-	@echo "[+] Lancement d'un backup PostgreSQL..."
-	@./scripts/backup.sh
+	@echo "[+] Backup PostgreSQL (dev)..."
+	@$(COMPOSE_DEV) exec -T backend-status npm run backup
 
 restore:
-	@if [ -z "$(FILE)" ]; then echo "Usage: make restore FILE=backups/<dump.sql.gz>"; exit 1; fi
-	@echo "[+] Restauration de la sauvegarde $(FILE)..."
-	@./scripts/restore.sh "$(FILE)"
+	@if [ -z "$(FILE)" ]; then echo "Usage: make restore FILE=<dump.sql.gz>"; exit 1; fi
+	@echo "[+] Restauration (dev) de $(FILE)..."
+	@$(COMPOSE_DEV) exec -T backend-status npm run restore -- "$(FILE)"
+
+prod-backup:
+	@echo "[+] Backup PostgreSQL (prod)..."
+	@$(COMPOSE_PROD) exec -T backend-status npm run backup
+
+prod-restore:
+	@if [ -z "$(FILE)" ]; then echo "Usage: make prod-restore FILE=<dump.sql.gz>"; exit 1; fi
+	@echo "[+] Restauration (prod) de $(FILE)..."
+	@$(COMPOSE_PROD) exec -T backend-status npm run restore -- "$(FILE)"
 
 # ENVIRONNEMENT DE PRODUCTION
 prod:
