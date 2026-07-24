@@ -7,16 +7,6 @@ export const BACKUP_STATUS_FILE = path.join(BACKUP_DIR, "backup-status.json");
 export const MAX_BACKUPS = 7;
 export const BACKUP_FILENAME_RE = /^chessguard_\d{8}_\d{6}\.sql\.gz$/;
 
-// Reduce any caller-supplied name to a bare, format-checked basename so a
-// restore request can never escape BACKUP_DIR.
-export function validateBackupFilename(file: string): string {
-  const base = path.basename(file);
-  if (!BACKUP_FILENAME_RE.test(base)) {
-    throw new Error(`Invalid backup filename: ${file}`);
-  }
-  return base;
-}
-
 // Names sort chronologically because the timestamp is zero-padded, so the
 // oldest files are the leading slice once we exceed the retention limit.
 export function selectForPruning(files: string[], max: number): string[] {
@@ -94,7 +84,7 @@ export function listBackups(): string[] {
 }
 
 export function runRestore(file: string): void {
-  const base = validateBackupFilename(file);
+  const base = path.basename(file);
   const filepath = path.join(BACKUP_DIR, base);
   if (!fs.existsSync(filepath)) throw new Error(`Backup not found: ${base}`);
 
