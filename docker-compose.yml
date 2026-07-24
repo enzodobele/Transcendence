@@ -183,7 +183,7 @@ services:
     volumes:
       - ./src/backend-status:/app
       - /app/node_modules
-      - ./backups:/backups
+      - backups_data:/backups
       - vault_creds_status:/vault/creds:ro
     environment:
       VAULT_ADDR: http://vault:8200
@@ -424,6 +424,7 @@ volumes:
   vault_data:
   pg_secrets:
   tools_secrets:
+  backups_data:
   vault_creds_auth:
   vault_creds_friends:
   vault_creds_game:

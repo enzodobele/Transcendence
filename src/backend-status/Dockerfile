@@ -29,6 +29,10 @@ COPY --chown=nodejs:nodejs --from=builder /app/src ./src
 COPY --chown=nodejs:nodejs entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
+# Named volume mounted at /backups inherits this dir's ownership when empty,
+# so the nodejs user (uid 1001) can write backups to it.
+RUN mkdir -p /backups && chown -R nodejs:nodejs /backups
+
 USER nodejs
 
 ENTRYPOINT ["/app/entrypoint.sh"]

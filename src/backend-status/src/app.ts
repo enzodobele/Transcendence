@@ -1,8 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
 import * as fs from "fs";
-import * as path from "path";
-import { execSync } from "child_process";
 import cron from "node-cron";
 import {
   Counter,
@@ -10,6 +8,7 @@ import {
   Registry,
   collectDefaultMetrics,
 } from "prom-client";
+import { runBackup, runRestore, listBackups, BACKUP_STATUS_FILE } from "./backup";
 
 
 // Configuration secrets
@@ -32,14 +31,6 @@ function readSecretFile(envVar: string): string
 }
 
 const JWT_SECRET = readSecretFile("JWT_SECRET_FILE");
-const DB_USER = readSecretFile("DB_USER_FILE");
-const DB_PASSWORD = readSecretFile("DB_PASSWORD_FILE");
-const DB_NAME = readSecretFile("DB_NAME_FILE");
-const DB_HOST = "db";
-
-const BACKUP_DIR = "/backups";
-const BACKUP_STATUS_FILE = path.join(BACKUP_DIR, "backup-status.json");
-const MAX_BACKUPS = 7;
 
 
 // Services surveillés
@@ -78,39 +69,6 @@ function requireAdmin(req: Request, res: Response, next: NextFunction): void
   {
     res.status(401).json({ error: "Token invalide" });
   }
-}
-
-
-// Backup
-
-function runBackup(): void
-{
-  if (!fs.existsSync(BACKUP_DIR))
-    fs.mkdirSync(BACKUP_DIR, { recursive: true });
-
-  const now = new Date();
-  const ts = now.toISOString().slice(0, 19).replace("T", "_").replace(/:/g, "");
-  const filename = `chessguard_${ts}.sql.gz`;
-  const filepath = path.join(BACKUP_DIR, filename);
-
-  execSync(
-    `pg_dump -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} | gzip > ${filepath}`,
-    { env: { ...process.env, PGPASSWORD: DB_PASSWORD } },
-  );
-
-  fs.writeFileSync(
-    BACKUP_STATUS_FILE,
-    JSON.stringify({ lastBackup: now.toISOString(), file: filename }, null, 2),
-  );
-
-  const files = fs
-    .readdirSync(BACKUP_DIR)
-    .filter((f) => f.endsWith(".sql.gz"))
-    .sort();
-  while (files.length > MAX_BACKUPS)
-    fs.unlinkSync(path.join(BACKUP_DIR, files.shift()!));
-
-  console.log(`[backup] Terminé : ${filename}`);
 }
 
 
@@ -218,6 +176,31 @@ app.post("/backup", requireAdmin, (_req: Request, res: Response) =>
   {
     console.error("[backup] Erreur :", err.message);
     res.status(500).json({ error: "Backup échoué", details: err.message });
+  }
+});
+
+// Admin — list restorable backups
+app.get("/backups", requireAdmin, (_req: Request, res: Response) => {
+  res.json({ backups: listBackups() });
+});
+
+// Admin — restore (destructive: requires confirm === true)
+app.post("/restore", requireAdmin, (req: Request, res: Response) => {
+  const { file, confirm } = req.body ?? {};
+  if (confirm !== true) {
+    res.status(400).json({ error: "Restore requires confirm: true" });
+    return;
+  }
+  if (typeof file !== "string" || !file) {
+    res.status(400).json({ error: "Missing 'file'" });
+    return;
+  }
+  try {
+    runRestore(file);
+    res.json({ success: true, message: `Restauré depuis ${file}` });
+  } catch (err: any) {
+    console.error("[restore] Erreur :", err.message);
+    res.status(400).json({ error: "Restore échoué", details: err.message });
   }
 });
 
